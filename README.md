@@ -6,7 +6,7 @@
 
 | id | 名称 | 版本 | 路径 | 说明 |
 | --- | --- | --- | --- | --- |
-| `virtual-intelligent-dev-team` | 虚拟智能开发团队 | `v2.5` | `virtual-intelligent-dev-team/` | 自动路由到合适技术领域智能体并组织协作交付。 |
+| `virtual-intelligent-dev-team` | 虚拟智能开发团队 | `v2.6` | `virtual-intelligent-dev-team/` | 自动路由到合适技术领域智能体并组织协作交付。 |
 
 ## 仓库结构
 

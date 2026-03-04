@@ -141,6 +141,37 @@ def detect_process_skills(
             if keyword and keyword_matches(lowered, keyword):
                 process_hits.setdefault(skill_name, []).append(keyword)
 
+    # Fallback: infer git workflow intent from common command-like expressions,
+    # even when explicit process keywords are not provided.
+    if "git-workflow" not in process_hits:
+        git_anchor = keyword_matches(lowered, "git")
+        git_action_keywords = [
+            "commit",
+            "push",
+            "branch",
+            "checkout",
+            "merge",
+            "rebase",
+            "tag",
+            "pull request",
+            "merge request",
+            "pr",
+            "mr",
+            "提交",
+            "推送",
+            "分支",
+            "合并",
+            "拉取请求",
+        ]
+        action_hits = [
+            keyword for keyword in git_action_keywords if keyword_matches(lowered, keyword)
+        ]
+        strong_action_count = len(set(action_hits))
+        if (git_anchor and strong_action_count > 0) or strong_action_count >= 2:
+            process_hits["git-workflow"] = [
+                f"fallback:{keyword}" for keyword in sorted(set(action_hits))
+            ]
+
     needs_worktree = "using-git-worktrees" in process_hits
     needs_git_workflow = "git-workflow" in process_hits
     process_skills = [

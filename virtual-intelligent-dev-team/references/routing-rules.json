@@ -1,7 +1,7 @@
 {
   "meta": {
     "author": "fxbin",
-    "version": "v2.5",
+    "version": "v2.6",
     "updated": "2026-03-04"
   },
   "thresholds": {
@@ -293,17 +293,39 @@
       { "keyword": "hotfix 并行", "score": 1 }
     ],
     "git-workflow": [
+      { "keyword": "git workflow", "score": 1 },
+      { "keyword": "git-workflow", "score": 1 },
+      { "keyword": "git flow", "score": 1 },
+      { "keyword": "git-flow", "score": 1 },
       { "keyword": "分支策略", "score": 1 },
       { "keyword": "gitflow", "score": 1 },
       { "keyword": "trunk based", "score": 1 },
+      { "keyword": "branch", "score": 1 },
+      { "keyword": "分支", "score": 1 },
       { "keyword": "提交规范", "score": 1 },
+      { "keyword": "commit", "score": 1 },
+      { "keyword": "git commit", "score": 1 },
+      { "keyword": "提交", "score": 1 },
+      { "keyword": "提交代码", "score": 1 },
+      { "keyword": "提交改动", "score": 1 },
       { "keyword": "commit message", "score": 1 },
+      { "keyword": "conventional commits", "score": 1 },
+      { "keyword": "push", "score": 1 },
+      { "keyword": "git push", "score": 1 },
+      { "keyword": "推送", "score": 1 },
+      { "keyword": "pr", "score": 1 },
       { "keyword": "pr流程", "score": 1 },
       { "keyword": "pull request", "score": 1 },
+      { "keyword": "merge request", "score": 1 },
+      { "keyword": "mr", "score": 1 },
+      { "keyword": "拉取请求", "score": 1 },
       { "keyword": "pr 流程", "score": 1 },
+      { "keyword": "checkout", "score": 1 },
       { "keyword": "merge", "score": 1 },
       { "keyword": "rebase", "score": 1 },
       { "keyword": "release", "score": 1 },
+      { "keyword": "发版", "score": 1 },
+      { "keyword": "发布", "score": 1 },
       { "keyword": "tag", "score": 1 }
     ]
   }

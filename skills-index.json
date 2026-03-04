@@ -6,7 +6,7 @@
     {
       "id": "virtual-intelligent-dev-team",
       "display_name": "虚拟智能开发团队",
-      "version": "v2.5",
+      "version": "v2.6",
       "path": "virtual-intelligent-dev-team",
       "positioning": "personal-skill",
       "default_prompt": "Use $virtual-intelligent-dev-team to auto-route this request to the right specialist agents and coordinate a complete team workflow.",
