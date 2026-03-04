@@ -1,0 +1,5 @@
+interface:
+  display_name: "虚拟智能开发团队"
+  short_description: "Auto-route tasks to the right specialist agents as a full team."
+  default_prompt: "Use $virtual-intelligent-dev-team to auto-route this request to the right specialist agents and coordinate a complete team workflow."
+

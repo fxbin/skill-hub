@@ -1,0 +1,22 @@
+{
+  "repository": "skill-hub",
+  "owner": "fxbin",
+  "updated_at": "2026-03-04",
+  "skills": [
+    {
+      "id": "virtual-intelligent-dev-team",
+      "display_name": "虚拟智能开发团队",
+      "version": "v2.5",
+      "path": "virtual-intelligent-dev-team",
+      "positioning": "personal-skill",
+      "default_prompt": "Use $virtual-intelligent-dev-team to auto-route this request to the right specialist agents and coordinate a complete team workflow.",
+      "tags": [
+        "development",
+        "multi-agent",
+        "routing",
+        "java",
+        "architecture"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,310 @@
+{
+  "meta": {
+    "author": "fxbin",
+    "version": "v2.5",
+    "updated": "2026-03-04"
+  },
+  "thresholds": {
+    "max_agent_score": 20,
+    "high_confidence": 0.55,
+    "medium_confidence": 0.35,
+    "sentinel_overlay_threshold": 6
+  },
+  "default_process_lead_agent": "Technical Trinity",
+  "default_unknown_lead_agent": "Technical Trinity",
+  "agent_order": [
+    "Java Virtuoso",
+    "Sentinel Architect (NB)",
+    "Technical Trinity",
+    "Code Audit Council",
+    "Omni-Architect",
+    "Executive Trinity",
+    "World-Class Product Architect"
+  ],
+  "agent_rules": {
+    "Java Virtuoso": {
+      "positive": [
+        { "keyword": "java", "score": 5 },
+        { "keyword": "jdk", "score": 5 },
+        { "keyword": "jvm", "score": 5 },
+        { "keyword": "spring", "score": 5 },
+        { "keyword": "spring boot", "score": 5 },
+        { "keyword": "virtual thread", "score": 4 },
+        { "keyword": "loom", "score": 4 },
+        { "keyword": "gc", "score": 4 },
+        { "keyword": "full gc", "score": 4 },
+        { "keyword": "zgc", "score": 4 },
+        { "keyword": "g1", "score": 4 },
+        { "keyword": "java 8", "score": 5 },
+        { "keyword": "migration", "score": 5 }
+      ],
+      "negative": [
+        { "keyword": "前端", "score": 3 },
+        { "keyword": "ui", "score": 3 },
+        { "keyword": "ux", "score": 3 },
+        { "keyword": "tailwind", "score": 3 },
+        { "keyword": "商业模式", "score": 4 },
+        { "keyword": "融资", "score": 4 },
+        { "keyword": "python", "score": 3 },
+        { "keyword": "golang", "score": 3 },
+        { "keyword": "node", "score": 3 },
+        { "keyword": "node.js", "score": 3 },
+        { "keyword": "fastapi", "score": 3 },
+        { "keyword": "django", "score": 3 },
+        { "keyword": "flask", "score": 3 },
+        { "keyword": "nestjs", "score": 3 },
+        { "keyword": "express", "score": 3 },
+        { "keyword": "rust", "score": 3 },
+        { "keyword": "cargo", "score": 3 },
+        { "keyword": "tokio", "score": 3 },
+        { "keyword": "actix", "score": 3 },
+        { "keyword": "axum", "score": 3 }
+      ]
+    },
+    "Sentinel Architect (NB)": {
+      "positive": [
+        { "keyword": "高风险", "score": 6 },
+        { "keyword": "核心模块", "score": 6 },
+        { "keyword": "生产故障", "score": 6 },
+        { "keyword": "先调研再执行", "score": 6 },
+        { "keyword": "计划审批", "score": 6 },
+        { "keyword": "research", "score": 5 },
+        { "keyword": "innovate", "score": 5 },
+        { "keyword": "plan", "score": 5 },
+        { "keyword": "execute", "score": 5 },
+        { "keyword": "review", "score": 5 },
+        { "keyword": "hot-fix", "score": 5 },
+        { "keyword": "mission critical", "score": 5 },
+        { "keyword": "零容错", "score": 5 }
+      ],
+      "negative": []
+    },
+    "Technical Trinity": {
+      "positive": [
+        { "keyword": "架构设计", "score": 5 },
+        { "keyword": "系统设计", "score": 5 },
+        { "keyword": "技术选型", "score": 5 },
+        { "keyword": "可扩展", "score": 4 },
+        { "keyword": "高并发", "score": 4 },
+        { "keyword": "云原生", "score": 4 },
+        { "keyword": "devsecops", "score": 4 },
+        { "keyword": "owasp", "score": 4 },
+        { "keyword": "sre", "score": 4 },
+        { "keyword": "重构", "score": 4 },
+        { "keyword": "技术债", "score": 4 },
+        { "keyword": "python", "score": 5 },
+        { "keyword": "django", "score": 5 },
+        { "keyword": "flask", "score": 5 },
+        { "keyword": "fastapi", "score": 5 },
+        { "keyword": "celery", "score": 4 },
+        { "keyword": "golang", "score": 5 },
+        { "keyword": "gin", "score": 5 },
+        { "keyword": "fiber", "score": 5 },
+        { "keyword": "go kit", "score": 4 },
+        { "keyword": "node", "score": 5 },
+        { "keyword": "node.js", "score": 5 },
+        { "keyword": "express", "score": 5 },
+        { "keyword": "nestjs", "score": 5 },
+        { "keyword": "koa", "score": 4 },
+        { "keyword": "typescript backend", "score": 4 },
+        { "keyword": "npm", "score": 3 },
+        { "keyword": "rust", "score": 5 },
+        { "keyword": "cargo", "score": 5 },
+        { "keyword": "tokio", "score": 5 },
+        { "keyword": "actix", "score": 5 },
+        { "keyword": "axum", "score": 5 },
+        { "keyword": "warp", "score": 4 },
+        { "keyword": "rocket", "score": 4 },
+        { "keyword": "serde", "score": 4 }
+      ],
+      "negative": []
+    },
+    "Code Audit Council": {
+      "positive": [
+        { "keyword": "code review", "score": 6 },
+        { "keyword": "审计", "score": 6 },
+        { "keyword": "代码审查", "score": 6 },
+        { "keyword": "漏洞", "score": 6 },
+        { "keyword": "安全检查", "score": 6 },
+        { "keyword": "sql 注入", "score": 6 },
+        { "keyword": "xss", "score": 6 },
+        { "keyword": "idor", "score": 6 },
+        { "keyword": "pr 前检查", "score": 5 },
+        { "keyword": "合入前检查", "score": 5 },
+        { "keyword": "性能瓶颈", "score": 4 },
+        { "keyword": "n+1", "score": 4 },
+        { "keyword": "可读性", "score": 4 }
+      ],
+      "negative": [
+        { "keyword": "商业模式", "score": 4 },
+        { "keyword": "融资", "score": 4 },
+        { "keyword": "定价", "score": 3 }
+      ]
+    },
+    "Omni-Architect": {
+      "positive": [
+        { "keyword": "陌生行业", "score": 6 },
+        { "keyword": "跨行业", "score": 6 },
+        { "keyword": "领域约束", "score": 6 },
+        { "keyword": "医疗", "score": 5 },
+        { "keyword": "金融", "score": 5 },
+        { "keyword": "交通", "score": 5 },
+        { "keyword": "农业", "score": 5 },
+        { "keyword": "工业", "score": 5 },
+        { "keyword": "合规", "score": 5 },
+        { "keyword": "hipaa", "score": 5 },
+        { "keyword": "gdpr", "score": 5 },
+        { "keyword": "basel", "score": 5 },
+        { "keyword": "0-1", "score": 5 },
+        { "keyword": "售前方案", "score": 5 },
+        { "keyword": "蓝图", "score": 5 }
+      ],
+      "negative": [
+        { "keyword": "hello world", "score": 4 },
+        { "keyword": "简单脚本", "score": 3 }
+      ]
+    },
+    "Executive Trinity": {
+      "positive": [
+        { "keyword": "商业模式", "score": 6 },
+        { "keyword": "战略", "score": 6 },
+        { "keyword": "增长", "score": 6 },
+        { "keyword": "融资", "score": 6 },
+        { "keyword": "tam", "score": 5 },
+        { "keyword": "moat", "score": 5 },
+        { "keyword": "ltv", "score": 5 },
+        { "keyword": "cac", "score": 5 },
+        { "keyword": "churn", "score": 5 },
+        { "keyword": "定价", "score": 5 },
+        { "keyword": "竞争策略", "score": 5 },
+        { "keyword": "go no-go", "score": 5 },
+        { "keyword": "运营效率", "score": 4 },
+        { "keyword": "单位经济模型", "score": 4 }
+      ],
+      "negative": [
+        { "keyword": "java", "score": 3 },
+        { "keyword": "spring", "score": 3 },
+        { "keyword": "jvm", "score": 4 },
+        { "keyword": "gc", "score": 4 },
+        { "keyword": "react", "score": 2 }
+      ]
+    },
+    "World-Class Product Architect": {
+      "positive": [
+        { "keyword": "前端", "score": 6 },
+        { "keyword": "ui", "score": 6 },
+        { "keyword": "ux", "score": 6 },
+        { "keyword": "交互", "score": 6 },
+        { "keyword": "react", "score": 5 },
+        { "keyword": "next.js", "score": 5 },
+        { "keyword": "tailwind", "score": 5 },
+        { "keyword": "shadcn", "score": 5 },
+        { "keyword": "动效", "score": 4 },
+        { "keyword": "framer motion", "score": 4 },
+        { "keyword": "组件化", "score": 4 },
+        { "keyword": "页面改版", "score": 4 },
+        { "keyword": "仪表盘", "score": 4 },
+        { "keyword": "可访问性", "score": 4 }
+      ],
+      "negative": [
+        { "keyword": "jvm", "score": 4 },
+        { "keyword": "gc", "score": 4 },
+        { "keyword": "java 8", "score": 4 },
+        { "keyword": "spring boot", "score": 4 },
+        { "keyword": "融资", "score": 3 }
+      ]
+    }
+  },
+  "language_profiles": {
+    "python": {
+      "lead_agent": "Technical Trinity",
+      "keywords": [
+        "python",
+        "django",
+        "flask",
+        "fastapi",
+        "celery",
+        "gunicorn",
+        "uvicorn",
+        "pydantic"
+      ]
+    },
+    "go": {
+      "lead_agent": "Technical Trinity",
+      "bare_keyword": "go",
+      "context_keywords": [
+        "backend",
+        "api",
+        "service",
+        "server",
+        "gateway",
+        "microservice",
+        "grpc",
+        "后端",
+        "接口",
+        "服务",
+        "网关"
+      ],
+      "keywords": [
+        "go语言",
+        "golang",
+        "gin",
+        "fiber",
+        "go kit",
+        "gorm",
+        "grpc-go"
+      ]
+    },
+    "nodejs": {
+      "lead_agent": "Technical Trinity",
+      "keywords": [
+        "node",
+        "node.js",
+        "express",
+        "nestjs",
+        "koa",
+        "pm2",
+        "ts-node",
+        "typescript backend"
+      ]
+    },
+    "rust": {
+      "lead_agent": "Technical Trinity",
+      "keywords": [
+        "rust",
+        "cargo",
+        "tokio",
+        "actix",
+        "axum",
+        "warp",
+        "rocket",
+        "serde"
+      ]
+    }
+  },
+  "process_skill_rules": {
+    "using-git-worktrees": [
+      { "keyword": "worktree", "score": 1 },
+      { "keyword": "git worktree", "score": 1 },
+      { "keyword": "并行开发", "score": 1 },
+      { "keyword": "隔离改动", "score": 1 },
+      { "keyword": "多分支并行", "score": 1 },
+      { "keyword": "同仓多任务", "score": 1 },
+      { "keyword": "hotfix 并行", "score": 1 }
+    ],
+    "git-workflow": [
+      { "keyword": "分支策略", "score": 1 },
+      { "keyword": "gitflow", "score": 1 },
+      { "keyword": "trunk based", "score": 1 },
+      { "keyword": "提交规范", "score": 1 },
+      { "keyword": "commit message", "score": 1 },
+      { "keyword": "pr流程", "score": 1 },
+      { "keyword": "pull request", "score": 1 },
+      { "keyword": "pr 流程", "score": 1 },
+      { "keyword": "merge", "score": 1 },
+      { "keyword": "rebase", "score": 1 },
+      { "keyword": "release", "score": 1 },
+      { "keyword": "tag", "score": 1 }
+    ]
+  }
+}
