@@ -27,31 +27,37 @@
 - 执行要点：确认当前分支、工作区、远端同步状态。
 - 通过条件：分支明确、工作区状态明确、无未知来源改动。
 - 失败处理：立即停止，先处理脏工作区或分支错误。
+- 校验命令：`python scripts/git_workflow_guardrail.py --repo . --stage G0 --pretty`
 
 2. `G1 暂存`
 - 执行要点：仅暂存当前任务相关文件。
 - 通过条件：暂存集与任务范围一致，不混入无关文件。
 - 失败处理：立即停止，回到变更筛选。
+- 校验命令：`python scripts/git_workflow_guardrail.py --repo . --stage G1 --pretty`
 
 3. `G2 提交`
 - 执行要点：单一意图提交，提交信息使用语义前缀 + 中文摘要。
 - 通过条件：一次提交只表达一个变更意图。
 - 失败处理：立即停止，拆分提交后重试。
+- 校验命令：`python scripts/git_workflow_guardrail.py --repo . --stage G2 --commit-message "fix: 修复 xxx" --pretty`
 
 4. `G3 同步`
 - 执行要点：与目标基线分支同步，优先小步解决冲突。
 - 通过条件：本地分支与远端关系清晰，可安全继续推送。
 - 失败处理：出现冲突、非快进失败、远端拒绝时立即停止并请求人工决策。
+- 校验命令：`python scripts/git_workflow_guardrail.py --repo . --stage G3 --pretty`
 
 5. `G4 推送/PR`
 - 执行要点：推送分支并按门禁发起评审流程。
 - 通过条件：推送成功，PR 信息完整，门禁策略明确。
 - 失败处理：权限不足或策略阻断时停止并反馈阻塞点。
+- 校验命令：`python scripts/git_workflow_guardrail.py --repo . --stage G4 --pretty`
 
 ## 低模型稳定性约束
 
 - 禁止跳步执行，必须从 `G0` 顺序推进到 `G4`。
 - 每一步都要给出“是否通过 + 原因”。
+- 每一步都要先过 `git_workflow_guardrail.py` 的对应阶段校验。
 - 未经用户明确授权，禁止执行危险命令：
   - `git reset --hard`
   - `git clean -fd`

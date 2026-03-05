@@ -112,6 +112,9 @@ Read `references/using-git-worktrees-playbook.md` when request hits parallel dev
 2. 内置 `git-workflow` 手册  
 Read `references/git-workflow-playbook.md` when request needs branch policy, commit convention, PR gate, and release cadence.
 
+3. 内置 `git_workflow_guardrail` 校验器  
+Run `scripts/git_workflow_guardrail.py` when you need deterministic G0-G4 checks before each Git operation step.
+
 ## 低智能模型稳定性护栏（Git 专项）
 
 当请求触发 Git 流程时，主责智能体必须执行以下硬约束：
@@ -122,6 +125,7 @@ Read `references/git-workflow-playbook.md` when request needs branch policy, com
 4. 禁止自动执行危险命令：`git reset --hard`、`git clean -fd`、`git push --force`（除非用户明确授权）。
 5. 提交必须满足最小粒度：一次提交只承载单一意图。
 6. 提交信息必须包含类型前缀与中文摘要，例如 `fix: 修复 xxx`。
+7. 执行 Git 步骤前必须运行 `scripts/git_workflow_guardrail.py` 对应阶段校验，未通过不得继续。
 
 ## 协作执行流程
 

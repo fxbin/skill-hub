@@ -268,12 +268,17 @@ def build_process_plan(needs_worktree: bool, needs_git_workflow: bool) -> list[d
                     "G4 推送/PR：推送分支并按门禁发起评审",
                 ],
                 "commands": [
+                    "python scripts/git_workflow_guardrail.py --repo . --stage G0 --pretty",
                     "git status --short --branch",
                     "git checkout -b feature/<task>",
+                    "python scripts/git_workflow_guardrail.py --repo . --stage G1 --pretty",
                     "git add <files>",
+                    "python scripts/git_workflow_guardrail.py --repo . --stage G2 --commit-message \"feat: <summary>\" --pretty",
                     "git commit -m \"feat: <summary>\"",
                     "git pull --rebase origin <base-branch>",
+                    "python scripts/git_workflow_guardrail.py --repo . --stage G3 --pretty",
                     "git push -u origin feature/<task>",
+                    "python scripts/git_workflow_guardrail.py --repo . --stage G4 --pretty",
                 ],
             }
         )
