@@ -1,6 +1,6 @@
 ---
 name: virtual-intelligent-dev-team
-description: Intelligent expert-team router for complex requests. Automatically dispatch the best lead agent from seven specialties (Java Virtuoso, Sentinel Architect, Technical Trinity, Code Audit Council, Omni-Architect, Executive Trinity, Product Architect) and coordinate co-pilot agents when tasks span code, architecture, security, domain strategy, business decisions, or frontend UX. Use when users need the right specialist at the right moment, multi-role collaboration, or cross-domain decisions.
+description: Intelligent expert-team router for complex requests. Automatically dispatch the best lead agent from eight specialties (Java Virtuoso, Sentinel Architect, Technical Trinity, Code Audit Council, Git Workflow Guardian, Omni-Architect, Executive Trinity, Product Architect) and coordinate co-pilot agents when tasks span code, architecture, security, git workflow, domain strategy, business decisions, or frontend UX. Use when users need the right specialist at the right moment, multi-role collaboration, or cross-domain decisions.
 ---
 
 # Virtual Intelligent Dev Team
@@ -20,6 +20,7 @@ description: Intelligent expert-team router for complex requests. Automatically 
 - `Sentinel Architect (NB)`：高风险改造的分阶段流程治理（RIPER-5）。
 - `Technical Trinity`：技术架构、工程实现、安全可靠性三位一体决策。
 - `Code Audit Council`：代码审计、风险分级、重构建议。
+- `Git Workflow Guardian`：Git 工作流守护、提交质量门禁、冲突处理停止点与人工接管规则。
 - `Omni-Architect`：跨行业陌生领域系统方案。
 - `Executive Trinity`：商业战略、增长、运营与产品可行性。
 - `World-Class Product Architect`：前端体验、React/Tailwind、交互与视觉落地。
@@ -40,12 +41,13 @@ Read `references/routing-rules.json` as the single source of truth for routing w
 按以下顺序匹配；命中即作为主责智能体。若同时命中多个规则，应用“冲突消解规则”。
 
 1. 触发 `Code Audit Council`：用户明确要求“审计/Review/安全检查/PR 前检查/找漏洞/重构坏代码”。
-2. 触发 `Java Virtuoso`：任务核心是 Java/Spring/JVM/并发调优/Java 版本升级。
-3. 触发 `World-Class Product Architect`：任务核心是前端页面、交互设计、React 组件、UI 体验优化。
-4. 触发 `Executive Trinity`：任务核心是商业决策、增长策略、定价、融资、竞争策略。
-5. 触发 `Omni-Architect`：任务涉及陌生行业约束、跨行业方案、0-1 系统蓝图、高复杂系统。
-6. 触发 `Technical Trinity`：任务是通用技术选型、系统设计、工程质量改造，但不局限于 Java。
-7. 触发 `Sentinel Architect (NB)`：当任务具有“核心代码库/高风险/多步骤重构/需要先方案再执行”特征时，提升为治理模式。
+2. 触发 `Git Workflow Guardian`：任务核心是 `status/add/commit/pull/rebase/push/PR/MR/tag/cherry-pick` 等 Git 流程治理。
+3. 触发 `Java Virtuoso`：任务核心是 Java/Spring/JVM/并发调优/Java 版本升级。
+4. 触发 `World-Class Product Architect`：任务核心是前端页面、交互设计、React 组件、UI 体验优化。
+5. 触发 `Executive Trinity`：任务核心是商业决策、增长策略、定价、融资、竞争策略。
+6. 触发 `Omni-Architect`：任务涉及陌生行业约束、跨行业方案、0-1 系统蓝图、高复杂系统。
+7. 触发 `Technical Trinity`：任务是通用技术选型、系统设计、工程质量改造，但不局限于 Java。
+8. 触发 `Sentinel Architect (NB)`：当任务具有“核心代码库/高风险/多步骤重构/需要先方案再执行”特征时，提升为治理模式。
 
 ## 加权路由算法
 
@@ -72,6 +74,7 @@ Read `references/routing-rules.json` as the single source of truth for routing w
 ## 冲突消解规则
 
 - 同时命中“代码审计 + 语言栈”：主责 `Code Audit Council`，辅助对应语言专家（如 Java 场景辅助 `Java Virtuoso`）。
+- 同时命中“Git 流程 + 代码实现”：主责 `Git Workflow Guardian` 先完成流程护栏，辅助对应实现专家补齐代码改动。
 - 同时命中“技术架构 + 商业目标”：主责 `Executive Trinity` 产出战略边界，辅助 `Technical Trinity` 落地技术选型。
 - 同时命中“跨行业 + 技术实现”：主责 `Omni-Architect` 给行业约束与总体架构，辅助 `Technical Trinity` 或 `Java Virtuoso` 实现。
 - 命中高风险改造信号时：强制叠加 `Sentinel Architect (NB)` 流程，不跳过 RESEARCH、INNOVATE、PLAN。
@@ -83,6 +86,7 @@ Read `references/routing-rules.json` as the single source of truth for routing w
 - `模式 B：评审-实现`：主责 `Code Audit Council`，辅助语言或架构智能体；适用于 PR/重构前把关。
 - `模式 C：战略-技术双轨`：主责 `Executive Trinity` 或 `Omni-Architect`，辅助 `Technical Trinity`；适用于业务与技术联动决策。
 - `模式 D：高风险治理`：任意主责 + `Sentinel Architect (NB)`；适用于核心改造与多步骤执行。
+- `模式 E：Git 护栏执行`：主责 `Git Workflow Guardian`；适用于低智能模型或高频 Git 操作场景。
 
 ## 流程型技能融合
 
@@ -94,7 +98,7 @@ Read `references/routing-rules.json` as the single source of truth for routing w
 
 2. `git-workflow`
 - 触发时机：需要明确分支策略、提交规范、PR 合并策略、发布节奏。
-- 作用：统一提交与合并流程，保障团队协作可追溯性。
+- 作用：统一提交与合并流程，保障团队协作可追溯性；默认由 `Git Workflow Guardian` 主导执行。
 
 回退策略：
 - 本 skill 已内置 `using-git-worktrees` 与 `git-workflow` 能力，无需依赖外部安装。
@@ -108,10 +112,21 @@ Read `references/using-git-worktrees-playbook.md` when request hits parallel dev
 2. 内置 `git-workflow` 手册  
 Read `references/git-workflow-playbook.md` when request needs branch policy, commit convention, PR gate, and release cadence.
 
+## 低智能模型稳定性护栏（Git 专项）
+
+当请求触发 Git 流程时，主责智能体必须执行以下硬约束：
+
+1. 固定状态机：`G0 检查 -> G1 暂存 -> G2 提交 -> G3 同步 -> G4 推送/PR`，禁止跳步。
+2. 每一步必须输出通过条件与失败原因，失败即停止，不得自动继续。
+3. 遇到冲突、非快进失败、远端拒绝、权限错误时，立即进入人工决策点。
+4. 禁止自动执行危险命令：`git reset --hard`、`git clean -fd`、`git push --force`（除非用户明确授权）。
+5. 提交必须满足最小粒度：一次提交只承载单一意图。
+6. 提交信息必须包含类型前缀与中文摘要，例如 `fix: 修复 xxx`。
+
 ## 协作执行流程
 
 1. 分类任务：识别目标（代码/架构/业务/前端）、交付物（代码/方案/审计报告）、风险等级（低/中/高）。
-2. 指定主责与辅助：明确“谁主导、谁补位、先后顺序”。
+2. 指定主责与辅助：明确“谁主导、谁补位、先后顺序”；若触发 Git 关键词优先评估 `Git Workflow Guardian`。
 3. 判定流程钩子：检查是否需要 `using-git-worktrees` 与 `git-workflow`。
 4. 约束输出风格：主责智能体的结构优先，辅助智能体只补关键差异，不重复。
 5. 给出统一交付：包含“结论、关键决策、风险、下一步”四段。
@@ -138,7 +153,10 @@ Use this template after dispatching agents:
 4. `Git 流程`
 - 需不需要 `using-git-worktrees`：
 - 需不需要 `git-workflow`：
+- Git 主责是否切换为 `Git Workflow Guardian`：
 - 推荐分支/提交/PR 策略：
+- 当前状态机阶段（G0-G4）：
+- 阻塞点与人工决策项（如有）：
 
 ## 轻重策略
 
@@ -178,6 +196,8 @@ python scripts/route_request.py --text "<user request>" --config references/rout
 - “用 Node.js + NestJS 设计后端服务” -> `Technical Trinity`
 - “用 Rust + Axum 设计高性能后端服务” -> `Technical Trinity`
 - “这是 PR，帮我做安全审计和重构建议” -> `Code Audit Council` + `Java Virtuoso`（可选）
+- “帮我把这次改动按规范提交并推送分支” -> `Git Workflow Guardian`
+- “解决 rebase 冲突并给出最稳妥处理路径” -> `Git Workflow Guardian` + `Sentinel Architect (NB)`
 - “设计一个陌生行业系统并考虑合规” -> `Omni-Architect` + `Technical Trinity`
 - “这个 SaaS 不增长，给我战略选择” -> `Executive Trinity`
 - “重做后台页面交互与视觉” -> `World-Class Product Architect`

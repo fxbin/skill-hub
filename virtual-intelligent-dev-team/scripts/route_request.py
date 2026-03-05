@@ -261,20 +261,33 @@ def build_process_plan(needs_worktree: bool, needs_git_workflow: bool) -> list[d
                 "skill": "git-workflow",
                 "reference": "references/git-workflow-playbook.md",
                 "steps": [
-                    "确认分支模型（main/develop/feature/fix/hotfix）",
-                    "按语义规范提交 commit message",
-                    "按 PR 门禁完成评审后合并",
-                    "发布时打 tag 并记录版本",
+                    "G0 检查：确认分支、工作区、远端状态",
+                    "G1 暂存：仅暂存本次任务必需改动",
+                    "G2 提交：按语义前缀提交单一意图变更",
+                    "G3 同步：与远端同步并处理冲突",
+                    "G4 推送/PR：推送分支并按门禁发起评审",
                 ],
                 "commands": [
+                    "git status --short --branch",
                     "git checkout -b feature/<task>",
+                    "git add <files>",
                     "git commit -m \"feat: <summary>\"",
+                    "git pull --rebase origin <base-branch>",
                     "git push -u origin feature/<task>",
-                    "git tag v<major>.<minor>.<patch>",
                 ],
             }
         )
     return plan
+
+
+def pick_process_lead_agent(process_skills: list[str], config: dict[str, object]) -> str:
+    mapping = config.get("process_skill_lead_agents", {})
+    if isinstance(mapping, dict):
+        for skill in process_skills:
+            candidate = mapping.get(skill)
+            if isinstance(candidate, str) and candidate.strip():
+                return candidate
+    return str(config.get("default_process_lead_agent", "Technical Trinity"))
 
 
 def pick_mode(
@@ -332,8 +345,7 @@ def route_request(text: str, config: dict[str, object]) -> dict[str, object]:
     language_only = lead_score == 0 and len(process_skills) == 0 and len(detected_languages) > 0
     unknown_only = lead_score == 0 and len(process_skills) == 0 and len(detected_languages) == 0
     if process_only:
-        default_lead = str(config.get("default_process_lead_agent", "Technical Trinity"))
-        lead_agent = default_lead
+        lead_agent = pick_process_lead_agent(process_skills=process_skills, config=config)
         lead_score = scores.get(lead_agent, 0)
     elif language_only:
         lead_agent = language_routing.get(detected_languages[0], "Technical Trinity")

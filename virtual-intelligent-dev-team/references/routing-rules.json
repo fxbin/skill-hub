@@ -1,8 +1,8 @@
 {
   "meta": {
     "author": "fxbin",
-    "version": "v2.6",
-    "updated": "2026-03-04"
+    "version": "v2.7",
+    "updated": "2026-03-05"
   },
   "thresholds": {
     "max_agent_score": 20,
@@ -10,13 +10,18 @@
     "medium_confidence": 0.35,
     "sentinel_overlay_threshold": 6
   },
-  "default_process_lead_agent": "Technical Trinity",
+  "default_process_lead_agent": "Git Workflow Guardian",
   "default_unknown_lead_agent": "Technical Trinity",
+  "process_skill_lead_agents": {
+    "git-workflow": "Git Workflow Guardian",
+    "using-git-worktrees": "Git Workflow Guardian"
+  },
   "agent_order": [
     "Java Virtuoso",
     "Sentinel Architect (NB)",
     "Technical Trinity",
     "Code Audit Council",
+    "Git Workflow Guardian",
     "Omni-Architect",
     "Executive Trinity",
     "World-Class Product Architect"
@@ -139,6 +144,46 @@
         { "keyword": "商业模式", "score": 4 },
         { "keyword": "融资", "score": 4 },
         { "keyword": "定价", "score": 3 }
+      ]
+    },
+    "Git Workflow Guardian": {
+      "positive": [
+        { "keyword": "git workflow", "score": 7 },
+        { "keyword": "git-workflow", "score": 7 },
+        { "keyword": "git flow", "score": 6 },
+        { "keyword": "git-flow", "score": 6 },
+        { "keyword": "git", "score": 4 },
+        { "keyword": "status", "score": 4 },
+        { "keyword": "add", "score": 4 },
+        { "keyword": "commit", "score": 5 },
+        { "keyword": "push", "score": 5 },
+        { "keyword": "pull", "score": 4 },
+        { "keyword": "branch", "score": 4 },
+        { "keyword": "checkout", "score": 4 },
+        { "keyword": "merge", "score": 4 },
+        { "keyword": "rebase", "score": 5 },
+        { "keyword": "cherry-pick", "score": 5 },
+        { "keyword": "tag", "score": 4 },
+        { "keyword": "stash", "score": 4 },
+        { "keyword": "pr", "score": 5 },
+        { "keyword": "mr", "score": 5 },
+        { "keyword": "pull request", "score": 5 },
+        { "keyword": "merge request", "score": 5 },
+        { "keyword": "提交", "score": 5 },
+        { "keyword": "推送", "score": 5 },
+        { "keyword": "分支", "score": 4 },
+        { "keyword": "合并", "score": 4 },
+        { "keyword": "冲突", "score": 5 },
+        { "keyword": "回滚", "score": 5 },
+        { "keyword": "提交信息", "score": 5 }
+      ],
+      "negative": [
+        { "keyword": "商业模式", "score": 4 },
+        { "keyword": "融资", "score": 4 },
+        { "keyword": "定价", "score": 3 },
+        { "keyword": "ui", "score": 3 },
+        { "keyword": "ux", "score": 3 },
+        { "keyword": "react", "score": 3 }
       ]
     },
     "Omni-Architect": {
@@ -326,7 +371,14 @@
       { "keyword": "release", "score": 1 },
       { "keyword": "发版", "score": 1 },
       { "keyword": "发布", "score": 1 },
-      { "keyword": "tag", "score": 1 }
+      { "keyword": "tag", "score": 1 },
+      { "keyword": "status", "score": 1 },
+      { "keyword": "add", "score": 1 },
+      { "keyword": "cherry-pick", "score": 1 },
+      { "keyword": "stash", "score": 1 },
+      { "keyword": "冲突", "score": 1 },
+      { "keyword": "回滚", "score": 1 },
+      { "keyword": "提交信息", "score": 1 }
     ]
   }
 }
