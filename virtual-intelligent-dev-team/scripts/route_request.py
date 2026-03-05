@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 from pathlib import Path
 
 
@@ -234,7 +235,65 @@ def detect_languages(
     return detected_languages, language_hits, language_routing
 
 
-def build_process_plan(needs_worktree: bool, needs_git_workflow: bool) -> list[dict[str, object]]:
+def detect_repo_strategy(repo_path: Path) -> dict[str, str]:
+    default = {"strategy": "unknown", "base_branch": "main"}
+    cmd = [
+        "git",
+        "-C",
+        str(repo_path),
+        "for-each-ref",
+        "--format=%(refname:short)",
+        "refs/heads",
+    ]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
+    except Exception:
+        return default
+    if proc.returncode != 0:
+        return default
+
+    branches = {line.strip() for line in (proc.stdout or "").splitlines() if line.strip()}
+    has_main = "main" in branches
+    has_master = "master" in branches
+    has_develop = "develop" in branches
+
+    if has_develop and (has_main or has_master):
+        return {"strategy": "git-flow-lite", "base_branch": "main" if has_main else "master"}
+    if has_main:
+        return {"strategy": "trunk-main", "base_branch": "main"}
+    if has_master:
+        return {"strategy": "trunk-master", "base_branch": "master"}
+    if has_develop:
+        return {"strategy": "develop-only", "base_branch": "develop"}
+    return default
+
+
+def build_git_templates(repo_strategy: dict[str, str]) -> dict[str, object]:
+    strategy = repo_strategy.get("strategy", "unknown")
+    base_branch = repo_strategy.get("base_branch", "main")
+    branch_prefix = "feature" if strategy == "git-flow-lite" else "feat"
+    return {
+        "branch_name": f"{branch_prefix}/<ticket>-<summary>",
+        "commit_message": "fix: 修复 <模块> 的 <问题>",
+        "pr_title": "fix: <模块> - <变更摘要>",
+        "pr_sections": ["背景", "改动点", "风险与回滚", "验证结果"],
+        "base_branch": base_branch,
+    }
+
+
+def build_auto_execute_policy() -> dict[str, str]:
+    return {
+        "low_risk": "auto_execute",
+        "medium_risk": "confirm_before_execute",
+        "high_risk": "must_confirm_and_explain_risk",
+    }
+
+
+def build_process_plan(
+    needs_worktree: bool,
+    needs_git_workflow: bool,
+    repo_strategy: dict[str, str],
+) -> list[dict[str, object]]:
     plan: list[dict[str, object]] = []
     if needs_worktree:
         plan.append(
@@ -256,11 +315,13 @@ def build_process_plan(needs_worktree: bool, needs_git_workflow: bool) -> list[d
             }
         )
     if needs_git_workflow:
+        templates = build_git_templates(repo_strategy)
         plan.append(
             {
                 "skill": "git-workflow",
                 "reference": "references/git-workflow-playbook.md",
                 "steps": [
+                    "R0 画像：识别仓库分支策略与基线分支",
                     "G0 检查：确认分支、工作区、远端状态",
                     "G1 暂存：仅暂存本次任务必需改动",
                     "G2 提交：按语义前缀提交单一意图变更",
@@ -268,17 +329,27 @@ def build_process_plan(needs_worktree: bool, needs_git_workflow: bool) -> list[d
                     "G4 推送/PR：推送分支并按门禁发起评审",
                 ],
                 "commands": [
+                    "python scripts/git_workflow_guardrail.py --repo . --detect-repo-strategy --print-templates --pretty",
                     "python scripts/git_workflow_guardrail.py --repo . --stage G0 --pretty",
                     "git status --short --branch",
-                    "git checkout -b feature/<task>",
+                    f"git checkout -b {templates['branch_name']}",
                     "python scripts/git_workflow_guardrail.py --repo . --stage G1 --pretty",
                     "git add <files>",
-                    "python scripts/git_workflow_guardrail.py --repo . --stage G2 --commit-message \"feat: <summary>\" --pretty",
-                    "git commit -m \"feat: <summary>\"",
-                    "git pull --rebase origin <base-branch>",
+                    f"python scripts/git_workflow_guardrail.py --repo . --stage G2 --commit-message \"{templates['commit_message']}\" --pretty",
+                    f"git commit -m \"{templates['commit_message']}\"",
+                    f"git pull --rebase origin {templates['base_branch']}",
                     "python scripts/git_workflow_guardrail.py --repo . --stage G3 --pretty",
-                    "git push -u origin feature/<task>",
+                    f"git push -u origin {templates['branch_name']}",
                     "python scripts/git_workflow_guardrail.py --repo . --stage G4 --pretty",
+                ],
+                "auto_execute_policy": build_auto_execute_policy(),
+                "repo_strategy": repo_strategy,
+                "templates": templates,
+                "kpis": [
+                    "first_push_success_rate",
+                    "rebase_conflict_rate",
+                    "rollback_rate",
+                    "manual_intervention_rate",
                 ],
             }
         )
@@ -330,10 +401,12 @@ def build_clarifying_question(text: str, need_clarify: bool) -> str | None:
     return "Please share tech stack, target outcome, and expected output type (code, architecture, or review)."
 
 
-def route_request(text: str, config: dict[str, object]) -> dict[str, object]:
+def route_request(text: str, config: dict[str, object], repo_path: Path) -> dict[str, object]:
     scores, reasons = compute_scores(text, config)
     needs_worktree, needs_git_workflow, process_skills, process_hits = detect_process_skills(text, config)
     detected_languages, language_hits, language_routing = detect_languages(text, config)
+    repo_strategy = detect_repo_strategy(repo_path)
+    git_templates = build_git_templates(repo_strategy)
 
     agent_order = config.get("agent_order", [])
     if not isinstance(agent_order, list) or len(agent_order) == 0:
@@ -383,6 +456,7 @@ def route_request(text: str, config: dict[str, object]) -> dict[str, object]:
     process_plan = build_process_plan(
         needs_worktree=needs_worktree,
         needs_git_workflow=needs_git_workflow,
+        repo_strategy=repo_strategy,
     )
 
     mode = pick_mode(
@@ -425,6 +499,17 @@ def route_request(text: str, config: dict[str, object]) -> dict[str, object]:
         "process_skills": process_skills,
         "builtin_process_enabled": True,
         "process_plan": process_plan,
+        "git_workflow_profile": {
+            "repo_strategy": repo_strategy,
+            "auto_execute_policy": build_auto_execute_policy(),
+            "templates": git_templates,
+            "kpis": [
+                "first_push_success_rate",
+                "rebase_conflict_rate",
+                "rollback_rate",
+                "manual_intervention_rate",
+            ],
+        },
         "confidence": confidence,
         "mode": mode,
         "clarifying_question": clarifying_question,
@@ -446,14 +531,20 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Pretty-print JSON output.",
     )
+    parser.add_argument(
+        "--repo",
+        default=".",
+        help="Repository path for strategy detection.",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     config_path = Path(args.config).resolve()
+    repo_path = Path(args.repo).resolve()
     config = load_config(config_path)
-    result = route_request(args.text, config)
+    result = route_request(args.text, config, repo_path=repo_path)
     result["routing_config"] = {
         "path": str(config_path),
         "version": str(config.get("meta", {}).get("version", "unknown")),

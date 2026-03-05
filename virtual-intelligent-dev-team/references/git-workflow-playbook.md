@@ -1,7 +1,7 @@
 # Git Workflow Playbook
 
 作者：fxbin  
-版本：v1.1  
+版本：v1.2  
 更新日期：2026-03-05
 
 ## 目标
@@ -20,6 +20,12 @@
 
 - 主责：`Git Workflow Guardian`
 - 职责：流程门禁、命令顺序、异常停止、人工接管提示
+
+## R0 仓库画像识别
+
+- 目的：自动识别仓库策略并生成分支/提交/PR 模板，减少人工补充。
+- 识别结果：`trunk-main`、`trunk-master`、`git-flow-lite`、`custom`。
+- 执行命令：`python scripts/git_workflow_guardrail.py --repo . --detect-repo-strategy --print-templates --pretty`
 
 ## 固定状态机（必须顺序执行）
 
@@ -58,11 +64,28 @@
 - 禁止跳步执行，必须从 `G0` 顺序推进到 `G4`。
 - 每一步都要给出“是否通过 + 原因”。
 - 每一步都要先过 `git_workflow_guardrail.py` 的对应阶段校验。
+- 自动化边界：低风险命令可自动执行；中风险命令需确认；高风险命令必须确认并说明风险。
 - 未经用户明确授权，禁止执行危险命令：
   - `git reset --hard`
   - `git clean -fd`
   - `git push --force`
 - 遇到不确定场景，默认保守：停止并请求人工决策。
+
+## 失败恢复机制
+
+- 每一步失败都要返回 checkpoint（分支、HEAD、暂存/未暂存状态、stash 数）。
+- 恢复优先策略：回到最近安全点，再进行最小重试。
+- 指令原则：优先 `soft` 恢复，不直接做破坏性回滚。
+
+## 指标追踪
+
+- 指标文件：`.skill-metrics/git_guardrail_metrics.jsonl`
+- 默认记录字段：时间、阶段、是否通过、仓库策略、最高风险级别
+- 建议关注 KPI：
+  - `first_push_success_rate`
+  - `rebase_conflict_rate`
+  - `rollback_rate`
+  - `manual_intervention_rate`
 
 ## 推荐策略
 

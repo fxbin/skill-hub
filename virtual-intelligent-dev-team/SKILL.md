@@ -126,6 +126,9 @@ Run `scripts/git_workflow_guardrail.py` when you need deterministic G0-G4 checks
 5. 提交必须满足最小粒度：一次提交只承载单一意图。
 6. 提交信息必须包含类型前缀与中文摘要，例如 `fix: 修复 xxx`。
 7. 执行 Git 步骤前必须运行 `scripts/git_workflow_guardrail.py` 对应阶段校验，未通过不得继续。
+8. 执行前先做 `R0 仓库画像识别`，基于仓库策略自动生成分支、提交、PR 模板。
+9. 自动化边界遵循三级策略：低风险自动执行，中风险先确认，高风险必须确认并解释风险。
+10. 每次流程执行记录指标：首次推送成功率、冲突率、回滚率、人工介入率。
 
 ## 协作执行流程
 
@@ -158,9 +161,12 @@ Use this template after dispatching agents:
 - 需不需要 `using-git-worktrees`：
 - 需不需要 `git-workflow`：
 - Git 主责是否切换为 `Git Workflow Guardian`：
+- 仓库策略画像（trunk-main/trunk-master/git-flow-lite/custom）：
 - 推荐分支/提交/PR 策略：
 - 当前状态机阶段（G0-G4）：
 - 阻塞点与人工决策项（如有）：
+- 自动化边界判定（low/medium/high）：
+- 本次指标记录（push 成功/冲突/回滚/人工介入）：
 
 ## 轻重策略
 
