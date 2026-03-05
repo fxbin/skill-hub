@@ -80,6 +80,38 @@ Read `references/routing-rules.json` as the single source of truth for routing w
 - 命中高风险改造信号时：强制叠加 `Sentinel Architect (NB)` 流程，不跳过 RESEARCH、INNOVATE、PLAN。
 - 若无法判定主责：先输出最小假设并给出 1 个澄清问题，再继续。
 
+## 治理机制（圆桌会议 + 三省六部）
+
+复杂任务默认进入治理流程，避免“单智能体拍脑袋”：
+
+1. 圆桌会议四阶段
+- 议题定义
+- 方案辩论（中书省提案）
+- 风险投票（门下省审议）
+- 执行决议（尚书省落地）
+
+2. 三省分工
+- 中书省：负责提案，默认由主责智能体牵头，必要时带 1 个辅助智能体。
+- 门下省：负责审议，默认由 `Code Audit Council`，高风险叠加 `Sentinel Architect (NB)`。
+- 尚书省：负责执行，由主责与辅助智能体按职责落地。
+
+3. 六部职责
+- 吏部：智能体选派与优先级编排
+- 户部：资源与上下文预算分配
+- 礼部：输出规范与协作礼仪一致性
+- 兵部：安全与高风险防线
+- 刑部：质量门禁与争议裁决
+- 工部：工程实施与交付推进
+
+4. 一院双轨三闭环（增强）
+- 一院：`枢机院` 负责轨道裁决（常规轨/快反轨）与门禁策略。
+- 双轨：`三省六部轨`（稳态治理）与 `军机处直通轨`（紧急快反）。
+- 三闭环：
+  - 决策闭环：保留少数意见与双签记录。
+  - 执行闭环：里程碑、时限、责任人跟踪。
+  - 复盘闭环：结果回奏并回写 `国史馆知识库`。
+- 硬约束：高风险任务必须双签；直通轨任务必须事后回审，不得跳过。
+
 ## 协作模式库
 
 - `模式 A：单点执行`：仅主责智能体；适用于明确单域需求。
@@ -87,6 +119,8 @@ Read `references/routing-rules.json` as the single source of truth for routing w
 - `模式 C：战略-技术双轨`：主责 `Executive Trinity` 或 `Omni-Architect`，辅助 `Technical Trinity`；适用于业务与技术联动决策。
 - `模式 D：高风险治理`：任意主责 + `Sentinel Architect (NB)`；适用于核心改造与多步骤执行。
 - `模式 E：Git 护栏执行`：主责 `Git Workflow Guardian`；适用于低智能模型或高频 Git 操作场景。
+- `模式 F：圆桌治理（三省六部）`：跨领域、低置信或高风险场景下启用结构化治理。
+- `模式 G：枢机快反（军机处直通）`：紧急/实验性任务启用直通执行，但必须事后回审。
 
 ## 流程型技能融合
 
@@ -138,6 +172,7 @@ Run `scripts/git_workflow_guardrail.py` when you need deterministic G0-G4 checks
 4. 约束输出风格：主责智能体的结构优先，辅助智能体只补关键差异，不重复。
 5. 给出统一交付：包含“结论、关键决策、风险、下一步”四段。
 6. 高风险任务走治理：进入 `Sentinel Architect` 的阶段化流程并等待用户确认再执行改动。
+7. 符合圆桌触发条件时：按三省六部输出治理分工与决议机制。
 
 ## 交付模板
 
@@ -168,6 +203,17 @@ Use this template after dispatching agents:
 - 自动化边界判定（low/medium/high）：
 - 本次指标记录（push 成功/冲突/回滚/人工介入）：
 
+5. `治理流程`
+- 是否启用圆桌会议：
+- 枢机院裁决轨道（三省六部轨/军机处直通轨）：
+- 三省分工（中书省/门下省/尚书省）：
+- 六部分工（吏部/户部/礼部/兵部/刑部/工部）：
+- 决议机制（多数通过或双签通过）：
+- 双签是否必需（是/否）：
+- 事后回审是否必需（是/否）：
+- 回审与归档目标（国史馆知识库）：
+- 少数意见记录（如有）：
+
 ## 轻重策略
 
 - 对简单单点问题只启用 1 个智能体，避免过度编排。
@@ -192,6 +238,10 @@ python scripts/route_request.py --text "<user request>" --config references/rout
 - `process_skills`：建议触发的流程技能列表
 - `builtin_process_enabled`：是否启用内置流程能力（固定为 `true`）
 - `process_plan`：内置流程执行步骤建议
+- `governance_plan`：圆桌会议、三省六部与决议机制
+- `governance_plan.privy_council`：枢机院轨道裁决与双签/回审门禁
+- `governance_plan.post_audit`：事后回审流程与归档目标
+- `governance_plan.feedback_loop`：结果回奏、指标归档、规则调优闭环
 - `confidence`：路由置信度
 - `mode`：建议协作模式
 - `clarifying_question`：低置信场景下的澄清问题（无则为 `null`）

@@ -289,6 +289,302 @@ def build_auto_execute_policy() -> dict[str, str]:
     }
 
 
+def get_governance_defaults(config: dict[str, object]) -> dict[str, object]:
+    governance = config.get("governance", {})
+    if not isinstance(governance, dict):
+        governance = {}
+    roundtable = governance.get("roundtable", {})
+    if not isinstance(roundtable, dict):
+        roundtable = {}
+    privy_council = governance.get("privy_council", {})
+    if not isinstance(privy_council, dict):
+        privy_council = {}
+    defaults = {
+        "assistant_count_min": 1,
+        "confidence_max": 0.75,
+        "force_keywords": ["圆桌会议", "三省六部", "多智能体治理", "cross-functional", "governance"],
+    }
+    privy_defaults = {
+        "prefer_regular_for_git": True,
+        "allow_high_risk_fast_track": False,
+        "force_fast_track_keywords": ["紧急", "立即", "阻塞", "P0", "hotfix", "实验性", "快速验证"],
+        "force_regular_keywords": ["审计", "合规", "高风险", "核心模块", "双签"],
+    }
+    return {
+        "roundtable": {
+            "assistant_count_min": int(roundtable.get("assistant_count_min", defaults["assistant_count_min"])),
+            "confidence_max": float(roundtable.get("confidence_max", defaults["confidence_max"])),
+            "force_keywords": roundtable.get("force_keywords", defaults["force_keywords"]),
+        },
+        "privy_council": {
+            "prefer_regular_for_git": bool(
+                privy_council.get("prefer_regular_for_git", privy_defaults["prefer_regular_for_git"])
+            ),
+            "allow_high_risk_fast_track": bool(
+                privy_council.get(
+                    "allow_high_risk_fast_track",
+                    privy_defaults["allow_high_risk_fast_track"],
+                )
+            ),
+            "force_fast_track_keywords": privy_council.get(
+                "force_fast_track_keywords",
+                privy_defaults["force_fast_track_keywords"],
+            ),
+            "force_regular_keywords": privy_council.get(
+                "force_regular_keywords",
+                privy_defaults["force_regular_keywords"],
+            ),
+        },
+    }
+
+
+def should_enable_roundtable(
+    text: str,
+    assistants: list[str],
+    confidence: float,
+    sentinel_overlay: bool,
+    governance_defaults: dict[str, object],
+) -> bool:
+    roundtable = governance_defaults.get("roundtable", {})
+    if not isinstance(roundtable, dict):
+        roundtable = {}
+    assistant_count_min = int(roundtable.get("assistant_count_min", 1))
+    confidence_max = float(roundtable.get("confidence_max", 0.75))
+    force_keywords = roundtable.get("force_keywords", [])
+    if not isinstance(force_keywords, list):
+        force_keywords = []
+
+    if sentinel_overlay:
+        return True
+    if len(assistants) >= assistant_count_min and confidence <= confidence_max:
+        return True
+    lowered = text.lower()
+    for keyword in force_keywords:
+        if not isinstance(keyword, str):
+            continue
+        if keyword_matches(lowered, keyword.lower()):
+            return True
+    return False
+
+
+def should_use_fast_track(
+    text: str,
+    sentinel_overlay: bool,
+    needs_git_workflow: bool,
+    governance_defaults: dict[str, object],
+) -> tuple[bool, list[str]]:
+    privy = governance_defaults.get("privy_council", {})
+    if not isinstance(privy, dict):
+        privy = {}
+    prefer_regular_for_git = bool(privy.get("prefer_regular_for_git", True))
+    allow_high_risk_fast_track = bool(privy.get("allow_high_risk_fast_track", False))
+    force_fast_track_keywords = privy.get("force_fast_track_keywords", [])
+    force_regular_keywords = privy.get("force_regular_keywords", [])
+    if not isinstance(force_fast_track_keywords, list):
+        force_fast_track_keywords = []
+    if not isinstance(force_regular_keywords, list):
+        force_regular_keywords = []
+
+    lowered = text.lower()
+    rationale: list[str] = []
+
+    if sentinel_overlay and not allow_high_risk_fast_track:
+        rationale.append("命中高风险信号，禁止直通轨")
+        return False, rationale
+
+    for keyword in force_regular_keywords:
+        if isinstance(keyword, str) and keyword_matches(lowered, keyword.lower()):
+            rationale.append(f"命中常规轨强制关键词: {keyword}")
+            return False, rationale
+
+    for keyword in force_fast_track_keywords:
+        if isinstance(keyword, str) and keyword_matches(lowered, keyword.lower()):
+            rationale.append(f"命中直通轨关键词: {keyword}")
+            return True, rationale
+
+    if needs_git_workflow and prefer_regular_for_git:
+        rationale.append("Git 流程默认走常规轨")
+        return False, rationale
+
+    return False, rationale
+
+
+def dedupe_agents(items: list[str]) -> list[str]:
+    seen: set[str] = set()
+    result: list[str] = []
+    for item in items:
+        if item not in seen:
+            result.append(item)
+            seen.add(item)
+    return result
+
+
+def pick_ministry_owner(
+    ministry: str,
+    lead_agent: str,
+    assistants: list[str],
+    scores: dict[str, int],
+    sentinel_overlay: bool,
+    needs_git_workflow: bool,
+) -> str:
+    if ministry == "吏部":
+        return lead_agent
+    if ministry == "户部":
+        return "Git Workflow Guardian" if needs_git_workflow else "Technical Trinity"
+    if ministry == "礼部":
+        if scores.get("World-Class Product Architect", 0) > 0:
+            return "World-Class Product Architect"
+        return "Executive Trinity" if scores.get("Executive Trinity", 0) > 0 else lead_agent
+    if ministry == "兵部":
+        if sentinel_overlay:
+            return "Sentinel Architect (NB)"
+        return "Code Audit Council"
+    if ministry == "刑部":
+        return "Code Audit Council"
+    if ministry == "工部":
+        engineering_agents = {
+            "Java Virtuoso",
+            "Technical Trinity",
+            "Git Workflow Guardian",
+            "World-Class Product Architect",
+        }
+        if lead_agent in engineering_agents:
+            return lead_agent
+        for agent in assistants:
+            if agent in engineering_agents:
+                return agent
+        return "Technical Trinity"
+    return lead_agent
+
+
+def build_governance_plan(
+    text: str,
+    lead_agent: str,
+    assistants: list[str],
+    scores: dict[str, int],
+    confidence: float,
+    sentinel_overlay: bool,
+    needs_git_workflow: bool,
+    governance_defaults: dict[str, object],
+) -> dict[str, object]:
+    roundtable_enabled = should_enable_roundtable(
+        text=text,
+        assistants=assistants,
+        confidence=confidence,
+        sentinel_overlay=sentinel_overlay,
+        governance_defaults=governance_defaults,
+    )
+    fast_track_enabled, fast_track_rationale = should_use_fast_track(
+        text=text,
+        sentinel_overlay=sentinel_overlay,
+        needs_git_workflow=needs_git_workflow,
+        governance_defaults=governance_defaults,
+    )
+
+    proposal_agents = dedupe_agents([lead_agent] + assistants[:1])
+    review_agents = dedupe_agents(
+        [
+            "Code Audit Council",
+            "Sentinel Architect (NB)" if sentinel_overlay else "",
+        ]
+    )
+    review_agents = [agent for agent in review_agents if agent != ""]
+    execution_agents = dedupe_agents([lead_agent] + assistants)
+
+    ministries = [
+        ("吏部", "智能体选派与优先级"),
+        ("户部", "预算与资源编排"),
+        ("礼部", "输出规范与对齐"),
+        ("兵部", "安全与风险防线"),
+        ("刑部", "质量门禁与裁决"),
+        ("工部", "工程实施与交付"),
+    ]
+    ministry_assignments: list[dict[str, str]] = []
+    for name, duty in ministries:
+        owner = pick_ministry_owner(
+            ministry=name,
+            lead_agent=lead_agent,
+            assistants=assistants,
+            scores=scores,
+            sentinel_overlay=sentinel_overlay,
+            needs_git_workflow=needs_git_workflow,
+        )
+        ministry_assignments.append(
+            {
+                "name": name,
+                "owner_agent": owner,
+                "duty": duty,
+            }
+        )
+
+    selected_track = "军机处直通轨" if fast_track_enabled else "三省六部轨"
+    if sentinel_overlay:
+        risk_level = "high"
+    elif len(assistants) > 0 or roundtable_enabled:
+        risk_level = "medium"
+    else:
+        risk_level = "low"
+
+    dual_sign_required = sentinel_overlay or (risk_level == "high")
+    post_audit_required = fast_track_enabled
+
+    if dual_sign_required:
+        decision_protocol = "双签通过：Sentinel Architect (NB) + Code Audit Council"
+    elif fast_track_enabled:
+        decision_protocol = "先执行后审计：军机直通后进入时限回审"
+    elif roundtable_enabled:
+        decision_protocol = "圆桌共识 + 主责智能体拍板"
+    elif len(assistants) > 0:
+        decision_protocol = "多方会签后主责拍板"
+    else:
+        decision_protocol = "主责智能体直接决策"
+
+    return {
+        "roundtable_enabled": roundtable_enabled,
+        "risk_level": risk_level,
+        "privy_council": {
+            "name": "枢机院",
+            "selected_track": selected_track,
+            "rationale": fast_track_rationale,
+            "dual_sign_required": dual_sign_required,
+            "post_audit_required": post_audit_required,
+        },
+        "tracks": {
+            "regular": {
+                "name": "三省六部轨",
+                "flow": ["中书省提案", "门下省审议", "尚书省分发", "六部执行"],
+            },
+            "fast": {
+                "name": "军机处直通轨",
+                "flow": ["军机处下达", "执行部门直达", "快速反馈", "结果回奏"],
+            },
+        },
+        "agenda": [
+            "议题定义",
+            "方案辩论（中书省提案）",
+            "风险投票（门下省审议）",
+            "执行决议（尚书省落地）",
+        ],
+        "three_departments": {
+            "中书省": {"role": "提案", "agents": proposal_agents},
+            "门下省": {"role": "审议", "agents": review_agents},
+            "尚书省": {"role": "执行", "agents": execution_agents},
+        },
+        "six_ministries": ministry_assignments,
+        "decision_protocol": decision_protocol,
+        "post_audit": {
+            "required": post_audit_required,
+            "flow": ["T+0执行", "T+1审计复盘", "T+2规则回写"],
+            "archive_target": "国史馆知识库",
+        },
+        "feedback_loop": {
+            "enabled": True,
+            "loop": ["结果回奏", "指标归档", "规则调优"],
+        },
+        "minority_report": "允许记录少数意见，写入最终决议作为风险备忘",
+    }
+
+
 def build_process_plan(
     needs_worktree: bool,
     needs_git_workflow: bool,
@@ -372,10 +668,16 @@ def pick_mode(
     process_only: bool,
     language_only: bool,
     unknown_only: bool,
+    roundtable_enabled: bool,
+    fast_track_enabled: bool,
     assistant_count: int,
     high_confidence: float,
     medium_confidence: float,
 ) -> str:
+    if fast_track_enabled:
+        return "模式 G：枢机快反（军机处直通）"
+    if roundtable_enabled:
+        return "模式 F：圆桌治理（三省六部）"
     if process_only:
         return "流程驱动模式：按流程技能执行"
     if language_only:
@@ -453,6 +755,17 @@ def route_request(text: str, config: dict[str, object], repo_path: Path) -> dict
     assistants = [
         agent for agent in assistants if scores.get(agent, 0) > 0 and agent != lead_agent
     ]
+    governance_defaults = get_governance_defaults(config)
+    governance_plan = build_governance_plan(
+        text=text,
+        lead_agent=lead_agent,
+        assistants=assistants,
+        scores=scores,
+        confidence=confidence,
+        sentinel_overlay=sentinel_overlay,
+        needs_git_workflow=needs_git_workflow,
+        governance_defaults=governance_defaults,
+    )
     process_plan = build_process_plan(
         needs_worktree=needs_worktree,
         needs_git_workflow=needs_git_workflow,
@@ -465,6 +778,10 @@ def route_request(text: str, config: dict[str, object], repo_path: Path) -> dict
         process_only=process_only,
         language_only=language_only,
         unknown_only=unknown_only,
+        roundtable_enabled=bool(governance_plan.get("roundtable_enabled", False)),
+        fast_track_enabled=(
+            (governance_plan.get("privy_council") or {}).get("selected_track") == "军机处直通轨"
+        ),
         assistant_count=len(assistants),
         high_confidence=high_confidence,
         medium_confidence=medium_confidence,
@@ -499,6 +816,7 @@ def route_request(text: str, config: dict[str, object], repo_path: Path) -> dict
         "process_skills": process_skills,
         "builtin_process_enabled": True,
         "process_plan": process_plan,
+        "governance_plan": governance_plan,
         "git_workflow_profile": {
             "repo_strategy": repo_strategy,
             "auto_execute_policy": build_auto_execute_policy(),

@@ -1,7 +1,7 @@
 {
   "meta": {
     "author": "fxbin",
-    "version": "v3.0",
+    "version": "v3.2",
     "updated": "2026-03-05"
   },
   "thresholds": {
@@ -12,6 +12,39 @@
   },
   "default_process_lead_agent": "Git Workflow Guardian",
   "default_unknown_lead_agent": "Technical Trinity",
+  "governance": {
+    "roundtable": {
+      "assistant_count_min": 1,
+      "confidence_max": 0.75,
+      "force_keywords": [
+        "圆桌会议",
+        "三省六部",
+        "多智能体治理",
+        "cross-functional",
+        "governance"
+      ]
+    },
+    "privy_council": {
+      "prefer_regular_for_git": true,
+      "allow_high_risk_fast_track": false,
+      "force_fast_track_keywords": [
+        "紧急",
+        "立即",
+        "阻塞",
+        "P0",
+        "hotfix",
+        "实验性",
+        "快速验证"
+      ],
+      "force_regular_keywords": [
+        "审计",
+        "合规",
+        "高风险",
+        "核心模块",
+        "双签"
+      ]
+    }
+  },
   "process_skill_lead_agents": {
     "git-workflow": "Git Workflow Guardian",
     "using-git-worktrees": "Git Workflow Guardian"

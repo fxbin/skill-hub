@@ -6,10 +6,10 @@
     {
       "id": "virtual-intelligent-dev-team",
       "display_name": "虚拟智能开发团队",
-      "version": "v3.0",
+      "version": "v3.2",
       "path": "virtual-intelligent-dev-team",
       "positioning": "personal-skill",
-      "default_prompt": "Use $virtual-intelligent-dev-team to auto-route this request to the right specialist agents and enforce deterministic git workflow guardrails when needed.",
+      "default_prompt": "Use $virtual-intelligent-dev-team to auto-route this request, enforce deterministic git guardrails, and coordinate privy-council dual-track governance with roundtable and post-audit loops.",
       "tags": [
         "development",
         "multi-agent",
@@ -17,7 +17,11 @@
         "java",
         "architecture",
         "git-workflow",
-        "deterministic"
+        "deterministic",
+        "governance",
+        "roundtable",
+        "privy-council",
+        "dual-track"
       ]
     }
   ]
