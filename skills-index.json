@@ -6,10 +6,10 @@
     {
       "id": "virtual-intelligent-dev-team",
       "display_name": "虚拟智能开发团队",
-      "version": "v3.2",
+      "version": "v3.3",
       "path": "virtual-intelligent-dev-team",
       "positioning": "personal-skill",
-      "default_prompt": "Use $virtual-intelligent-dev-team to auto-route this request, enforce deterministic git guardrails, and coordinate privy-council dual-track governance with roundtable and post-audit loops.",
+      "default_prompt": "Use $virtual-intelligent-dev-team to auto-route this request, enforce deterministic git guardrails, and coordinate privy-council dual-track governance with anti-gaming controls, dual-sign evidence, and post-audit loops.",
       "tags": [
         "development",
         "multi-agent",
@@ -21,7 +21,9 @@
         "governance",
         "roundtable",
         "privy-council",
-        "dual-track"
+        "dual-track",
+        "anti-gaming",
+        "slo"
       ]
     }
   ]

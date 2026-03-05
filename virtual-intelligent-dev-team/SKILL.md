@@ -111,6 +111,8 @@ Read `references/routing-rules.json` as the single source of truth for routing w
   - 执行闭环：里程碑、时限、责任人跟踪。
   - 复盘闭环：结果回奏并回写 `国史馆知识库`。
 - 硬约束：高风险任务必须双签；直通轨任务必须事后回审，不得跳过。
+- 防滥用约束：直通轨必须满足“紧急信号 + 客观信号”，并受 24 小时配额与冷却期限制。
+- 质量约束：每次执行必须产出 DRI 与 SLO，回写内容按 `draft/verified/gold` 分级。
 
 ## 协作模式库
 
@@ -206,12 +208,16 @@ Use this template after dispatching agents:
 5. `治理流程`
 - 是否启用圆桌会议：
 - 枢机院裁决轨道（三省六部轨/军机处直通轨）：
+- 枢机院裁决依据（命中信号/阻断原因/配额与冷却状态）：
 - 三省分工（中书省/门下省/尚书省）：
 - 六部分工（吏部/户部/礼部/兵部/刑部/工部）：
 - 决议机制（多数通过或双签通过）：
 - 双签是否必需（是/否）：
+- 双签证据（风险摘要/影响范围/回滚方案/验证方案）：
 - 事后回审是否必需（是/否）：
 - 回审与归档目标（国史馆知识库）：
+- 归档等级（draft/verified/gold）与提升规则：
+- 执行合同（DRI + SLO + 检查点）：
 - 少数意见记录（如有）：
 
 ## 轻重策略
@@ -240,7 +246,11 @@ python scripts/route_request.py --text "<user request>" --config references/rout
 - `process_plan`：内置流程执行步骤建议
 - `governance_plan`：圆桌会议、三省六部与决议机制
 - `governance_plan.privy_council`：枢机院轨道裁决与双签/回审门禁
+- `governance_plan.privy_council.signal_evidence`：紧急信号、客观信号与操纵风险判定
+- `governance_plan.privy_council.track_stats`：快反轨配额与冷却统计
 - `governance_plan.post_audit`：事后回审流程与归档目标
+- `governance_plan.execution_contract`：DRI、SLO 与阶段检查点
+- `governance_plan.dual_sign`：双签责任人与证据模板
 - `governance_plan.feedback_loop`：结果回奏、指标归档、规则调优闭环
 - `confidence`：路由置信度
 - `mode`：建议协作模式

@@ -6,6 +6,7 @@ Route a natural-language request to the most suitable agent team configuration.
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timedelta
 import json
 import re
 import subprocess
@@ -14,6 +15,8 @@ from pathlib import Path
 
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parent.parent / "references" / "routing-rules.json"
 ASCII_WORD_CLASS = "a-z0-9"
+TRACK_REGULAR = "三省六部轨"
+TRACK_FAST = "军机处直通轨"
 
 
 def load_config(config_path: Path) -> dict[str, object]:
@@ -289,6 +292,101 @@ def build_auto_execute_policy() -> dict[str, str]:
     }
 
 
+def now_iso() -> str:
+    return datetime.now().isoformat(timespec="seconds")
+
+
+def ensure_list_str(value: object, default: list[str]) -> list[str]:
+    if not isinstance(value, list):
+        return default
+    result: list[str] = []
+    for item in value:
+        if isinstance(item, str):
+            result.append(item)
+    return result if len(result) > 0 else default
+
+
+def keyword_hits(text: str, keywords: list[str]) -> list[str]:
+    lowered = text.lower()
+    hits: list[str] = []
+    for keyword in keywords:
+        token = keyword.lower().strip()
+        if token != "" and keyword_matches(lowered, token):
+            hits.append(keyword)
+    return hits
+
+
+def parse_iso_time(value: str) -> datetime | None:
+    try:
+        return datetime.fromisoformat(value)
+    except Exception:
+        return None
+
+
+def load_governance_events(repo_path: Path, metrics_file: str) -> list[dict[str, object]]:
+    file_path = repo_path / metrics_file
+    if not file_path.exists():
+        return []
+    events: list[dict[str, object]] = []
+    try:
+        with file_path.open("r", encoding="utf-8") as file:
+            for line in file:
+                raw = line.strip()
+                if raw == "":
+                    continue
+                try:
+                    item = json.loads(raw)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(item, dict):
+                    events.append(item)
+    except Exception:
+        return []
+    return events
+
+
+def append_governance_event(repo_path: Path, metrics_file: str, payload: dict[str, object]) -> None:
+    file_path = repo_path / metrics_file
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    with file_path.open("a", encoding="utf-8") as file:
+        file.write(json.dumps(payload, ensure_ascii=False) + "\n")
+
+
+def get_fast_track_stats(
+    repo_path: Path,
+    metrics_file: str,
+    window_hours: int,
+) -> dict[str, object]:
+    now = datetime.now()
+    events = load_governance_events(repo_path, metrics_file)
+    window_start = now - timedelta(hours=max(window_hours, 1))
+
+    count_24h = 0
+    latest_fast_track: datetime | None = None
+    for event in events:
+        timestamp = event.get("timestamp")
+        track = event.get("selected_track")
+        if not isinstance(timestamp, str) or not isinstance(track, str):
+            continue
+        dt = parse_iso_time(timestamp)
+        if dt is None:
+            continue
+        if track != TRACK_FAST:
+            continue
+        if dt >= window_start:
+            count_24h += 1
+        if latest_fast_track is None or dt > latest_fast_track:
+            latest_fast_track = dt
+
+    return {
+        "count_in_window": count_24h,
+        "window_hours": max(window_hours, 1),
+        "latest_fast_track_at": latest_fast_track.isoformat(timespec="seconds")
+        if latest_fast_track is not None
+        else None,
+    }
+
+
 def get_governance_defaults(config: dict[str, object]) -> dict[str, object]:
     governance = config.get("governance", {})
     if not isinstance(governance, dict):
@@ -299,6 +397,19 @@ def get_governance_defaults(config: dict[str, object]) -> dict[str, object]:
     privy_council = governance.get("privy_council", {})
     if not isinstance(privy_council, dict):
         privy_council = {}
+    anti_gaming = governance.get("anti_gaming", {})
+    if not isinstance(anti_gaming, dict):
+        anti_gaming = {}
+    fast_track_control = governance.get("fast_track_control", {})
+    if not isinstance(fast_track_control, dict):
+        fast_track_control = {}
+    execution_control = governance.get("execution_control", {})
+    if not isinstance(execution_control, dict):
+        execution_control = {}
+    audit_control = governance.get("audit_control", {})
+    if not isinstance(audit_control, dict):
+        audit_control = {}
+
     defaults = {
         "assistant_count_min": 1,
         "confidence_max": 0.75,
@@ -310,11 +421,36 @@ def get_governance_defaults(config: dict[str, object]) -> dict[str, object]:
         "force_fast_track_keywords": ["紧急", "立即", "阻塞", "P0", "hotfix", "实验性", "快速验证"],
         "force_regular_keywords": ["审计", "合规", "高风险", "核心模块", "双签"],
     }
+    anti_defaults = {
+        "min_objective_signals_for_fast_track": 1,
+        "urgent_keywords": ["紧急", "立即", "阻塞", "P0", "hotfix", "实验性", "快速验证"],
+        "objective_keywords": ["生产故障", "告警", "失败", "回滚", "error", "exception", "500", "timeout"],
+    }
+    fast_control_defaults = {
+        "quota_per_24h": 3,
+        "cooldown_minutes": 30,
+        "metrics_file": ".skill-metrics/governance_events.jsonl",
+        "window_hours": 24,
+        "write_event_log": True,
+    }
+    execution_defaults = {
+        "require_dri": True,
+        "slo_minutes": {"low": 120, "medium": 60, "high": 30},
+    }
+    audit_defaults = {
+        "archive_levels": ["draft", "verified", "gold"],
+        "default_archive_level": "draft",
+        "promotion_rules": [
+            "双签通过后可从 draft 提升到 verified",
+            "连续稳定达标后可从 verified 提升到 gold",
+        ],
+    }
+
     return {
         "roundtable": {
             "assistant_count_min": int(roundtable.get("assistant_count_min", defaults["assistant_count_min"])),
             "confidence_max": float(roundtable.get("confidence_max", defaults["confidence_max"])),
-            "force_keywords": roundtable.get("force_keywords", defaults["force_keywords"]),
+            "force_keywords": ensure_list_str(roundtable.get("force_keywords"), defaults["force_keywords"]),
         },
         "privy_council": {
             "prefer_regular_for_git": bool(
@@ -326,13 +462,63 @@ def get_governance_defaults(config: dict[str, object]) -> dict[str, object]:
                     privy_defaults["allow_high_risk_fast_track"],
                 )
             ),
-            "force_fast_track_keywords": privy_council.get(
-                "force_fast_track_keywords",
+            "force_fast_track_keywords": ensure_list_str(
+                privy_council.get("force_fast_track_keywords"),
                 privy_defaults["force_fast_track_keywords"],
             ),
-            "force_regular_keywords": privy_council.get(
-                "force_regular_keywords",
+            "force_regular_keywords": ensure_list_str(
+                privy_council.get("force_regular_keywords"),
                 privy_defaults["force_regular_keywords"],
+            ),
+        },
+        "anti_gaming": {
+            "min_objective_signals_for_fast_track": int(
+                anti_gaming.get(
+                    "min_objective_signals_for_fast_track",
+                    anti_defaults["min_objective_signals_for_fast_track"],
+                )
+            ),
+            "urgent_keywords": ensure_list_str(
+                anti_gaming.get("urgent_keywords"),
+                anti_defaults["urgent_keywords"],
+            ),
+            "objective_keywords": ensure_list_str(
+                anti_gaming.get("objective_keywords"),
+                anti_defaults["objective_keywords"],
+            ),
+        },
+        "fast_track_control": {
+            "quota_per_24h": int(
+                fast_track_control.get("quota_per_24h", fast_control_defaults["quota_per_24h"])
+            ),
+            "cooldown_minutes": int(
+                fast_track_control.get("cooldown_minutes", fast_control_defaults["cooldown_minutes"])
+            ),
+            "metrics_file": str(
+                fast_track_control.get("metrics_file", fast_control_defaults["metrics_file"])
+            ),
+            "window_hours": int(
+                fast_track_control.get("window_hours", fast_control_defaults["window_hours"])
+            ),
+            "write_event_log": bool(
+                fast_track_control.get("write_event_log", fast_control_defaults["write_event_log"])
+            ),
+        },
+        "execution_control": {
+            "require_dri": bool(execution_control.get("require_dri", execution_defaults["require_dri"])),
+            "slo_minutes": execution_control.get("slo_minutes", execution_defaults["slo_minutes"]),
+        },
+        "audit_control": {
+            "archive_levels": ensure_list_str(
+                audit_control.get("archive_levels"),
+                audit_defaults["archive_levels"],
+            ),
+            "default_archive_level": str(
+                audit_control.get("default_archive_level", audit_defaults["default_archive_level"])
+            ),
+            "promotion_rules": ensure_list_str(
+                audit_control.get("promotion_rules"),
+                audit_defaults["promotion_rules"],
             ),
         },
     }
@@ -371,42 +557,99 @@ def should_use_fast_track(
     text: str,
     sentinel_overlay: bool,
     needs_git_workflow: bool,
+    repo_path: Path,
     governance_defaults: dict[str, object],
-) -> tuple[bool, list[str]]:
+) -> dict[str, object]:
     privy = governance_defaults.get("privy_council", {})
     if not isinstance(privy, dict):
         privy = {}
+    anti = governance_defaults.get("anti_gaming", {})
+    if not isinstance(anti, dict):
+        anti = {}
+    fast_control = governance_defaults.get("fast_track_control", {})
+    if not isinstance(fast_control, dict):
+        fast_control = {}
+
     prefer_regular_for_git = bool(privy.get("prefer_regular_for_git", True))
     allow_high_risk_fast_track = bool(privy.get("allow_high_risk_fast_track", False))
-    force_fast_track_keywords = privy.get("force_fast_track_keywords", [])
-    force_regular_keywords = privy.get("force_regular_keywords", [])
-    if not isinstance(force_fast_track_keywords, list):
-        force_fast_track_keywords = []
-    if not isinstance(force_regular_keywords, list):
-        force_regular_keywords = []
+    force_fast_track_keywords = ensure_list_str(privy.get("force_fast_track_keywords"), [])
+    force_regular_keywords = ensure_list_str(privy.get("force_regular_keywords"), [])
 
-    lowered = text.lower()
+    min_objective_signals = int(anti.get("min_objective_signals_for_fast_track", 1))
+    urgent_keywords = ensure_list_str(anti.get("urgent_keywords"), [])
+    objective_keywords = ensure_list_str(anti.get("objective_keywords"), [])
+
+    quota_per_24h = max(int(fast_control.get("quota_per_24h", 3)), 0)
+    cooldown_minutes = max(int(fast_control.get("cooldown_minutes", 30)), 0)
+    metrics_file = str(fast_control.get("metrics_file", ".skill-metrics/governance_events.jsonl"))
+    window_hours = max(int(fast_control.get("window_hours", 24)), 1)
+
     rationale: list[str] = []
+    blockers: list[str] = []
+    selected = False
+
+    forced_regular_hits = keyword_hits(text, force_regular_keywords)
+    forced_fast_hits = keyword_hits(text, force_fast_track_keywords)
+    urgent_hits = keyword_hits(text, urgent_keywords)
+    objective_hits = keyword_hits(text, objective_keywords)
+
+    suspicious_manipulation = len(urgent_hits) > 0 and len(objective_hits) < min_objective_signals
+    if suspicious_manipulation:
+        blockers.append("疑似关键词操纵：紧急词存在但客观信号不足")
 
     if sentinel_overlay and not allow_high_risk_fast_track:
-        rationale.append("命中高风险信号，禁止直通轨")
-        return False, rationale
+        blockers.append("命中高风险信号，禁止直通轨")
 
-    for keyword in force_regular_keywords:
-        if isinstance(keyword, str) and keyword_matches(lowered, keyword.lower()):
-            rationale.append(f"命中常规轨强制关键词: {keyword}")
-            return False, rationale
-
-    for keyword in force_fast_track_keywords:
-        if isinstance(keyword, str) and keyword_matches(lowered, keyword.lower()):
-            rationale.append(f"命中直通轨关键词: {keyword}")
-            return True, rationale
+    if len(forced_regular_hits) > 0:
+        blockers.append(f"命中常规轨强制关键词: {', '.join(forced_regular_hits)}")
 
     if needs_git_workflow and prefer_regular_for_git:
-        rationale.append("Git 流程默认走常规轨")
-        return False, rationale
+        blockers.append("Git 流程默认走常规轨")
 
-    return False, rationale
+    if len(forced_fast_hits) > 0:
+        rationale.append(f"命中直通轨关键词: {', '.join(forced_fast_hits)}")
+        selected = True
+    elif len(urgent_hits) > 0 and len(objective_hits) >= min_objective_signals:
+        rationale.append("命中紧急信号且客观信号达标")
+        selected = True
+
+    stats = get_fast_track_stats(
+        repo_path=repo_path,
+        metrics_file=metrics_file,
+        window_hours=window_hours,
+    )
+    if selected:
+        if quota_per_24h > 0 and int(stats.get("count_in_window", 0)) >= quota_per_24h:
+            blockers.append("直通轨配额已达上限")
+        latest = stats.get("latest_fast_track_at")
+        if isinstance(latest, str):
+            latest_dt = parse_iso_time(latest)
+            if latest_dt is not None and cooldown_minutes > 0:
+                until = latest_dt + timedelta(minutes=cooldown_minutes)
+                if datetime.now() < until:
+                    blockers.append("直通轨处于冷却期")
+
+    enabled = selected and len(blockers) == 0
+    return {
+        "enabled": enabled,
+        "rationale": rationale,
+        "blockers": blockers,
+        "signals": {
+            "forced_fast_hits": forced_fast_hits,
+            "forced_regular_hits": forced_regular_hits,
+            "urgent_hits": urgent_hits,
+            "objective_hits": objective_hits,
+            "suspicious_manipulation": suspicious_manipulation,
+        },
+        "stats": stats,
+        "policy": {
+            "quota_per_24h": quota_per_24h,
+            "cooldown_minutes": cooldown_minutes,
+            "metrics_file": metrics_file,
+            "window_hours": window_hours,
+            "min_objective_signals_for_fast_track": min_objective_signals,
+        },
+    }
 
 
 def dedupe_agents(items: list[str]) -> list[str]:
@@ -459,6 +702,7 @@ def pick_ministry_owner(
 
 def build_governance_plan(
     text: str,
+    repo_path: Path,
     lead_agent: str,
     assistants: list[str],
     scores: dict[str, int],
@@ -474,12 +718,27 @@ def build_governance_plan(
         sentinel_overlay=sentinel_overlay,
         governance_defaults=governance_defaults,
     )
-    fast_track_enabled, fast_track_rationale = should_use_fast_track(
+    fast_track_decision = should_use_fast_track(
         text=text,
         sentinel_overlay=sentinel_overlay,
         needs_git_workflow=needs_git_workflow,
+        repo_path=repo_path,
         governance_defaults=governance_defaults,
     )
+    fast_track_enabled = bool(fast_track_decision.get("enabled", False))
+    fast_track_rationale = fast_track_decision.get("rationale", [])
+    fast_track_blockers = fast_track_decision.get("blockers", [])
+    if not isinstance(fast_track_rationale, list):
+        fast_track_rationale = []
+    if not isinstance(fast_track_blockers, list):
+        fast_track_blockers = []
+
+    execution_control = governance_defaults.get("execution_control", {})
+    if not isinstance(execution_control, dict):
+        execution_control = {}
+    audit_control = governance_defaults.get("audit_control", {})
+    if not isinstance(audit_control, dict):
+        audit_control = {}
 
     proposal_agents = dedupe_agents([lead_agent] + assistants[:1])
     review_agents = dedupe_agents(
@@ -517,7 +776,7 @@ def build_governance_plan(
             }
         )
 
-    selected_track = "军机处直通轨" if fast_track_enabled else "三省六部轨"
+    selected_track = TRACK_FAST if fast_track_enabled else TRACK_REGULAR
     if sentinel_overlay:
         risk_level = "high"
     elif len(assistants) > 0 or roundtable_enabled:
@@ -527,6 +786,18 @@ def build_governance_plan(
 
     dual_sign_required = sentinel_overlay or (risk_level == "high")
     post_audit_required = fast_track_enabled
+    archive_levels = ensure_list_str(audit_control.get("archive_levels"), ["draft", "verified", "gold"])
+    default_archive_level = str(audit_control.get("default_archive_level", "draft"))
+    promotion_rules = ensure_list_str(
+        audit_control.get("promotion_rules"),
+        ["双签通过后可从 draft 提升到 verified"],
+    )
+    risk_to_slo = execution_control.get("slo_minutes", {"low": 120, "medium": 60, "high": 30})
+    if not isinstance(risk_to_slo, dict):
+        risk_to_slo = {"low": 120, "medium": 60, "high": 30}
+    slo_minutes = int(risk_to_slo.get(risk_level, risk_to_slo.get("medium", 60)))
+    require_dri = bool(execution_control.get("require_dri", True))
+    dri_agent = lead_agent if require_dri else ""
 
     if dual_sign_required:
         decision_protocol = "双签通过：Sentinel Architect (NB) + Code Audit Council"
@@ -546,16 +817,20 @@ def build_governance_plan(
             "name": "枢机院",
             "selected_track": selected_track,
             "rationale": fast_track_rationale,
+            "blockers": fast_track_blockers,
+            "signal_evidence": fast_track_decision.get("signals", {}),
+            "track_control": fast_track_decision.get("policy", {}),
+            "track_stats": fast_track_decision.get("stats", {}),
             "dual_sign_required": dual_sign_required,
             "post_audit_required": post_audit_required,
         },
         "tracks": {
             "regular": {
-                "name": "三省六部轨",
+                "name": TRACK_REGULAR,
                 "flow": ["中书省提案", "门下省审议", "尚书省分发", "六部执行"],
             },
             "fast": {
-                "name": "军机处直通轨",
+                "name": TRACK_FAST,
                 "flow": ["军机处下达", "执行部门直达", "快速反馈", "结果回奏"],
             },
         },
@@ -571,11 +846,30 @@ def build_governance_plan(
             "尚书省": {"role": "执行", "agents": execution_agents},
         },
         "six_ministries": ministry_assignments,
+        "execution_contract": {
+            "dri_required": require_dri,
+            "dri_agent": dri_agent,
+            "slo_minutes": max(slo_minutes, 1),
+            "checkpoints": ["start", "mid", "final"],
+        },
         "decision_protocol": decision_protocol,
+        "dual_sign": {
+            "required": dual_sign_required,
+            "signers": ["Sentinel Architect (NB)", "Code Audit Council"] if dual_sign_required else [],
+            "evidence_template": [
+                "risk_summary",
+                "impact_scope",
+                "rollback_plan",
+                "verification_plan",
+            ],
+        },
         "post_audit": {
             "required": post_audit_required,
             "flow": ["T+0执行", "T+1审计复盘", "T+2规则回写"],
             "archive_target": "国史馆知识库",
+            "archive_level": default_archive_level,
+            "archive_levels": archive_levels,
+            "promotion_rules": promotion_rules,
         },
         "feedback_loop": {
             "enabled": True,
@@ -758,6 +1052,7 @@ def route_request(text: str, config: dict[str, object], repo_path: Path) -> dict
     governance_defaults = get_governance_defaults(config)
     governance_plan = build_governance_plan(
         text=text,
+        repo_path=repo_path,
         lead_agent=lead_agent,
         assistants=assistants,
         scores=scores,
@@ -766,6 +1061,27 @@ def route_request(text: str, config: dict[str, object], repo_path: Path) -> dict
         needs_git_workflow=needs_git_workflow,
         governance_defaults=governance_defaults,
     )
+    fast_track_control = governance_defaults.get("fast_track_control", {})
+    if not isinstance(fast_track_control, dict):
+        fast_track_control = {}
+    if bool(fast_track_control.get("write_event_log", True)):
+        metrics_file = str(
+            fast_track_control.get("metrics_file", ".skill-metrics/governance_events.jsonl")
+        )
+        try:
+            append_governance_event(
+                repo_path=repo_path,
+                metrics_file=metrics_file,
+                payload={
+                    "timestamp": now_iso(),
+                    "lead_agent": lead_agent,
+                    "risk_level": governance_plan.get("risk_level"),
+                    "selected_track": ((governance_plan.get("privy_council") or {}).get("selected_track")),
+                    "mode_hint": "route_request",
+                },
+            )
+        except Exception:
+            pass
     process_plan = build_process_plan(
         needs_worktree=needs_worktree,
         needs_git_workflow=needs_git_workflow,
@@ -780,7 +1096,7 @@ def route_request(text: str, config: dict[str, object], repo_path: Path) -> dict
         unknown_only=unknown_only,
         roundtable_enabled=bool(governance_plan.get("roundtable_enabled", False)),
         fast_track_enabled=(
-            (governance_plan.get("privy_council") or {}).get("selected_track") == "军机处直通轨"
+            (governance_plan.get("privy_council") or {}).get("selected_track") == TRACK_FAST
         ),
         assistant_count=len(assistants),
         high_confidence=high_confidence,

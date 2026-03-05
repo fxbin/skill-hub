@@ -1,7 +1,7 @@
 {
   "meta": {
     "author": "fxbin",
-    "version": "v3.2",
+    "version": "v3.3",
     "updated": "2026-03-05"
   },
   "thresholds": {
@@ -42,6 +42,55 @@
         "高风险",
         "核心模块",
         "双签"
+      ]
+    },
+    "anti_gaming": {
+      "min_objective_signals_for_fast_track": 1,
+      "urgent_keywords": [
+        "紧急",
+        "立即",
+        "阻塞",
+        "P0",
+        "hotfix",
+        "实验性",
+        "快速验证"
+      ],
+      "objective_keywords": [
+        "生产故障",
+        "告警",
+        "失败",
+        "回滚",
+        "error",
+        "exception",
+        "500",
+        "timeout"
+      ]
+    },
+    "fast_track_control": {
+      "quota_per_24h": 3,
+      "cooldown_minutes": 30,
+      "metrics_file": ".skill-metrics/governance_events.jsonl",
+      "window_hours": 24,
+      "write_event_log": true
+    },
+    "execution_control": {
+      "require_dri": true,
+      "slo_minutes": {
+        "low": 120,
+        "medium": 60,
+        "high": 30
+      }
+    },
+    "audit_control": {
+      "archive_levels": [
+        "draft",
+        "verified",
+        "gold"
+      ],
+      "default_archive_level": "draft",
+      "promotion_rules": [
+        "双签通过后可从 draft 提升到 verified",
+        "连续稳定达标后可从 verified 提升到 gold"
       ]
     }
   },
