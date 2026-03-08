@@ -1,12 +1,26 @@
 {
   "repository": "skill-hub",
   "owner": "fxbin",
-  "updated_at": "2026-03-05",
+  "updated_at": "2026-03-08",
   "skills": [
+    {
+      "id": "skill-creator",
+      "display_name": "Skill 创建器",
+      "version": "v2.1.0",
+      "path": "skill-creator",
+      "positioning": "personal-skill",
+      "default_prompt": "Use $skill-creator to scaffold, validate, or refine a reusable skill with correct metadata and workflow.",
+      "tags": [
+        "skill",
+        "creation",
+        "template",
+        "scaffolding"
+      ]
+    },
     {
       "id": "virtual-intelligent-dev-team",
       "display_name": "虚拟智能开发团队",
-      "version": "v3.3",
+      "version": "v3.4",
       "path": "virtual-intelligent-dev-team",
       "positioning": "personal-skill",
       "default_prompt": "Use $virtual-intelligent-dev-team to auto-route this request, enforce deterministic git guardrails, and coordinate privy-council dual-track governance with anti-gaming controls, dual-sign evidence, and post-audit loops.",

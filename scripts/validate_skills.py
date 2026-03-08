@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import sys
@@ -12,12 +13,18 @@ from typing import List
 
 
 INFRA_DIRS = {".git", ".github", "scripts", "__pycache__"}
-REQUIRED_FRONTMATTER_KEYS = {"name", "description"}
-REQUIRED_OPENAI_KEYS = {
-    "interface:",
-    "display_name:",
-    "short_description:",
-    "default_prompt:",
+NAME_PATTERN = re.compile(r"^[a-z0-9-]+$")
+DEFAULT_CONFIG = {
+    "required_frontmatter_keys": ["name", "description"],
+    "allowed_frontmatter_keys": ["name", "description", "metadata", "allowed-tools", "license"],
+    "required_openai_fields": ["display_name", "short_description", "default_prompt"],
+    "require_openai_yaml": False,
+    "require_version_file": True,
+    "require_skills_index": True,
+    "short_description_min": 25,
+    "short_description_max": 64,
+    "max_name_length": 64,
+    "max_description_length": 1024,
 }
 
 
@@ -43,6 +50,18 @@ def load_json(path: Path) -> dict:
         raise ValueError(f"{path.name} JSON 格式错误: {exc}") from exc
 
 
+def load_config(config_path: str | None) -> dict:
+    config = dict(DEFAULT_CONFIG)
+    if not config_path:
+        return config
+    path = Path(config_path).resolve()
+    data = load_json(path)
+    if not isinstance(data, dict):
+        raise ValueError("Config file must contain a JSON object")
+    config.update(data)
+    return config
+
+
 def parse_frontmatter(skill_md_path: Path) -> dict[str, str]:
     content = read_text(skill_md_path)
     match = re.match(r"^---\s*\n(.*?)\n---\s*\n", content, flags=re.DOTALL)
@@ -52,6 +71,9 @@ def parse_frontmatter(skill_md_path: Path) -> dict[str, str]:
     frontmatter: dict[str, str] = {}
     body = match.group(1)
     for line in body.splitlines():
+        # 只解析顶层 key，忽略缩进的嵌套字段（如 metadata.short-description）
+        if line.startswith(" ") or line.startswith("\t"):
+            continue
         stripped = line.strip()
         if not stripped or stripped.startswith("#"):
             continue
@@ -60,6 +82,16 @@ def parse_frontmatter(skill_md_path: Path) -> dict[str, str]:
             continue
         frontmatter[key.strip()] = value.strip().strip('"').strip("'")
     return frontmatter
+
+
+def extract_yaml_scalar(content: str, key: str) -> str:
+    match = re.search(rf"(?m)^\s*{re.escape(key)}\s*:\s*(.*?)\s*$", content)
+    if not match:
+        return ""
+    value = match.group(1).strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
+        return value[1:-1].strip()
+    return value
 
 
 def discover_skill_dirs(repo_root: Path) -> List[Path]:
@@ -81,25 +113,58 @@ def discover_skill_dirs(repo_root: Path) -> List[Path]:
     return skill_dirs
 
 
-def validate_openai_yaml(skill_dir: Path, skill_name: str, result: ValidationResult) -> None:
+def validate_openai_yaml(skill_dir: Path, skill_name: str, config: dict, result: ValidationResult) -> None:
     openai_yaml = skill_dir / "agents" / "openai.yaml"
     if not openai_yaml.exists():
-        result.warnings.append(f"{skill_dir.name}: 未找到 agents/openai.yaml（可选）")
+        if config.get("require_openai_yaml"):
+            result.errors.append(f"{skill_dir.name}: 缺少 agents/openai.yaml")
+        else:
+            result.warnings.append(f"{skill_dir.name}: 未找到 agents/openai.yaml（可选）")
         return
 
     if has_utf8_bom(openai_yaml):
         result.errors.append(f"{skill_dir.name}: agents/openai.yaml 存在 UTF-8 BOM")
 
     content = read_text(openai_yaml)
-    for key in REQUIRED_OPENAI_KEYS:
-        if key not in content:
-            result.errors.append(f"{skill_dir.name}: agents/openai.yaml 缺少字段 {key}")
+    if "interface:" not in content:
+        result.errors.append(f"{skill_dir.name}: agents/openai.yaml 缺少 interface 节点")
+        return
+
+    values = {
+        field: extract_yaml_scalar(content, field) for field in set(config["required_openai_fields"])
+    }
+    for field, value in values.items():
+        if not value:
+            result.errors.append(f"{skill_dir.name}: agents/openai.yaml 缺少字段 {field}")
+
+    short_description = values.get("short_description", "")
+    min_len = int(config["short_description_min"])
+    max_len = int(config["short_description_max"])
+    if short_description and not (min_len <= len(short_description) <= max_len):
+        result.warnings.append(
+            f"{skill_dir.name}: short_description 长度为 {len(short_description)}，建议 {min_len}-{max_len} 字符"
+        )
 
     expected_token = f"${skill_name}"
-    if expected_token not in content:
+    default_prompt = values.get("default_prompt", "")
+    if default_prompt and expected_token not in default_prompt:
         result.warnings.append(
             f"{skill_dir.name}: agents/openai.yaml default_prompt 未包含 {expected_token}"
         )
+
+
+def read_openai_interface(skill_dir: Path) -> dict[str, str]:
+    openai_yaml = skill_dir / "agents" / "openai.yaml"
+    if not openai_yaml.exists():
+        return {}
+    content = read_text(openai_yaml)
+    if "interface:" not in content:
+        return {}
+    return {
+        "display_name": extract_yaml_scalar(content, "display_name"),
+        "short_description": extract_yaml_scalar(content, "short_description"),
+        "default_prompt": extract_yaml_scalar(content, "default_prompt"),
+    }
 
 
 def validate_version_file(skill_dir: Path, result: ValidationResult) -> str:
@@ -133,11 +198,13 @@ def validate_skills_index(
     repo_root: Path,
     skill_dirs: List[Path],
     versions: dict[str, str],
+    config: dict,
     result: ValidationResult,
 ) -> None:
     index_file = repo_root / "skills-index.json"
     if not index_file.exists():
-        result.errors.append("仓库根目录缺少 skills-index.json")
+        if config.get("require_skills_index"):
+            result.errors.append("仓库根目录缺少 skills-index.json")
         return
 
     try:
@@ -161,7 +228,7 @@ def validate_skills_index(
         record = record_map[skill_id]
         record_version = str(record.get("version", "")).strip()
         current_version = versions.get(skill_id, "")
-        if current_version and record_version != current_version:
+        if config.get("require_version_file") and current_version and record_version != current_version:
             result.errors.append(
                 f"skills-index.json 技能 {skill_id} 版本({record_version}) 与 VERSION({current_version}) 不一致"
             )
@@ -172,8 +239,22 @@ def validate_skills_index(
                 f"skills-index.json 技能 {skill_id} 的 path({path_value}) 应为 {skill_id}"
             )
 
+        interface = read_openai_interface(skill_dir)
+        record_display_name = str(record.get("display_name", "")).strip()
+        if interface.get("display_name") and record_display_name != interface["display_name"]:
+            result.errors.append(
+                f"skills-index.json 技能 {skill_id} 的 display_name({record_display_name})"
+                f" 与 agents/openai.yaml({interface['display_name']}) 不一致"
+            )
 
-def validate_skill_dir(skill_dir: Path, result: ValidationResult) -> str:
+        record_prompt = str(record.get("default_prompt", "")).strip()
+        if interface.get("default_prompt") and record_prompt != interface["default_prompt"]:
+            result.errors.append(
+                f"skills-index.json 技能 {skill_id} 的 default_prompt 与 agents/openai.yaml 不一致"
+            )
+
+
+def validate_skill_dir(skill_dir: Path, config: dict, result: ValidationResult) -> str:
     skill_md = skill_dir / "SKILL.md"
     if has_utf8_bom(skill_md):
         result.errors.append(f"{skill_dir.name}: SKILL.md 存在 UTF-8 BOM")
@@ -184,26 +265,66 @@ def validate_skill_dir(skill_dir: Path, result: ValidationResult) -> str:
         result.errors.append(f"{skill_dir.name}: {exc}")
         return ""
 
-    missing = REQUIRED_FRONTMATTER_KEYS - set(frontmatter)
+    required_frontmatter = set(config["required_frontmatter_keys"])
+    missing = required_frontmatter - set(frontmatter)
     if missing:
         result.errors.append(f"{skill_dir.name}: SKILL.md frontmatter 缺少字段 {sorted(missing)}")
+
+    allowed_frontmatter = set(config["allowed_frontmatter_keys"])
+    unexpected = set(frontmatter) - allowed_frontmatter
+    if unexpected:
+        result.errors.append(
+            f"{skill_dir.name}: SKILL.md frontmatter 包含未允许字段 {sorted(unexpected)}"
+        )
 
     skill_name = frontmatter.get("name", "").strip()
     if not skill_name:
         result.errors.append(f"{skill_dir.name}: SKILL.md frontmatter.name 为空")
         return ""
 
+    max_name_length = int(config["max_name_length"])
+    if len(skill_name) > max_name_length:
+        result.errors.append(
+            f"{skill_dir.name}: frontmatter.name 长度超过 {max_name_length} 字符"
+        )
+    if not NAME_PATTERN.fullmatch(skill_name):
+        result.errors.append(
+            f"{skill_dir.name}: frontmatter.name 需为小写字母/数字/中划线"
+        )
+    if skill_name.startswith("-") or skill_name.endswith("-") or "--" in skill_name:
+        result.errors.append(
+            f"{skill_dir.name}: frontmatter.name 不能前后为中划线且不能包含连续中划线"
+        )
+
     if skill_name != skill_dir.name:
         result.errors.append(
             f"{skill_dir.name}: frontmatter.name({skill_name}) 与目录名不一致"
         )
 
-    validate_openai_yaml(skill_dir, skill_name, result)
-    return validate_version_file(skill_dir, result)
+    description = frontmatter.get("description", "").strip()
+    if not description:
+        result.errors.append(f"{skill_dir.name}: frontmatter.description 为空")
+    else:
+        max_description_length = int(config["max_description_length"])
+        if len(description) > max_description_length:
+            result.errors.append(
+                f"{skill_dir.name}: frontmatter.description 超过 {max_description_length} 字符"
+            )
+
+    validate_openai_yaml(skill_dir, skill_name, config, result)
+    if config.get("require_version_file"):
+        return validate_version_file(skill_dir, result)
+    return ""
 
 
 def main() -> int:
-    repo_root = Path(__file__).resolve().parent.parent
+    parser = argparse.ArgumentParser(description="Validate a skill repository.")
+    parser.add_argument("--repo-root", help="Repository root to validate")
+    parser.add_argument("--config", help="Optional JSON config file")
+    args = parser.parse_args()
+
+    repo_root = Path(args.repo_root).resolve() if args.repo_root else Path(__file__).resolve().parent.parent
+    config = load_config(args.config)
     result = ValidationResult(errors=[], warnings=[])
     versions: dict[str, str] = {}
 
@@ -212,8 +333,8 @@ def main() -> int:
         result.errors.append("未发现任何技能目录（需要目录下存在 SKILL.md）")
     else:
         for skill_dir in skill_dirs:
-            versions[skill_dir.name] = validate_skill_dir(skill_dir, result)
-        validate_skills_index(repo_root, skill_dirs, versions, result)
+            versions[skill_dir.name] = validate_skill_dir(skill_dir, config, result)
+        validate_skills_index(repo_root, skill_dirs, versions, config, result)
 
     if result.errors:
         print("校验失败：")

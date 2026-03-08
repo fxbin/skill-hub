@@ -1,0 +1,14 @@
+{
+  "required_frontmatter_keys": ["name", "description"],
+  "allowed_frontmatter_keys": ["name", "description", "metadata", "allowed-tools", "license"],
+  "required_openai_fields": ["display_name", "short_description", "default_prompt"],
+  "require_openai_yaml": false,
+  "require_version_file": false,
+  "require_skills_index": false,
+  "resource_dirs": ["references", "scripts", "assets"],
+  "emit_openai_yaml": true,
+  "short_description_min": 25,
+  "short_description_max": 64,
+  "max_name_length": 64,
+  "max_description_length": 1024
+}
