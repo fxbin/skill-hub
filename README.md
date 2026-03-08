@@ -7,13 +7,15 @@
 | id | 名称 | 版本 | 路径 | 说明 |
 | --- | --- | --- | --- | --- |
 | `skill-forge` | Skill Forge | `v3.0.0` | `skill-forge/` | 创建新技能的通用工具链，支持脚手架、配置化 openai.yaml 生成与校验。 |
-| `virtual-intelligent-dev-team` | 虚拟智能开发团队 | `v3.4` | `virtual-intelligent-dev-team/` | 自动路由到合适技术领域智能体并组织协作交付。 |
+| `webnovel-style-forge` | Webnovel Style Forge | `v1.0.0` | `webnovel-style-forge/` | 通过样章分析与多轮对比淬炼，提炼并迭代优化网文文风提示词。 |
+| `virtual-intelligent-dev-team` | 虚拟智能开发团队 | `v3.6` | `virtual-intelligent-dev-team/` | 自动路由到合适技术领域智能体并组织协作交付。 |
 
 ## 仓库结构
 
 ```text
 skill-hub/
 ├── skill-forge/
+├── webnovel-style-forge/
 ├── virtual-intelligent-dev-team/
 ├── scripts/
 │   └── validate_skills.py

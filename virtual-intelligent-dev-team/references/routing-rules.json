@@ -1,8 +1,8 @@
 {
   "meta": {
     "author": "fxbin",
-    "version": "v3.4",
-    "updated": "2026-03-05"
+    "version": "v3.6",
+    "updated": "2026-03-09"
   },
   "thresholds": {
     "max_agent_score": 20,
@@ -98,6 +98,63 @@
     "git-workflow": "Git Workflow Guardian",
     "using-git-worktrees": "Git Workflow Guardian"
   },
+  "priority_routing_rules": [
+    {
+      "agent": "Code Audit Council",
+      "any_keywords": [
+        "review",
+        "code review",
+        "pr review",
+        "security review",
+        "审计",
+        "代码审查",
+        "安全检查",
+        "漏洞"
+      ],
+      "exclude_if_any_keywords": [
+        "ui review",
+        "ux review",
+        "设计评审",
+        "视觉评审",
+        "动效评审"
+      ]
+    },
+    {
+      "agent": "Git Workflow Guardian",
+      "any_keywords": [
+        "git workflow",
+        "git-workflow",
+        "git flow",
+        "git-flow",
+        "分支策略",
+        "提交规范",
+        "conventional commits",
+        "commit message",
+        "status",
+        "add",
+        "commit",
+        "push",
+        "pull",
+        "checkout",
+        "merge",
+        "rebase",
+        "cherry-pick",
+        "tag",
+        "stash",
+        "提交",
+        "推送",
+        "分支",
+        "合并",
+        "回滚",
+        "提交信息",
+        "pr 流程",
+        "pr流程",
+        "pull request",
+        "merge request",
+        "拉取请求"
+      ]
+    }
+  ],
   "agent_order": [
     "Java Virtuoso",
     "Sentinel Architect (NB)",
@@ -159,8 +216,11 @@
         { "keyword": "innovate", "score": 5 },
         { "keyword": "plan", "score": 5 },
         { "keyword": "execute", "score": 5 },
-        { "keyword": "review", "score": 5 },
         { "keyword": "hot-fix", "score": 5 },
+        { "keyword": "hotfix", "score": 5 },
+        { "keyword": "rebase 冲突", "score": 6 },
+        { "keyword": "merge 冲突", "score": 6 },
+        { "keyword": "冲突处理", "score": 5 },
         { "keyword": "mission critical", "score": 5 },
         { "keyword": "零容错", "score": 5 }
       ],
@@ -209,6 +269,11 @@
     "Code Audit Council": {
       "positive": [
         { "keyword": "code review", "score": 6 },
+        { "keyword": "review", "score": 6 },
+        { "keyword": "pr review", "score": 6 },
+        { "keyword": "security review", "score": 6 },
+        { "keyword": "代码review", "score": 6 },
+        { "keyword": "代码 review", "score": 6 },
         { "keyword": "审计", "score": 6 },
         { "keyword": "代码审查", "score": 6 },
         { "keyword": "漏洞", "score": 6 },
@@ -225,7 +290,11 @@
       "negative": [
         { "keyword": "商业模式", "score": 4 },
         { "keyword": "融资", "score": 4 },
-        { "keyword": "定价", "score": 3 }
+        { "keyword": "定价", "score": 3 },
+        { "keyword": "ui review", "score": 6 },
+        { "keyword": "ux review", "score": 6 },
+        { "keyword": "视觉评审", "score": 6 },
+        { "keyword": "动效评审", "score": 6 }
       ]
     },
     "Git Workflow Guardian": {

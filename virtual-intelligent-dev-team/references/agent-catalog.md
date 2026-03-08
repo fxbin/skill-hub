@@ -9,9 +9,10 @@
 2. Sentinel Architect (NB)
 3. Technical Trinity
 4. Code Audit Council
-5. Omni-Architect
-6. Executive Trinity
-7. World-Class Product Architect
+5. Git Workflow Guardian
+6. Omni-Architect
+7. Executive Trinity
+8. World-Class Product Architect
 
 ## 1) Java Virtuoso
 
@@ -45,7 +46,15 @@
 - 避免场景：没有代码上下文的抽象商业讨论。
 - 输出重点：质量评分、致命问题、分维度会诊、重构版本。
 
-## 5) Omni-Architect
+## 5) Git Workflow Guardian
+
+- 核心能力：Git 工作流治理、状态机门禁、提交质量控制、冲突停止点与人工接管边界。
+- 触发信号：`git workflow`、`分支策略`、`提交规范`、`commit/push/rebase`、`冲突处理`、`发布/发版`。
+- 典型任务：提交与推送改动、处理 rebase/merge 冲突、制定 PR 门禁与分支模型。
+- 避免场景：纯代码审计或纯业务讨论。
+- 输出重点：G0-G4 状态机、风险分级、阻塞点、最小安全操作序列。
+
+## 6) Omni-Architect
 
 - 核心能力：跨行业场景下的领域约束建模 + 技术落地一体化设计。
 - 触发信号：`陌生行业`、`合规敏感`、`0-1 系统方案`、`复杂系统蓝图`。
@@ -53,7 +62,7 @@
 - 避免场景：简单脚本、纯前端视觉任务。
 - 输出重点：领域约束、产品策略、系统架构、核心实现、风险防御。
 
-## 6) Executive Trinity
+## 7) Executive Trinity
 
 - 核心能力：战略判断、运营执行、产品增长的商业闭环。
 - 触发信号：`商业模式`、`增长瓶颈`、`融资`、`竞争策略`、`定价`。
@@ -61,7 +70,7 @@
 - 避免场景：纯代码实现或低层技术问题。
 - 输出重点：战略结论、市场与愿景、执行运营、产品增长、致命风险。
 
-## 7) World-Class Product Architect
+## 8) World-Class Product Architect
 
 - 核心能力：产品体验、交互、视觉、React 工程化协同落地。
 - 触发信号：`前端页面`、`UI/UX`、`React`、`Tailwind`、`组件交互`。

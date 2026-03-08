@@ -126,6 +126,38 @@ def compute_scores(
     return scores, hits
 
 
+def normalize_process_hit(hit: str) -> str:
+    if hit.startswith("fallback:"):
+        return hit.split(":", 1)[1]
+    return hit
+
+
+def is_git_review_context_only(text: str, git_hits: list[str]) -> bool:
+    if len(git_hits) == 0:
+        return False
+    review_only_hits = {"pr", "mr", "pull request", "merge request", "拉取请求"}
+    normalized_hits = {normalize_process_hit(hit) for hit in git_hits}
+    if len(normalized_hits) == 0 or not normalized_hits.issubset(review_only_hits):
+        return False
+
+    lowered = text.lower()
+    audit_context_keywords = [
+        "review",
+        "code review",
+        "pr review",
+        "security review",
+        "审计",
+        "代码审查",
+        "安全检查",
+        "漏洞",
+    ]
+    return any(keyword_matches(lowered, keyword.lower()) for keyword in audit_context_keywords)
+
+
+def should_suppress_git_workflow(text: str, process_hits: dict[str, list[str]]) -> bool:
+    return is_git_review_context_only(text, process_hits.get("git-workflow", []))
+
+
 def detect_process_skills(
     text: str, config: dict[str, object]
 ) -> tuple[bool, bool, list[str], dict[str, list[str]]]:
@@ -175,6 +207,9 @@ def detect_process_skills(
             process_hits["git-workflow"] = [
                 f"fallback:{keyword}" for keyword in sorted(set(action_hits))
             ]
+
+    if should_suppress_git_workflow(text, process_hits):
+        process_hits.pop("git-workflow", None)
 
     needs_worktree = "using-git-worktrees" in process_hits
     needs_git_workflow = "git-workflow" in process_hits
@@ -314,6 +349,43 @@ def keyword_hits(text: str, keywords: list[str]) -> list[str]:
         if token != "" and keyword_matches(lowered, token):
             hits.append(keyword)
     return hits
+
+
+def detect_priority_lead(text: str, config: dict[str, object]) -> dict[str, object] | None:
+    lowered = text.lower()
+    rules = config.get("priority_routing_rules", [])
+    if not isinstance(rules, list):
+        return None
+
+    for rule in rules:
+        if not isinstance(rule, dict):
+            continue
+
+        agent = str(rule.get("agent", "")).strip()
+        any_keywords = ensure_list_str(rule.get("any_keywords"), [])
+        all_keywords = ensure_list_str(rule.get("all_keywords"), [])
+        exclude_keywords = ensure_list_str(rule.get("exclude_if_any_keywords"), [])
+        if agent == "" or (len(any_keywords) == 0 and len(all_keywords) == 0):
+            continue
+
+        any_hits = [keyword for keyword in any_keywords if keyword_matches(lowered, keyword.lower())]
+        all_hits = [keyword for keyword in all_keywords if keyword_matches(lowered, keyword.lower())]
+        exclude_hits = [
+            keyword for keyword in exclude_keywords if keyword_matches(lowered, keyword.lower())
+        ]
+
+        if len(all_keywords) > 0 and len(all_hits) != len(all_keywords):
+            continue
+        if len(any_keywords) > 0 and len(any_hits) == 0:
+            continue
+        if len(exclude_hits) > 0:
+            continue
+
+        return {
+            "agent": agent,
+            "matched_keywords": dedupe_agents(any_hits + all_hits),
+        }
+    return None
 
 
 def parse_iso_time(value: str) -> datetime | None:
@@ -885,20 +957,21 @@ def build_process_plan(
     repo_strategy: dict[str, str],
 ) -> list[dict[str, object]]:
     plan: list[dict[str, object]] = []
+    base_branch = str(repo_strategy.get("base_branch", "main"))
     if needs_worktree:
         plan.append(
             {
                 "skill": "using-git-worktrees",
                 "reference": "references/using-git-worktrees-playbook.md",
                 "steps": [
-                    "确定基线分支（main/develop）",
+                    f"确定基线分支（当前建议为 {base_branch}）",
                     "为每个任务创建独立 worktree 与分支",
                     "在各自 worktree 内开发与提交",
                     "任务完成后清理已合并 worktree",
                 ],
                 "commands": [
                     "git worktree list",
-                    "git worktree add ../wt-<task> -b <branch> main",
+                    f"git worktree add ../wt-<task> -b <branch> {base_branch}",
                     "git worktree remove ../wt-<task>",
                     "git worktree prune",
                 ],
@@ -927,10 +1000,10 @@ def build_process_plan(
                     "git add <files>",
                     f"python scripts/git_workflow_guardrail.py --repo . --stage G2 --commit-message \"{templates['commit_message']}\" --pretty",
                     f"git commit -m \"{templates['commit_message']}\"",
-                    f"git pull --rebase origin {templates['base_branch']}",
                     "python scripts/git_workflow_guardrail.py --repo . --stage G3 --pretty",
-                    f"git push -u origin {templates['branch_name']}",
+                    f"git pull --rebase origin {templates['base_branch']}",
                     "python scripts/git_workflow_guardrail.py --repo . --stage G4 --pretty",
+                    f"git push -u origin {templates['branch_name']}",
                 ],
                 "auto_execute_policy": build_auto_execute_policy(),
                 "repo_strategy": repo_strategy,
@@ -1014,6 +1087,12 @@ def route_request(text: str, config: dict[str, object], repo_path: Path) -> dict
         key=lambda item: (-item[1], order_index.get(item[0], 999)),
     )
     lead_agent, lead_score = sorted_agents[0]
+    priority_route = detect_priority_lead(text, config)
+    if priority_route is not None:
+        priority_agent = str(priority_route.get("agent", "")).strip()
+        if priority_agent != "":
+            lead_agent = priority_agent
+            lead_score = scores.get(lead_agent, 0)
 
     process_only = lead_score == 0 and len(process_skills) > 0
     language_only = lead_score == 0 and len(process_skills) == 0 and len(detected_languages) > 0
@@ -1038,17 +1117,27 @@ def route_request(text: str, config: dict[str, object], repo_path: Path) -> dict
     sentinel_score = scores.get("Sentinel Architect (NB)", 0)
     sentinel_overlay = sentinel_score >= sentinel_threshold and sentinel_score > 0
 
+    assistant_candidates = [agent for agent, _ in sorted_agents if agent != lead_agent]
     if process_only or language_only or unknown_only or confidence >= high_confidence:
         assistants = []
     elif confidence >= medium_confidence:
-        assistants = [sorted_agents[1][0]]
+        assistants = assistant_candidates[:1]
     else:
-        assistants = [sorted_agents[1][0], sorted_agents[2][0]]
+        assistants = assistant_candidates[:2]
 
     # Avoid duplicate value-add when assistant score is zero.
     assistants = [
         agent for agent in assistants if scores.get(agent, 0) > 0 and agent != lead_agent
     ]
+    git_reason_hits = reasons.get("Git Workflow Guardian", {}).get("positive", [])
+    if (
+        lead_agent != "Git Workflow Guardian"
+        and isinstance(git_reason_hits, list)
+        and is_git_review_context_only(text, git_reason_hits)
+    ):
+        assistants = [agent for agent in assistants if agent != "Git Workflow Guardian"]
+    if sentinel_overlay and lead_agent != "Sentinel Architect (NB)":
+        assistants = dedupe_agents(["Sentinel Architect (NB)"] + assistants)
     governance_defaults = get_governance_defaults(config)
     governance_plan = build_governance_plan(
         text=text,
@@ -1118,6 +1207,7 @@ def route_request(text: str, config: dict[str, object], repo_path: Path) -> dict
         "process_only_fallback": process_only,
         "language_only_fallback": language_only,
         "unknown_only_fallback": unknown_only,
+        "priority_routing": priority_route,
         "language_hits": language_hits,
         "process_skill_hits": process_hits,
     }
@@ -1191,4 +1281,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -1,0 +1,103 @@
+{
+  "routing_cases": [
+    {
+      "name": "review_java_gc",
+      "text": "请 review 这个 Java GC 问题并给出建议",
+      "expect": {
+        "lead_agent": "Code Audit Council",
+        "assistant_agents_contains": ["Java Virtuoso"],
+        "needs_git_workflow": false,
+        "priority_agent": "Code Audit Council"
+      }
+    },
+    {
+      "name": "pr_audit_review",
+      "text": "这是 PR，帮我做安全审计和重构建议",
+      "expect": {
+        "lead_agent": "Code Audit Council",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "process_skills": [],
+        "priority_agent": "Code Audit Council"
+      }
+    },
+    {
+      "name": "ui_review",
+      "text": "给 React 页面做 UI review",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "rebase_conflict",
+      "text": "解决 rebase 冲突并给出最稳妥处理路径",
+      "expect": {
+        "lead_agent": "Git Workflow Guardian",
+        "assistant_agents_contains": ["Sentinel Architect (NB)"],
+        "needs_git_workflow": true,
+        "priority_agent": "Git Workflow Guardian"
+      }
+    }
+  ],
+  "process_plan_cases": [
+    {
+      "name": "worktree_master_branch",
+      "needs_worktree": true,
+      "needs_git_workflow": false,
+      "repo_strategy": {
+        "strategy": "trunk-master",
+        "base_branch": "master"
+      },
+      "expect": {
+        "commands_contains": [
+          "git worktree add ../wt-<task> -b <branch> master"
+        ]
+      }
+    },
+    {
+      "name": "git_workflow_guardrail_order",
+      "needs_worktree": false,
+      "needs_git_workflow": true,
+      "repo_strategy": {
+        "strategy": "trunk-master",
+        "base_branch": "master"
+      },
+      "expect": {
+        "ordered_pairs": [
+          [
+            "python scripts/git_workflow_guardrail.py --repo . --stage G3 --pretty",
+            "git pull --rebase origin master"
+          ],
+          [
+            "python scripts/git_workflow_guardrail.py --repo . --stage G4 --pretty",
+            "git push -u origin feat/<ticket>-<summary>"
+          ]
+        ]
+      }
+    }
+  ],
+  "guardrail_cases": [
+    {
+      "name": "command_policy",
+      "type": "command_policy",
+      "commands": ["git status", "git push", "git push --force"],
+      "expect": {
+        "max_risk": "high",
+        "decisions": {
+          "git status": "low",
+          "git push": "medium",
+          "git push --force": "high"
+        }
+      }
+    },
+    {
+      "name": "g0_staged_should_fail",
+      "type": "g0_staged_should_fail"
+    },
+    {
+      "name": "g3_behind_should_report_sync",
+      "type": "g3_behind_should_report_sync"
+    }
+  ]
+}

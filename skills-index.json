@@ -18,9 +18,25 @@
       ]
     },
     {
+      "id": "webnovel-style-forge",
+      "display_name": "Webnovel Style Forge",
+      "version": "v1.0.0",
+      "path": "webnovel-style-forge",
+      "positioning": "personal-skill",
+      "default_prompt": "Use $webnovel-style-forge to extract, compare, and iteratively refine a target webnovel writing style.",
+      "tags": [
+        "writing",
+        "webnovel",
+        "style",
+        "prompt",
+        "iteration",
+        "comparison"
+      ]
+    },
+    {
       "id": "virtual-intelligent-dev-team",
       "display_name": "虚拟智能开发团队",
-      "version": "v3.4",
+      "version": "v3.6",
       "path": "virtual-intelligent-dev-team",
       "positioning": "personal-skill",
       "default_prompt": "Use $virtual-intelligent-dev-team to auto-route this request, enforce deterministic git guardrails, and coordinate privy-council dual-track governance with anti-gaming controls, dual-sign evidence, and post-audit loops.",

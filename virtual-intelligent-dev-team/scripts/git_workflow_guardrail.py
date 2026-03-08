@@ -228,10 +228,22 @@ def ensure(condition: bool, message: str) -> None:
 
 
 def validate_g0(repo: Path) -> dict[str, object]:
-    branch = current_branch(repo)
+    checkpoint = get_repo_checkpoint(repo)
+    branch = str(checkpoint["branch"])
     unmerged = list_unmerged_files(repo)
     ensure(len(unmerged) == 0, f"Unmerged files found: {', '.join(unmerged)}")
-    return {"branch": branch}
+    staged_changes = int(checkpoint["staged_changes"])
+    ensure(
+        staged_changes == 0,
+        "G0 requires no pre-existing staged changes; unstage current files before entering the workflow",
+    )
+    return {
+        "branch": branch,
+        "staged_changes": staged_changes,
+        "unstaged_changes": int(checkpoint["unstaged_changes"]),
+        "untracked_files": int(checkpoint["untracked_files"]),
+        "stash_count": int(checkpoint["stash_count"]),
+    }
 
 
 def validate_g1(repo: Path, max_staged_files: int) -> dict[str, object]:
@@ -258,13 +270,18 @@ def validate_g3(repo: Path) -> dict[str, object]:
     unmerged = list_unmerged_files(repo)
     ensure(len(unmerged) == 0, f"Unmerged files found: {', '.join(unmerged)}")
     behind, ahead = upstream_relation(repo)
-    ensure(behind == 0, f"Branch is behind upstream by {behind} commits")
-    return {"behind": behind, "ahead": ahead}
+    return {
+        "behind": behind,
+        "ahead": ahead,
+        "requires_sync": behind > 0,
+    }
 
 
 def validate_g4(repo: Path) -> dict[str, object]:
     g3_result = validate_g3(repo)
+    behind = int(g3_result["behind"])
     ahead = int(g3_result["ahead"])
+    ensure(behind == 0, f"Branch is behind upstream by {behind} commits")
     ensure(ahead > 0, "No commits ahead of upstream, nothing to push or open PR for")
     return g3_result
 
@@ -306,7 +323,8 @@ def build_recovery_plan(stage: str, checkpoint: dict[str, object]) -> list[str]:
     stage_specific = {
         "G0": [
             "git status --short --branch",
-            "确认当前分支是否正确",
+            "git restore --staged <file>",
+            "确认当前分支是否正确，并清空遗留暂存集后重试 G0",
         ],
         "G1": [
             "git restore --staged <file>",

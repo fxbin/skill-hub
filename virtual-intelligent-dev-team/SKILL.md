@@ -30,7 +30,7 @@ description: Intelligent expert-team router for complex requests. Automatically 
 - 已支持 `Python`、`Go`、`Node.js`、`Rust` 开发场景识别。
 - 默认由 `Technical Trinity` 作为这些语言栈的主责智能体。
 - Go 语言支持“上下文识别”：`go` 需要与 `backend/api/service` 等上下文同时出现才会触发。
-- 语言识别与关键词权重在 `references/routing-rules.json` 的 `language_profiles` 与 `agent_rules.Technical Trinity` 中维护。
+- 语言识别与关键词权重在 `references/routing-rules.json` 的 `language_profiles`、`agent_rules` 与 `priority_routing_rules` 中维护。
 
 Read `references/agent-catalog.md` when you need detailed trigger keywords, anti-patterns, and output preferences.
 Read `references/routing-score-matrix.md` when you need weighted routing and confidence-based dispatch.
@@ -38,10 +38,10 @@ Read `references/routing-rules.json` as the single source of truth for routing w
 
 ## 自动路由规则
 
-按以下顺序匹配；命中即作为主责智能体。若同时命中多个规则，应用“冲突消解规则”。
+先走“显式优先路由”，再走加权打分；若同时命中多个显式规则，应用“冲突消解规则”。
 
-1. 触发 `Code Audit Council`：用户明确要求“审计/Review/安全检查/PR 前检查/找漏洞/重构坏代码”。
-2. 触发 `Git Workflow Guardian`：任务核心是 `status/add/commit/pull/rebase/push/PR/MR/tag/cherry-pick` 等 Git 流程治理。
+1. 触发 `Code Audit Council`：用户明确要求“审计/Review/安全检查/PR 前检查/找漏洞/重构坏代码”；但 `UI review/UX review/视觉评审` 仍优先走前端体验路由。
+2. 触发 `Git Workflow Guardian`：任务核心是 `status/add/commit/pull/rebase/push/tag/cherry-pick`、分支策略、提交规范、PR 流程治理；单独提到“这是一个 PR”但语义是审计时，不自动切 Git 主责。
 3. 触发 `Java Virtuoso`：任务核心是 Java/Spring/JVM/并发调优/Java 版本升级。
 4. 触发 `World-Class Product Architect`：任务核心是前端页面、交互设计、React 组件、UI 体验优化。
 5. 触发 `Executive Trinity`：任务核心是商业决策、增长策略、定价、融资、竞争策略。
@@ -51,7 +51,7 @@ Read `references/routing-rules.json` as the single source of truth for routing w
 
 ## 加权路由算法
 
-在规则匹配之外，统一执行一次加权打分，避免仅靠单关键词误判：
+在显式优先路由之外，统一执行一次加权打分，避免仅靠单关键词误判：
 
 1. 文本预处理：统一小写、去噪、保留技术词和业务词。
 2. 关键词打分：按 `references/routing-rules.json` 累加各智能体分值。
@@ -151,6 +151,12 @@ Read `references/git-workflow-playbook.md` when request needs branch policy, com
 3. 内置 `git_workflow_guardrail` 校验器  
 Run `scripts/git_workflow_guardrail.py` when you need deterministic G0-G4 checks before each Git operation step.
 
+4. 内置 `semantic-regression` 校验器  
+Run `scripts/validate_virtual_team.py --pretty` when you change routing rules, guardrail logic, or examples and need a single-pass semantic regression check.
+
+5. 内置回归用例集  
+Read `references/regression-cases.json` when you need the canonical routing/process/guardrail case matrix.
+
 ## 低智能模型稳定性护栏（Git 专项）
 
 当请求触发 Git 流程时，主责智能体必须执行以下硬约束：
@@ -161,7 +167,7 @@ Run `scripts/git_workflow_guardrail.py` when you need deterministic G0-G4 checks
 4. 禁止自动执行危险命令：`git reset --hard`、`git clean -fd`、`git push --force`（除非用户明确授权）。
 5. 提交必须满足最小粒度：一次提交只承载单一意图。
 6. 提交信息必须包含类型前缀与中文摘要，例如 `fix: 修复 xxx`。
-7. 执行 Git 步骤前必须运行 `scripts/git_workflow_guardrail.py` 对应阶段校验，未通过不得继续。
+7. 执行 Git 步骤前必须运行 `scripts/git_workflow_guardrail.py` 对应阶段校验，未通过不得继续；其中 `G3` 用于同步前检查，`G4` 用于推送或开 PR 前检查。
 8. 执行前先做 `R0 仓库画像识别`，基于仓库策略自动生成分支、提交、PR 模板。
 9. 自动化边界遵循三级策略：低风险自动执行，中风险先确认，高风险必须确认并解释风险。
 10. 每次流程执行记录指标：首次推送成功率、冲突率、回滚率、人工介入率。
@@ -256,7 +262,30 @@ python scripts/route_request.py --text "<user request>" --config references/rout
 - `mode`：建议协作模式
 - `clarifying_question`：低置信场景下的澄清问题（无则为 `null`）
 - `reason`：命中关键词摘要（包含正向与负向命中）
+- `reason.priority_routing`：显式优先路由命中信息（如有）
 - `routing_config`：当前使用的配置文件路径与版本
+
+## 语义回归校验
+
+当你修改以下任一内容时，必须运行语义回归校验：
+- `references/routing-rules.json`
+- `scripts/route_request.py`
+- `scripts/git_workflow_guardrail.py`
+- `references/git-workflow-playbook.md`
+- `SKILL.md` 中的路由或流程承诺
+
+执行命令：
+
+```bash
+python scripts/validate_virtual_team.py --pretty
+```
+
+校验覆盖：
+- 路由结果与优先级
+- `PR` 审计场景的 Git 流程抑制
+- `Sentinel` 治理叠加是否真实体现在辅助智能体
+- worktree 与 git-workflow 的命令顺序和基线分支
+- G0/G3 守门语义与命令风险分级
 
 ## 快速触发示例
 
@@ -265,11 +294,10 @@ python scripts/route_request.py --text "<user request>" --config references/rout
 - “用 Go + Gin 设计高并发网关” -> `Technical Trinity`
 - “用 Node.js + NestJS 设计后端服务” -> `Technical Trinity`
 - “用 Rust + Axum 设计高性能后端服务” -> `Technical Trinity`
-- “这是 PR，帮我做安全审计和重构建议” -> `Code Audit Council` + `Java Virtuoso`（可选）
+- “这是 PR，帮我做安全审计和重构建议” -> `Code Audit Council`
 - “帮我把这次改动按规范提交并推送分支” -> `Git Workflow Guardian`
 - “解决 rebase 冲突并给出最稳妥处理路径” -> `Git Workflow Guardian` + `Sentinel Architect (NB)`
 - “设计一个陌生行业系统并考虑合规” -> `Omni-Architect` + `Technical Trinity`
 - “这个 SaaS 不增长，给我战略选择” -> `Executive Trinity`
 - “重做后台页面交互与视觉” -> `World-Class Product Architect`
 - “核心模块重构，必须先调研后执行” -> `Sentinel Architect (NB)`
-
