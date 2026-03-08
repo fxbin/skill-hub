@@ -1,6 +1,6 @@
 # Skill Tooling Configuration
 
-`skill-creator` 的脚本支持通过 JSON 配置切换“通用模式”和“仓库特定模式”。
+`skill-forge` 的脚本支持通过 JSON 配置切换“通用模式”和“仓库特定模式”。
 
 最小示例：
 
@@ -32,12 +32,12 @@
 示例：
 
 ```bash
-python skill-creator/scripts/init_skill.py my-skill --path . \
-  --config skill-creator/references/generic-skill-config.json
+python skill-forge/scripts/init_skill.py my-skill --path . \
+  --config skill-forge/references/generic-skill-config.json
 
-python skill-creator/scripts/quick_validate.py ./my-skill \
-  --config skill-creator/references/generic-skill-config.json
+python skill-forge/scripts/quick_validate.py ./my-skill \
+  --config skill-forge/references/generic-skill-config.json
 
 python scripts/validate_skills.py --repo-root . \
-  --config skill-creator/references/generic-skill-config.json
+  --config skill-forge/references/generic-skill-config.json
 ```

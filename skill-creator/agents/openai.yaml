@@ -1,4 +1,0 @@
-interface:
-  display_name: "Skill 创建器"
-  short_description: "用于创建或更新可复用技能，统一 frontmatter 与触发规则"
-  default_prompt: "Use $skill-creator to scaffold, validate, or refine a reusable skill with correct metadata and workflow."

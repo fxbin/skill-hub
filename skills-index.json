@@ -1,15 +1,15 @@
 {
   "repository": "skill-hub",
   "owner": "fxbin",
-  "updated_at": "2026-03-08",
+  "updated_at": "2026-03-09",
   "skills": [
     {
-      "id": "skill-creator",
-      "display_name": "Skill 创建器",
-      "version": "v2.1.0",
-      "path": "skill-creator",
+      "id": "skill-forge",
+      "display_name": "Skill Forge",
+      "version": "v3.0.0",
+      "path": "skill-forge",
       "positioning": "personal-skill",
-      "default_prompt": "Use $skill-creator to scaffold, validate, or refine a reusable skill with correct metadata and workflow.",
+      "default_prompt": "Use $skill-forge to scaffold, validate, or refine a reusable skill with correct metadata and workflow.",
       "tags": [
         "skill",
         "creation",

@@ -19,20 +19,20 @@ interface:
 生成方式：
 
 ```bash
-python skill-creator/scripts/generate_openai_yaml.py /path/to/skill
+python skill-forge/scripts/generate_openai_yaml.py /path/to/skill
 ```
 
 如果外部仓库有不同的字段长度或必填规则，使用：
 
 ```bash
-python skill-creator/scripts/generate_openai_yaml.py /path/to/skill \
-  --config skill-creator/references/generic-skill-config.json
+python skill-forge/scripts/generate_openai_yaml.py /path/to/skill \
+  --config skill-forge/references/generic-skill-config.json
 ```
 
 覆盖字段：
 
 ```bash
-python skill-creator/scripts/generate_openai_yaml.py /path/to/skill \
+python skill-forge/scripts/generate_openai_yaml.py /path/to/skill \
   --interface display_name="My Skill" \
   --interface short_description="Help create or update My Skill" \
   --interface default_prompt="Use $my-skill to ..."
