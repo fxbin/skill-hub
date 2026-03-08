@@ -1,0 +1,4 @@
+interface:
+  display_name: "Webnovel Style Forge"
+  short_description: "Refine webnovel style prompts through iterative comparison"
+  default_prompt: "Use $webnovel-style-forge to extract, compare, and iteratively refine a target webnovel writing style."

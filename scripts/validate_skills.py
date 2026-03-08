@@ -14,6 +14,11 @@ from typing import List
 
 INFRA_DIRS = {".git", ".github", "scripts", "__pycache__"}
 NAME_PATTERN = re.compile(r"^[a-z0-9-]+$")
+RELATIVE_REF_PATTERN = re.compile(r"`((?:references|scripts|assets|agents)/[^`\n]+|VERSION)`")
+README_SKILL_ROW_PATTERN = re.compile(
+    r"^\|\s*`(?P<id>[^`]+)`\s*\|\s*(?P<name>[^|]+?)\s*\|\s*`(?P<version>[^`]+)`\s*\|\s*`(?P<path>[^`]+)`\s*\|",
+    flags=re.MULTILINE,
+)
 DEFAULT_CONFIG = {
     "required_frontmatter_keys": ["name", "description"],
     "allowed_frontmatter_keys": ["name", "description", "metadata", "allowed-tools", "license"],
@@ -94,6 +99,10 @@ def extract_yaml_scalar(content: str, key: str) -> str:
     return value
 
 
+def find_relative_refs(content: str) -> list[str]:
+    return [match.group(1).strip() for match in RELATIVE_REF_PATTERN.finditer(content)]
+
+
 def discover_skill_dirs(repo_root: Path) -> List[Path]:
     skill_dirs: List[Path] = []
 
@@ -165,6 +174,52 @@ def read_openai_interface(skill_dir: Path) -> dict[str, str]:
         "short_description": extract_yaml_scalar(content, "short_description"),
         "default_prompt": extract_yaml_scalar(content, "default_prompt"),
     }
+
+
+def validate_skill_references(skill_dir: Path, result: ValidationResult) -> None:
+    skill_md = skill_dir / "SKILL.md"
+    content = read_text(skill_md)
+    refs = find_relative_refs(content)
+    for rel in refs:
+        target = skill_dir / rel
+        if not target.exists():
+            result.errors.append(f"{skill_dir.name}: SKILL.md 引用了不存在的路径 {rel}")
+
+
+def validate_script_test_coverage(skill_dir: Path, result: ValidationResult) -> None:
+    scripts_dir = skill_dir / "scripts"
+    if not scripts_dir.is_dir():
+        return
+
+    scripts = [path for path in scripts_dir.rglob("*") if path.is_file()]
+    executable_scripts = [path for path in scripts if path.suffix in {".py", ".sh", ".js"}]
+    if len(executable_scripts) == 0:
+        return
+
+    tests_dir = skill_dir / "tests"
+    if not tests_dir.is_dir():
+        result.warnings.append(f"{skill_dir.name}: 存在 scripts/ 但未提供 tests/ 覆盖")
+        return
+
+    test_files = [path for path in tests_dir.rglob("test_*.py") if path.is_file()]
+    if len(test_files) == 0:
+        result.warnings.append(f"{skill_dir.name}: 存在 scripts/ 但 tests/ 下未发现 test_*.py")
+
+
+def read_readme_skill_rows(repo_root: Path) -> dict[str, dict[str, str]]:
+    readme = repo_root / "README.md"
+    if not readme.exists():
+        return {}
+    content = read_text(readme)
+    rows: dict[str, dict[str, str]] = {}
+    for match in README_SKILL_ROW_PATTERN.finditer(content):
+        skill_id = match.group("id").strip()
+        rows[skill_id] = {
+            "display_name": match.group("name").strip(),
+            "version": match.group("version").strip(),
+            "path": match.group("path").strip(),
+        }
+    return rows
 
 
 def validate_version_file(skill_dir: Path, result: ValidationResult) -> str:
@@ -254,6 +309,43 @@ def validate_skills_index(
             )
 
 
+def validate_readme_index(
+    repo_root: Path,
+    skill_dirs: List[Path],
+    versions: dict[str, str],
+    result: ValidationResult,
+) -> None:
+    readme = repo_root / "README.md"
+    if not readme.exists():
+        result.errors.append("仓库根目录缺少 README.md")
+        return
+
+    rows = read_readme_skill_rows(repo_root)
+    for skill_dir in skill_dirs:
+        skill_id = skill_dir.name
+        if skill_id not in rows:
+            result.errors.append(f"README.md 缺少技能表格记录: {skill_id}")
+            continue
+
+        row = rows[skill_id]
+        expected_version = versions.get(skill_id, "")
+        if expected_version and row["version"] != expected_version:
+            result.errors.append(
+                f"README.md 技能 {skill_id} 版本({row['version']}) 与 VERSION({expected_version}) 不一致"
+            )
+        if row["path"] != f"{skill_id}/":
+            result.errors.append(
+                f"README.md 技能 {skill_id} 的路径({row['path']}) 应为 {skill_id}/"
+            )
+        interface = read_openai_interface(skill_dir)
+        display_name = interface.get("display_name", "").strip()
+        if display_name and row["display_name"] != display_name:
+            result.errors.append(
+                f"README.md 技能 {skill_id} 的名称({row['display_name']})"
+                f" 与 agents/openai.yaml({display_name}) 不一致"
+            )
+
+
 def validate_skill_dir(skill_dir: Path, config: dict, result: ValidationResult) -> str:
     skill_md = skill_dir / "SKILL.md"
     if has_utf8_bom(skill_md):
@@ -311,7 +403,9 @@ def validate_skill_dir(skill_dir: Path, config: dict, result: ValidationResult) 
                 f"{skill_dir.name}: frontmatter.description 超过 {max_description_length} 字符"
             )
 
+    validate_skill_references(skill_dir, result)
     validate_openai_yaml(skill_dir, skill_name, config, result)
+    validate_script_test_coverage(skill_dir, result)
     if config.get("require_version_file"):
         return validate_version_file(skill_dir, result)
     return ""
@@ -335,6 +429,7 @@ def main() -> int:
         for skill_dir in skill_dirs:
             versions[skill_dir.name] = validate_skill_dir(skill_dir, config, result)
         validate_skills_index(repo_root, skill_dirs, versions, config, result)
+        validate_readme_index(repo_root, skill_dirs, versions, result)
 
     if result.errors:
         print("校验失败：")
