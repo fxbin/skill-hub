@@ -1,26 +1,28 @@
 {
   "repository": "skill-hub",
   "owner": "fxbin",
-  "updated_at": "2026-03-09",
+  "updated_at": "2026-03-11",
   "skills": [
     {
       "id": "skill-forge",
       "display_name": "Skill Forge",
-      "version": "v3.0.0",
+      "version": "v5.1.0",
       "path": "skill-forge",
       "positioning": "personal-skill",
-      "default_prompt": "Use $skill-forge to scaffold, validate, or refine a reusable skill with correct metadata and workflow.",
+      "default_prompt": "Use $skill-forge to scaffold, validate, benchmark, or iteratively refine a reusable skill with correct metadata and workflow.",
       "tags": [
         "skill",
         "creation",
-        "template",
+        "evaluation",
+        "benchmark",
+        "portfolio",
         "scaffolding"
       ]
     },
     {
       "id": "webnovel-style-forge",
       "display_name": "Webnovel Style Forge",
-      "version": "v1.0.0",
+      "version": "v2.0.0",
       "path": "webnovel-style-forge",
       "positioning": "personal-skill",
       "default_prompt": "Use $webnovel-style-forge to extract, compare, and iteratively refine a target webnovel writing style.",
@@ -30,16 +32,17 @@
         "style",
         "prompt",
         "iteration",
-        "comparison"
+        "comparison",
+        "anti-ai"
       ]
     },
     {
       "id": "virtual-intelligent-dev-team",
-      "display_name": "虚拟智能开发团队",
-      "version": "v3.6",
+      "display_name": "Virtual Intelligent Dev Team",
+      "version": "v4.0",
       "path": "virtual-intelligent-dev-team",
       "positioning": "personal-skill",
-      "default_prompt": "Use $virtual-intelligent-dev-team to auto-route this request, enforce deterministic git guardrails, and coordinate privy-council dual-track governance with anti-gaming controls, dual-sign evidence, and post-audit loops.",
+      "default_prompt": "Use $virtual-intelligent-dev-team to auto-route this request, enforce deterministic git guardrails, and coordinate specialized agents across engineering, architecture, security, workflow, strategy, and frontend UX.",
       "tags": [
         "development",
         "multi-agent",
@@ -47,13 +50,10 @@
         "java",
         "architecture",
         "git-workflow",
-        "deterministic",
-        "governance",
-        "roundtable",
-        "privy-council",
-        "dual-track",
-        "anti-gaming",
-        "slo"
+        "security",
+        "strategy",
+        "frontend",
+        "ux"
       ]
     }
   ]

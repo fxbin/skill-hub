@@ -6,9 +6,9 @@
 
 | id | 名称 | 版本 | 路径 | 说明 |
 | --- | --- | --- | --- | --- |
-| `skill-forge` | Skill Forge | `v3.0.0` | `skill-forge/` | 创建新技能的通用工具链，支持脚手架、配置化 openai.yaml 生成与校验。 |
-| `webnovel-style-forge` | Webnovel Style Forge | `v1.0.0` | `webnovel-style-forge/` | 通过样章分析与多轮对比淬炼，提炼并迭代优化网文文风提示词。 |
-| `virtual-intelligent-dev-team` | 虚拟智能开发团队 | `v3.6` | `virtual-intelligent-dev-team/` | 自动路由到合适技术领域智能体并组织协作交付。 |
+| `skill-forge` | Skill Forge | `v5.1.0` | `skill-forge/` | 仓库内统一的 skill 工程平台，覆盖脚手架、修复、eval、benchmark、portfolio 报告与迭代优化。 |
+| `webnovel-style-forge` | Webnovel Style Forge | `v2.0.0` | `webnovel-style-forge/` | 提炼网文文风、降低 AI 味、构建可复用风格提示词，并通过对照与迭代持续打磨。 |
+| `virtual-intelligent-dev-team` | Virtual Intelligent Dev Team | `v4.0` | `virtual-intelligent-dev-team/` | 自动路由到合适专家智能体并组织协作交付，覆盖开发、架构、安全、Git 流程、业务策略和前端 UX。 |
 
 ## 仓库结构
 
@@ -34,7 +34,7 @@ python scripts/validate_skills.py
 
 ## 提交流程
 
-1. 修改技能内容或路由规则。
-2. 更新对应技能的 `VERSION` 与 `skills-index.json`。
-3. 执行本地校验。
-4. 提交中文 commit 信息。
+1. 修改技能内容、规则或评估资产。
+2. 更新对应技能的 `VERSION`，以及 `skills-index.json` 和 `README.md`。
+3. 执行本地校验或 benchmark。
+4. 提交规范化 commit。
