@@ -1,4 +1,4 @@
 interface:
   display_name: "Skill Forge"
-  short_description: "Build, validate, benchmark, and refine reusable skills end to end."
+  short_description: "Build, validate, benchmark, and refine reusable skills."
   default_prompt: "Use $skill-forge to scaffold, validate, benchmark, or iteratively refine a reusable skill with correct metadata and workflow."

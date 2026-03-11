@@ -1,4 +1,4 @@
 interface:
-  display_name: "虚拟智能开发团队"
+  display_name: "Virtual Intelligent Dev Team"
   short_description: "Auto-route requests with deterministic guardrails and controls."
-  default_prompt: "Use $virtual-intelligent-dev-team to auto-route this request, enforce deterministic git guardrails, and coordinate privy-council dual-track governance with anti-gaming controls, dual-sign evidence, and post-audit loops."
+  default_prompt: "Use $virtual-intelligent-dev-team to auto-route this request, enforce deterministic git guardrails, and coordinate specialized agents across engineering, architecture, security, workflow, strategy, and frontend UX."
