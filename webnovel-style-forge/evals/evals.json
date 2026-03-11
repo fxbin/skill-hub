@@ -1,0 +1,47 @@
+{
+  "skill_name": "webnovel-style-forge",
+  "evals": [
+    {
+      "id": 1,
+      "category": "style-extraction",
+      "prompt": "Use $webnovel-style-forge to extract a reusable style prompt from five non-consecutive sample chapters of the same webnovel author. I do not want plot summary. I want sentence rhythm, dialogue habits, pacing, and scene texture.",
+      "expected_output": "Produces style analysis focused on expression mechanics and a reusable style prompt block.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "category": "anti-ai-cleanup",
+      "prompt": "Use $webnovel-style-forge to clean up an AI-written chapter that feels too explanatory and too polished. Compare it against the target excerpt and tell me where the AI smell is coming from before rewriting the style prompt.",
+      "expected_output": "Identifies AI smell sources, compares against target text, and proposes concrete cleanup directions.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "category": "iterative-refinement",
+      "prompt": "Use $webnovel-style-forge for a tempering round: compare my current generated prose v3 against target.txt, tell me what the target still does better, and revise the prompt for the next round.",
+      "expected_output": "Runs an iteration-oriented comparison and outputs the next prompt revision rather than a vague style summary.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "category": "baseline-comparison",
+      "prompt": "Use $webnovel-style-forge to build a no-style baseline and a styled version from the same scene outline, then explain the biggest expression-level differences between them.",
+      "expected_output": "Uses baseline vs styled comparison to surface style impact and key weaknesses.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "category": "dialogue-voice",
+      "prompt": "Use $webnovel-style-forge to imitate the dialogue feel of a specific webnovel while keeping the new scene original. I care most about voice separation, subtext, and cadence.",
+      "expected_output": "Focuses on dialogue voice and cadence without collapsing into direct plot imitation.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "category": "prompt-hardening",
+      "prompt": "Use $webnovel-style-forge to review my current style prompt. It is too abstract, full of words like immersive and vivid, and it does not change model output much. Rewrite it into concrete instructions.",
+      "expected_output": "Converts vague style language into executable prompt constraints.",
+      "files": []
+    }
+  ]
+}

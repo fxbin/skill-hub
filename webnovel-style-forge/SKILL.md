@@ -1,159 +1,164 @@
 ---
 name: webnovel-style-forge
-description: 网文文风提炼与淬炼技能。用于分析网文章节的行文技巧、对白组织、人物塑造、节奏控制与生活化表达，并通过“样章提炼 -> 生成对照 -> 原文对比 -> 多轮淬炼”迭代优化文风提示词。适用于模仿大神文风、降低 AI 味、复刻特定网文表达、整理文风提示词。用户会说“提炼文风”“模仿这个网文风格”“复刻某本书的文风”“降低 AI 味”“做文风提示词”“淬炼文风”等。
+description: Extract, compare, and iteratively refine webnovel writing style prompts. Use this skill when the user wants to imitate a specific webnovel author or book style, reduce obvious AI prose, turn sample chapters into reusable style prompts, or run repeated comparison rounds between generated prose and target text.
 ---
 
 # Webnovel Style Forge
 
-把网文文风拆成可复用的提示词，并通过多轮“打铁式”对比淬炼持续逼近目标表达。
+Use this skill to turn webnovel style analysis into reusable prompting and iterative refinement.
 
-## 核心目标
+## When To Use
 
-- 从多份样章中提炼稳定的行文特征，而不是被单一剧情牵着走。
-- 通过生成版与原文版逐轮对比，持续修正文风提示词的杂质与偏差。
-- 产出可直接插入写作工作流的文风提示词片段，而非空泛评价。
+Use `webnovel-style-forge` when the user wants to:
 
-## 使用场景
+- imitate the prose style of a specific webnovel, author, or chapter set
+- extract stable style traits from multiple sample chapters
+- reduce obvious AI writing smell in generated prose
+- compare generated prose against target text and refine the style prompt
+- build a reusable style prompt block for later drafting workflows
 
-- 用户想模仿某位网文作者或某本书的文风。
-- 用户已有一批样章，希望沉淀为可反复调用的文风提示词。
-- 用户觉得 AI 正文有明显的“AI 味”、铺陈过多、对白生硬，想迭代优化。
-- 用户已经有初版文风提示词，希望继续淬炼到更贴近目标作品。
+## Core Goal
 
-## 输入要求
+The goal is not to summarize plot. The goal is to isolate how the writing works:
 
-- 最少提供 3 份、建议 5 份不连续章节文本，分别存成独立文件。
-- 如需淬炼，额外提供：
-  - 当前版本生成稿，例如 `v1.txt`
-  - 对照原文稿，例如 `target.txt`
-- 如需做正文测试，再提供：
-  - 章节细纲
-  - 人物设定与关系
-  - 故事背景与必要约束
+- sentence movement
+- dialogue rhythm
+- narration density
+- character voice
+- detail placement
+- pacing and scene pressure
+- anti-AI cleanup patterns
 
-Read [references/style-tempering-method.md](references/style-tempering-method.md) when you need the full “打铁式淬炼” workflow, prompt templates, and optimization criteria.
-Read [references/example-output.md](references/example-output.md) when you need a concrete sample of diagnosis, refinement suggestions, and a reusable style prompt block.
-Read [references/anti-ai-checklist.md](references/anti-ai-checklist.md) when the generated prose still has obvious AI smell and you need a targeted cleanup pass before the next refinement round.
+## Inputs
 
-## 工作流程
+Prefer:
 
-### 1. 准备样本
+- at least 3 sample chapters from the same author or work
+- non-consecutive samples when possible
+- a current generated draft if the user wants refinement
+- a target reference excerpt for side-by-side comparison
 
-- 选择同一作者、同一作品的多个不连续章节。
-- 避免连续章节，降低模型被剧情记忆带偏的风险。
-- 如果样本跨度过大，先检查是否存在前后期文风明显变化。
+If the user wants iterative tempering, ask for:
 
-### 2. 提炼初版文风
+- current generated version such as `v1.txt`
+- target text such as `target.txt`
 
-对每份样章做“只看表达，不看剧情”的分析，重点抓：
+## Resources
 
-- 行文技巧
-- 文风与表达
-- 对话组织
-- 人物塑造方式
-- 节奏与信息密度
-- 生活细节与时代/地域质感
+Read only what is needed:
 
-首轮分析目标不是直接得到完美提示词，而是产出一个可测试的初版。
+- [style-tempering-method.md](references/style-tempering-method.md) for the full iterative method and prompt framing
+- [example-output.md](references/example-output.md) for a concrete output pattern
+- [anti-ai-checklist.md](references/anti-ai-checklist.md) when the draft still sounds obviously synthetic
 
-### 3. 做无文风对照
+## Workflow
 
-- 先不给任何文风提示词，仅基于细纲与设定生成一版正文。
-- 保留这版作为“无文风控制”的基线。
-- 观察 AI 常见问题：铺陈过长、抒情过多、对话生硬、解释性说明过重、人物说话同质化。
+### 1. Prepare the samples
 
-### 4. 测试初版文风提示词
+- prefer multiple non-consecutive excerpts
+- avoid overfitting to one scene or one plot beat
+- check whether the source material itself has large internal style shifts
 
-- 将初版文风提示词插入正文生成提示中。
-- 用同一细纲、同一设定再生成一版正文。
-- 不要求一次到位，目标是暴露偏差。
-- 如果这一版已经出现明显的 AI 套话、解释腔、广告腔或格式化句式，先按 `anti-ai-checklist.md` 做一次“去痕清洗”，再进入下一轮对比淬炼。
+### 2. Extract a first-pass style profile
 
-### 5. 进入打铁式淬炼
+Analyze expression rather than story:
 
-淬炼的关键不是让 AI 再提炼一次文风，而是让它比较：
+- sentence construction
+- narration stance
+- dialogue design
+- character portrayal
+- sensory and domestic detail usage
+- pacing and transition habits
 
-- 当前生成版 `vN.txt`
-- 目标原文 `target.txt`
+The first pass should produce a usable draft prompt, not a perfect one.
 
-要求 AI 只分析表达层面的差异，归纳“原文比生成稿更好”的地方，并把这些差异转成下一轮可执行的提示词修正方向。
+### 3. Establish a no-style baseline
 
-### 6. 多轮迭代
+Before using the style prompt, generate one plain baseline draft from the same outline or scene setup.
 
-每轮都重复以下动作：
+Use that baseline to identify common AI weaknesses such as:
 
-1. 用当前提示词生成正文。
-2. 人工快速判断是否更接近目标风格。
-3. 若仍有偏差，把新生成稿与原文再丢给 AI 做表达层对比。
-4. 吸收改进点，更新提示词。
+- excessive explanation
+- generic emotional phrasing
+- flattened dialogue
+- repetitive sentence cadence
+- over-obvious summary language
 
-终止条件：
+### 4. Test the first style prompt
 
-- 你已经喜欢当前成色。
-- 进一步修改只是在做个人偏好微调。
-- 不同模型开始对同一提示词表现出明显分化。
+Generate a styled draft with the same scene setup.
 
-## 关键原则
+Do not assume success on the first round. The purpose is to expose the gap between:
 
-### 只提炼“表达机制”，不提炼剧情
+- target text
+- generated baseline
+- generated styled draft
 
-- 不总结故事设定、人物事件、世界观走向。
-- 只总结如何写：句式、对白、视角、节奏、细节、冲突、留白。
+### 5. Run iterative comparison
 
-### 对比优于空想
+Compare current generated output against target text at the expression layer only.
 
-- 初版提示词可以粗糙。
-- 后续优化必须尽量基于“生成稿 vs 原文”的对比结果，而不是主观拍脑袋。
-- 若生成稿的问题已经明显属于通用 AI 套话，而不是目标文风偏差，优先做去 AI 化，再继续比对原文。
+Focus on:
 
-### 提示词要能落地
+- what the target does better
+- where the generated draft still sounds synthetic
+- which style constraints are still too vague
+- which prompt instructions are overbroad or decorative
 
-- 用“要做什么/禁止什么”的可执行句式。
-- 避免“更有味道”“更细腻”这种不可操作表达。
-- 尽量写成约束项、倾向项、禁用项。
+Translate those gaps into the next prompt revision.
 
-### 一次只解决几类偏差
+### 6. Repeat until useful
 
-- 首轮常见优先级：节奏、对白、人物关系、细节密度。
-- 不要一轮塞入过多改动，否则难以判断哪条在起作用。
+Each round should:
 
-## 输出模板
+1. generate a new draft
+2. compare it with target text
+3. identify the biggest remaining style gap
+4. update the prompt with concrete, reusable constraints
 
-1. `文风诊断`
-- 当前版本最像什么
-- 当前版本最不像什么
-- AI 味最重的 3 个问题
+Stop when:
 
-2. `文风提炼`
-- 行文技巧
-- 对话特征
-- 人物塑造
-- 细节与背景处理
-- 节奏与结构
+- the prompt is consistently producing usable prose
+- further changes are only subjective preference tuning
+- model variance becomes larger than the gains from prompt edits
 
-3. `淬炼建议`
-- 保留项
-- 删除项
-- 新增项
-- 下一轮优先修正点
+## Key Principles
 
-4. `可用提示词`
-- 输出一版可直接复制使用的文风提示词
+### Analyze expression, not plot
 
-5. `测试建议`
-- 推荐用哪个模型继续调
-- 下一轮建议使用哪段原文做对照
+Do not over-index on story beats, setting facts, or character events. Focus on reusable writing mechanics.
 
-## 快速触发示例
+### Comparison is better than abstract praise
 
-- “帮我提炼这本书的文风，整理成提示词”
-- “这段 AI 正文太有 AI 味，按原文帮我继续淬炼”
-- “模仿这位网文作者的对白和节奏”
-- “我有 5 个样章，帮我做打铁式文风迭代”
+Prefer concrete differences between generated prose and target prose over vague judgments like "more vivid" or "more immersive."
 
-## 边界与风险
+### Prompts must be executable
 
-- 同一套文风提示词跨模型复现效果不一定一致。
-- 样章过少、过于连续，容易过拟合剧情而不是风格。
-- 如果目标作品本身风格不稳定，最终提示词也会发散。
-- 文风提示词只是正文提示的一部分；设定、细纲、人物关系同样会影响效果。
+Write instructions as usable constraints:
+
+- what to do
+- what to avoid
+- what to emphasize
+
+Avoid non-operational language such as "make it more flavorful."
+
+### Fix only a few deltas per round
+
+Do not rewrite the whole style prompt every iteration. Focus on the most important gaps first.
+
+## Output Format
+
+Return results in this structure:
+
+1. `Style diagnosis`
+2. `Extracted style traits`
+3. `Refinement suggestions`
+4. `Reusable style prompt`
+5. `Next test recommendation`
+
+## Risks And Limits
+
+- style prompts may not transfer cleanly across models
+- too few samples can cause overfitting to plot instead of style
+- unstable source material leads to unstable prompt guidance
+- prose quality also depends on outline quality, character setup, and scene constraints
