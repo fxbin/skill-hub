@@ -1,6 +1,7 @@
 import importlib.util
 import json
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -87,6 +88,17 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual("World-Class Product Architect", result["lead_agent"])
         self.assertIsNone(result["reason"]["priority_routing"])
 
+    def test_checkout_ux_audit_stays_with_product_architect(self) -> None:
+        result = route_request.route_request(
+            "Audit this checkout UX for accessibility and mobile responsiveness.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertFalse(result["needs_git_workflow"])
+        self.assertEqual([], result["process_skills"])
+
     def test_worktree_plan_uses_repo_base_branch(self) -> None:
         plan = route_request.build_process_plan(
             needs_worktree=True,
@@ -126,6 +138,372 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual("Git Workflow Guardian", result["lead_agent"])
         self.assertIn("Sentinel Architect (NB)", result["assistant_agents"])
 
+    def test_strategy_request_adds_technical_trinity_copilot(self) -> None:
+        result = route_request.route_request(
+            "This SaaS is not growing. Set the strategy and also land the technical plan.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Executive Trinity", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertNotEqual("模式 A：单点执行", result["mode"])
+
+    def test_omni_request_adds_technical_trinity_copilot(self) -> None:
+        result = route_request.route_request(
+            "Design a system for an unfamiliar industry, including compliance and technical landing.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Omni-Architect", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+
+    def test_python_fastapi_routes_to_technical_trinity(self) -> None:
+        result = route_request.route_request(
+            "Use Python and FastAPI to build a backend service.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Technical Trinity", result["lead_agent"])
+        self.assertIn("python", result["detected_languages"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_python_django_review_routes_to_audit_with_python_assistant(self) -> None:
+        result = route_request.route_request(
+            "Review this Django API for security issues.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Code Audit Council", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertEqual(
+            "Code Audit Council",
+            (result["reason"]["priority_routing"] or {}).get("agent"),
+        )
+
+    def test_python_flask_git_workflow_routes_to_git_guardian(self) -> None:
+        result = route_request.route_request(
+            "Refactor this Flask service and then commit and push the branch.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Git Workflow Guardian", result["lead_agent"])
+        self.assertTrue(result["needs_git_workflow"])
+        self.assertIn("git-workflow", result["process_skills"])
+
+    def test_python_celery_design_routes_to_technical_trinity(self) -> None:
+        result = route_request.route_request(
+            "Design a Python service with Celery workers and reliability guardrails.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Technical Trinity", result["lead_agent"])
+        self.assertIn("python", result["detected_languages"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_python_pr_audit_keeps_audit_lead_with_git_and_python_assistants(self) -> None:
+        result = route_request.route_request(
+            "This is a PR. Review this Django service for security issues before merge.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Code Audit Council", result["lead_agent"])
+        self.assertIn("Git Workflow Guardian", result["assistant_agents"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertTrue(result["needs_git_workflow"])
+
+    def test_python_fastapi_worktree_and_git_routes_to_git_guardian(self) -> None:
+        result = route_request.route_request(
+            "Use FastAPI for a backend service, then commit, push, and isolate the work in a worktree.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Git Workflow Guardian", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertTrue(result["needs_git_workflow"])
+        self.assertTrue(result["needs_worktree"])
+        self.assertIn("using-git-worktrees", result["process_skills"])
+        self.assertIn("git-workflow", result["process_skills"])
+
+    def test_go_gin_design_routes_to_technical_trinity(self) -> None:
+        result = route_request.route_request(
+            "Design a Go service with Gin and improve concurrency.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Technical Trinity", result["lead_agent"])
+        self.assertIn("go", result["detected_languages"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_go_pr_audit_review_keeps_audit_lead(self) -> None:
+        result = route_request.route_request(
+            "Review this Go API for security issues before merge.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Code Audit Council", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertTrue(result["needs_git_workflow"])
+        self.assertEqual(
+            "Code Audit Council",
+            (result["reason"]["priority_routing"] or {}).get("agent"),
+        )
+
+    def test_go_gin_worktree_and_git_routes_to_git_guardian(self) -> None:
+        result = route_request.route_request(
+            "Use Go with Gin, then commit, push, and isolate the work in a worktree.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Git Workflow Guardian", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertTrue(result["needs_worktree"])
+        self.assertTrue(result["needs_git_workflow"])
+        self.assertIn("using-git-worktrees", result["process_skills"])
+        self.assertIn("git-workflow", result["process_skills"])
+
+    def test_node_nest_design_routes_to_technical_trinity(self) -> None:
+        result = route_request.route_request(
+            "Design a Node.js service with NestJS.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Technical Trinity", result["lead_agent"])
+        self.assertIn("nodejs", result["detected_languages"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_node_pr_audit_review_adds_node_assistant(self) -> None:
+        result = route_request.route_request(
+            "Review this NestJS API for security issues before merge.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Code Audit Council", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertTrue(result["needs_git_workflow"])
+
+    def test_node_nest_worktree_and_git_routes_to_git_guardian(self) -> None:
+        result = route_request.route_request(
+            "Use Node.js with NestJS, then commit, push, and isolate the work in a worktree.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Git Workflow Guardian", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertTrue(result["needs_worktree"])
+        self.assertTrue(result["needs_git_workflow"])
+
+    def test_frontend_react_redesign_stays_with_product_architect(self) -> None:
+        result = route_request.route_request(
+            "Redesign this React dashboard UI and improve the interaction flow.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertEqual([], result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_frontend_dashboard_responsive_routes_to_product_architect(self) -> None:
+        result = route_request.route_request(
+            "Redesign this analytics dashboard for mobile responsiveness and better information hierarchy.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertEqual([], result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_frontend_next_shadcn_design_routes_to_product_architect(self) -> None:
+        result = route_request.route_request(
+            "Design a Next.js admin console with shadcn/ui and Tailwind.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertEqual([], result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_frontend_motion_design_routes_to_product_architect(self) -> None:
+        result = route_request.route_request(
+            "Improve the Framer Motion transitions and loading states in this React onboarding flow.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertEqual([], result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_frontend_form_ux_accessibility_routes_to_product_architect(self) -> None:
+        result = route_request.route_request(
+            "Audit this signup form UX for accessibility, validation, and conversion friction.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertEqual([], result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_frontend_backend_contract_adds_technical_trinity(self) -> None:
+        result = route_request.route_request(
+            "Redesign this React admin page and align the frontend flow with the backend API contract.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_frontend_auth_api_error_states_adds_technical_trinity(self) -> None:
+        result = route_request.route_request(
+            "Redesign the login flow, align auth UX with the backend API, and handle error states clearly.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_frontend_chinese_next_tailwind_routes_to_product_architect(self) -> None:
+        result = route_request.route_request(
+            "用 Next.js 和 Tailwind 重做这个后台页面的交互和视觉层次。",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertEqual([], result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_frontend_chinese_form_api_feedback_adds_technical_trinity(self) -> None:
+        result = route_request.route_request(
+            "优化这个表单的错误提示、空状态和接口失败反馈，并和后端 API 契约对齐。",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_git_dashboard_mixed_request_adds_product_architect(self) -> None:
+        result = route_request.route_request(
+            "帮我提个 commit 然后 push，那个 dashboard 也顺手改下。",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Git Workflow Guardian", result["lead_agent"])
+        self.assertIn("World-Class Product Architect", result["assistant_agents"])
+        self.assertTrue(result["needs_git_workflow"])
+
+    def test_strategy_colloquial_tech_plan_adds_technical_trinity(self) -> None:
+        result = route_request.route_request(
+            "做个 saas 增长方案，然后把 tech plan 也落一下。",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Executive Trinity", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_review_nest_auth_flow_adds_technical_trinity(self) -> None:
+        result = route_request.route_request(
+            "review 下这个 nest 接口，顺便看下 auth flow。",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Code Audit Council", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_review_djagno_form_api_contract_adds_technical_trinity(self) -> None:
+        result = route_request.route_request(
+            "给这个 djagno 登录表单做个 ux review，并和后端 api 对齐。",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertIn("Technical Trinity", result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_frontend_tailwind_git_worktree_routes_to_git_guardian_with_product_assistant(self) -> None:
+        result = route_request.route_request(
+            "Improve the Tailwind admin UI, then commit, push, and isolate the work in a worktree.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Git Workflow Guardian", result["lead_agent"])
+        self.assertIn("World-Class Product Architect", result["assistant_agents"])
+        self.assertTrue(result["needs_worktree"])
+        self.assertTrue(result["needs_git_workflow"])
+        self.assertIn("using-git-worktrees", result["process_skills"])
+        self.assertIn("git-workflow", result["process_skills"])
+
+    def test_java_spring_design_routes_to_java_virtuoso(self) -> None:
+        result = route_request.route_request(
+            "Design a Java Spring Boot service for order processing.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Java Virtuoso", result["lead_agent"])
+        self.assertEqual([], result["assistant_agents"])
+        self.assertFalse(result["needs_git_workflow"])
+
+    def test_java_spring_pr_audit_review_adds_java_and_git_assistants(self) -> None:
+        result = route_request.route_request(
+            "Review this Spring Boot API for security issues before merge.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Code Audit Council", result["lead_agent"])
+        self.assertIn("Java Virtuoso", result["assistant_agents"])
+        self.assertIn("Git Workflow Guardian", result["assistant_agents"])
+        self.assertTrue(result["needs_git_workflow"])
+        self.assertEqual(
+            "Code Audit Council",
+            (result["reason"]["priority_routing"] or {}).get("agent"),
+        )
+
+    def test_java_spring_worktree_and_git_routes_to_git_guardian(self) -> None:
+        result = route_request.route_request(
+            "Use Java with Spring Boot, then commit, push, and isolate the work in a worktree.",
+            load_config(),
+            repo_path=REPO_ROOT,
+        )
+
+        self.assertEqual("Git Workflow Guardian", result["lead_agent"])
+        self.assertIn("Java Virtuoso", result["assistant_agents"])
+        self.assertTrue(result["needs_worktree"])
+        self.assertTrue(result["needs_git_workflow"])
+        self.assertIn("using-git-worktrees", result["process_skills"])
+        self.assertIn("git-workflow", result["process_skills"])
+
 
 class GuardrailTests(unittest.TestCase):
     def test_g0_blocks_preexisting_staged_changes(self) -> None:
@@ -160,6 +538,7 @@ class GuardrailTests(unittest.TestCase):
 
             git("clone", str(remote), str(local_b), cwd=root)
             configure_repo(local_b)
+            git("checkout", "main", cwd=local_b)
             (local_b / "demo.txt").write_text("v1\nv2\n", encoding="utf-8")
             git("add", "demo.txt", cwd=local_b)
             git("commit", "-m", "fix: update demo file", cwd=local_b)
@@ -181,7 +560,7 @@ class GuardrailTests(unittest.TestCase):
 class ValidatorScriptTests(unittest.TestCase):
     def test_validator_script_passes(self) -> None:
         proc = subprocess.run(
-            ["python3", str(VALIDATOR_SCRIPT)],
+            [sys.executable, str(VALIDATOR_SCRIPT)],
             cwd=str(REPO_ROOT),
             check=False,
             text=True,

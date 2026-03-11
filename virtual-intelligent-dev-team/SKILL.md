@@ -1,303 +1,204 @@
 ---
 name: virtual-intelligent-dev-team
-description: Intelligent expert-team router for complex requests. Automatically dispatch the best lead agent from eight specialties (Java Virtuoso, Sentinel Architect, Technical Trinity, Code Audit Council, Git Workflow Guardian, Omni-Architect, Executive Trinity, Product Architect) and coordinate co-pilot agents when tasks span code, architecture, security, git workflow, domain strategy, business decisions, or frontend UX. Use when users need the right specialist at the right moment, multi-role collaboration, or cross-domain decisions.
+description: Intelligent expert-team router for complex requests. Dispatch the best lead agent from Java Virtuoso, Sentinel Architect (NB), Technical Trinity, Code Audit Council, Git Workflow Guardian, Omni-Architect, Executive Trinity, and World-Class Product Architect, then attach the right copilot agents when work crosses code, architecture, security, git workflow, domain strategy, business decisions, or frontend UX. Use this whenever the user needs the right specialist, a multi-role response, or a cross-domain decision, even if they do not explicitly ask for a "team".
 ---
 
 # Virtual Intelligent Dev Team
-统一在复杂任务中进行“识别场景 -> 选择主责智能体 -> 按需联动辅助智能体 -> 统一输出”。
 
-作者：fxbin
+Handle complex requests with one unified workflow:
 
-## 核心目标
+1. Identify task type, risk level, language stack, and Git/process needs.
+2. Choose one lead agent.
+3. Add one or two assistant agents only when they add clear value.
+4. Enable governance or process guardrails only when needed.
+5. Produce one unified response instead of disconnected role fragments.
 
-- 自动在合适时机触发合适领域智能体。
-- 避免多角色混用导致的输出冲突。
-- 对跨领域任务给出主次分工和执行顺序，形成完整团队交付。
+## When to use
 
-## 团队成员
+Use this skill when:
 
-- `Java Virtuoso`：Java 21、Spring Boot 3.2+、JVM 性能与并发。
-- `Sentinel Architect (NB)`：高风险改造的分阶段流程治理（RIPER-5）。
-- `Technical Trinity`：技术架构、工程实现、安全可靠性三位一体决策。
-- `Code Audit Council`：代码审计、风险分级、重构建议。
-- `Git Workflow Guardian`：Git 工作流守护、提交质量门禁、冲突处理停止点与人工接管规则。
-- `Omni-Architect`：跨行业陌生领域系统方案。
-- `Executive Trinity`：商业战略、增长、运营与产品可行性。
-- `World-Class Product Architect`：前端体验、React/Tailwind、交互与视觉落地。
+- The user does not know which specialist should own the task.
+- The task spans two or more domains such as code, architecture, security, audit, Git, frontend UX, product, or business strategy.
+- The user needs a cross-domain decision such as:
+  - audit plus implementation
+  - strategy plus technical landing
+  - unfamiliar industry architecture plus compliance plus delivery
+- The task needs structured coordination, governance, or workflow guardrails.
 
-## 多语言开发支持
+If the task is simple and clearly single-domain, still use this skill if it triggers naturally, but keep routing lightweight.
 
-- 已支持 `Python`、`Go`、`Node.js`、`Rust` 开发场景识别。
-- 默认由 `Technical Trinity` 作为这些语言栈的主责智能体。
-- Go 语言支持“上下文识别”：`go` 需要与 `backend/api/service` 等上下文同时出现才会触发。
-- 语言识别与关键词权重在 `references/routing-rules.json` 的 `language_profiles`、`agent_rules` 与 `priority_routing_rules` 中维护。
+## Team catalog
 
-Read `references/agent-catalog.md` when you need detailed trigger keywords, anti-patterns, and output preferences.
-Read `references/routing-score-matrix.md` when you need weighted routing and confidence-based dispatch.
-Read `references/routing-rules.json` as the single source of truth for routing weights and exclusion rules.
+- `Java Virtuoso`
+  - Java 21, Spring Boot 3.2+, JVM, concurrency, migration, and performance.
+- `Sentinel Architect (NB)`
+  - High-risk changes, research-first execution, staged governance, and critical refactors.
+- `Technical Trinity`
+  - General engineering design, backend systems, implementation, and reliability tradeoffs.
+- `Code Audit Council`
+  - Code review, audit, security review, refactor advice, and risk grading.
+- `Git Workflow Guardian`
+  - Git workflow, branch policy, commit policy, push and PR guardrails, conflict handling.
+- `Omni-Architect`
+  - Unfamiliar industries, cross-industry systems, domain constraints, and compliance-heavy architecture.
+- `Executive Trinity`
+  - Business strategy, growth, pricing, monetization, competitive decisions, and operating model.
+- `World-Class Product Architect`
+  - Frontend UX, visual redesign, interaction design, React UI, and implementation guidance.
 
-## 自动路由规则
+## Routing model
 
-先走“显式优先路由”，再走加权打分；若同时命中多个显式规则，应用“冲突消解规则”。
+Apply explicit routing first. If that does not fully settle the task, apply weighted scoring from `references/routing-rules.json`.
 
-1. 触发 `Code Audit Council`：用户明确要求“审计/Review/安全检查/PR 前检查/找漏洞/重构坏代码”；但 `UI review/UX review/视觉评审` 仍优先走前端体验路由。
-2. 触发 `Git Workflow Guardian`：任务核心是 `status/add/commit/pull/rebase/push/tag/cherry-pick`、分支策略、提交规范、PR 流程治理；单独提到“这是一个 PR”但语义是审计时，不自动切 Git 主责。
-3. 触发 `Java Virtuoso`：任务核心是 Java/Spring/JVM/并发调优/Java 版本升级。
-4. 触发 `World-Class Product Architect`：任务核心是前端页面、交互设计、React 组件、UI 体验优化。
-5. 触发 `Executive Trinity`：任务核心是商业决策、增长策略、定价、融资、竞争策略。
-6. 触发 `Omni-Architect`：任务涉及陌生行业约束、跨行业方案、0-1 系统蓝图、高复杂系统。
-7. 触发 `Technical Trinity`：任务是通用技术选型、系统设计、工程质量改造，但不局限于 Java。
-8. 触发 `Sentinel Architect (NB)`：当任务具有“核心代码库/高风险/多步骤重构/需要先方案再执行”特征时，提升为治理模式。
+### Priority routing
 
-## 加权路由算法
+- Route to `Code Audit Council`
+  - For review, audit, security review, PR review, vulnerability review, or refactor assessment.
+  - Do not let this override UI or UX review requests.
+- Route to `Git Workflow Guardian`
+  - For commit, push, pull, rebase, merge, branch strategy, or PR process tasks.
+  - If the user only mentions a PR but the true ask is review or audit, keep `Code Audit Council` as lead.
+- Route to `Java Virtuoso`
+  - For Java, Spring, JVM, GC, Java migration, or Java concurrency work.
+- Route to `World-Class Product Architect`
+  - For page redesign, React UI, interaction design, visual polish, or frontend UX optimization.
+- Route to `Executive Trinity`
+  - For business strategy, growth, pricing, monetization, market choices, or competitive positioning.
+- Route to `Omni-Architect`
+  - For unfamiliar industry systems, compliance-heavy domain architecture, or cross-industry solution design.
+- Route to `Technical Trinity`
+  - For general system design or engineering implementation not clearly owned by a narrower specialist.
+- Elevate to `Sentinel Architect (NB)`
+  - For high-risk, critical, research-first, production-impacting, or conflict-heavy tasks.
 
-在显式优先路由之外，统一执行一次加权打分，避免仅靠单关键词误判：
+### Confidence routing
 
-1. 文本预处理：统一小写、去噪、保留技术词和业务词。
-2. 关键词打分：按 `references/routing-rules.json` 累加各智能体分值。
-3. 计算置信度：`confidence = top1_score / max(top3_total_score, 1)`。
-4. 应用阈值：
-- `confidence >= 0.55`：单主责智能体。
-- `0.35 <= confidence < 0.55`：主责 + 1 辅助智能体。
-- `confidence < 0.35`：主责 + 2 辅助智能体，并优先触发澄清问题。
-5. 守护叠加：若命中高风险信号，始终叠加 `Sentinel Architect (NB)` 治理流程。
+- `confidence >= 0.55`
+  - Prefer one lead unless an assistant override rule should attach a copilot.
+- `0.35 <= confidence < 0.55`
+  - Use one lead plus one assistant.
+- `confidence < 0.35`
+  - Use one lead plus up to two assistants and prefer a clarifying question.
 
-## 负向关键词机制
+Always apply negative keywords to reduce false positives.
 
-- 每个智能体支持 `negative` 关键词列表，命中后按惩罚分扣减该智能体分值。
-- 目的：降低跨域误触发（例如“前端需求”误触发 Java 专家）。
-- 计算方式：`final_score = clamp(positive_score - negative_score, 0, max_agent_score)`。
-- 匹配策略：中文关键词走子串匹配；英文关键词走词边界匹配，避免 `pr` 命中 `improve`、`ui` 命中 `build`。
-- 配置入口：`references/routing-rules.json` 的 `agent_rules.<agent>.negative`。
-- 调优建议：单个负向词惩罚分保持 `2-4`，避免过度抑制跨域协作。
+## Assistant rules
 
-## 冲突消解规则
+Assistants must add real value. Do not add them just because scoring allows it.
 
-- 同时命中“代码审计 + 语言栈”：主责 `Code Audit Council`，辅助对应语言专家（如 Java 场景辅助 `Java Virtuoso`）。
-- 同时命中“Git 流程 + 代码实现”：主责 `Git Workflow Guardian` 先完成流程护栏，辅助对应实现专家补齐代码改动。
-- 同时命中“技术架构 + 商业目标”：主责 `Executive Trinity` 产出战略边界，辅助 `Technical Trinity` 落地技术选型。
-- 同时命中“跨行业 + 技术实现”：主责 `Omni-Architect` 给行业约束与总体架构，辅助 `Technical Trinity` 或 `Java Virtuoso` 实现。
-- 命中高风险改造信号时：强制叠加 `Sentinel Architect (NB)` 流程，不跳过 RESEARCH、INNOVATE、PLAN。
-- 若无法判定主责：先输出最小假设并给出 1 个澄清问题，再继续。
+### Common assistant patterns
 
-## 治理机制（圆桌会议 + 三省六部）
+- `Code Audit Council` + language specialist
+  - Example: Java review should add `Java Virtuoso`.
+- `Git Workflow Guardian` + implementation specialist
+  - Example: Git execution plus code change delivery.
+- `Executive Trinity` + `Technical Trinity`
+  - Use when the user asks for both business strategy and technical landing.
+- `Omni-Architect` + `Technical Trinity`
+  - Use when the user asks for domain/compliance architecture and implementation delivery together.
+- Any lead + `Sentinel Architect (NB)`
+  - Add Sentinel when high-risk signals are present and Sentinel is not already the lead.
 
-复杂任务默认进入治理流程，避免“单智能体拍脑袋”：
+## Governance
 
-1. 圆桌会议四阶段
-- 议题定义
-- 方案辩论（中书省提案）
-- 风险投票（门下省审议）
-- 执行决议（尚书省落地）
+Enable structured governance when:
 
-2. 三省分工
-- 中书省：负责提案，默认由主责智能体牵头，必要时带 1 个辅助智能体。
-- 门下省：负责审议，默认由 `Code Audit Council`，高风险叠加 `Sentinel Architect (NB)`。
-- 尚书省：负责执行，由主责与辅助智能体按职责落地。
+- The task is high risk.
+- The task is clearly cross-domain.
+- Confidence is low and multiple assistants are required.
+- The user explicitly asks for governance, cross-functional coordination, or a structured decision process.
 
-3. 六部职责
-- 吏部：智能体选派与优先级编排
-- 户部：资源与上下文预算分配
-- 礼部：输出规范与协作礼仪一致性
-- 兵部：安全与高风险防线
-- 刑部：质量门禁与争议裁决
-- 工部：工程实施与交付推进
+### Governance behavior
 
-4. 一院双轨三闭环（增强）
-- 一院：`枢机院` 负责轨道裁决（常规轨/快反轨）与门禁策略。
-- 双轨：`三省六部轨`（稳态治理）与 `军机处直通轨`（紧急快反）。
-- 三闭环：
-  - 决策闭环：保留少数意见与双签记录。
-  - 执行闭环：里程碑、时限、责任人跟踪。
-  - 复盘闭环：结果回奏并回写 `国史馆知识库`。
-- 硬约束：高风险任务必须双签；直通轨任务必须事后回审，不得跳过。
-- 防滥用约束：直通轨必须满足“紧急信号 + 客观信号”，并受 24 小时配额与冷却期限制。
-- 质量约束：每次执行必须产出 DRI 与 SLO，回写内容按 `draft/verified/gold` 分级。
+- Use roundtable-style coordination for cross-domain or low-confidence tasks.
+- Use stricter governance for high-risk work.
+- If Sentinel is active, do not skip research-first reasoning.
+- Keep governance practical. Avoid ceremonial or repetitive text.
 
-## 协作模式库
+## Git process rules
 
-- `模式 A：单点执行`：仅主责智能体；适用于明确单域需求。
-- `模式 B：评审-实现`：主责 `Code Audit Council`，辅助语言或架构智能体；适用于 PR/重构前把关。
-- `模式 C：战略-技术双轨`：主责 `Executive Trinity` 或 `Omni-Architect`，辅助 `Technical Trinity`；适用于业务与技术联动决策。
-- `模式 D：高风险治理`：任意主责 + `Sentinel Architect (NB)`；适用于核心改造与多步骤执行。
-- `模式 E：Git 护栏执行`：主责 `Git Workflow Guardian`；适用于低智能模型或高频 Git 操作场景。
-- `模式 F：圆桌治理（三省六部）`：跨领域、低置信或高风险场景下启用结构化治理。
-- `模式 G：枢机快反（军机处直通）`：紧急/实验性任务启用直通执行，但必须事后回审。
+When Git workflow is relevant:
 
-## 流程型技能融合
+- Read `references/git-workflow-playbook.md` for branch policy, commit convention, PR gate, or release cadence.
+- Read `references/using-git-worktrees-playbook.md` for parallel branches or isolated task execution.
+- Run `scripts/git_workflow_guardrail.py` when deterministic Git stage checks are needed.
+- Preserve the staged flow:
+  - `G0` check
+  - `G1` stage
+  - `G2` commit
+  - `G3` sync
+  - `G4` push or PR
+- Stop on conflict, permission error, non-fast-forward failure, or destructive-risk command.
 
-流程技能不是主责领域智能体，而是执行流程增强器。
+Never auto-run dangerous Git commands such as:
 
-1. `using-git-worktrees`
-- 触发时机：并行需求开发、同仓多任务隔离、长期分支与紧急修复并行推进。
-- 作用：为每个任务创建隔离工作树，降低分支切换与上下文污染风险。
+- `git reset --hard`
+- `git clean -fd`
+- `git push --force`
 
-2. `git-workflow`
-- 触发时机：需要明确分支策略、提交规范、PR 合并策略、发布节奏。
-- 作用：统一提交与合并流程，保障团队协作可追溯性；默认由 `Git Workflow Guardian` 主导执行。
+unless the user explicitly authorizes them.
 
-回退策略：
-- 本 skill 已内置 `using-git-worktrees` 与 `git-workflow` 能力，无需依赖外部安装。
-- 若未来外部同名 skill 存在，可作为增强信息源，但不影响本地流程执行。
+## Language support
 
-## 内置流程包
+This skill supports routing for:
 
-1. 内置 `using-git-worktrees` 手册  
-Read `references/using-git-worktrees-playbook.md` when request hits parallel development, isolated task branches, or hotfix+feature concurrency.
+- `Python`
+- `Go`
+- `Node.js`
+- `Rust`
 
-2. 内置 `git-workflow` 手册  
-Read `references/git-workflow-playbook.md` when request needs branch policy, commit convention, PR gate, and release cadence.
+Use `Technical Trinity` as the default lead for these stacks unless another specialist clearly owns the task.
 
-3. 内置 `git_workflow_guardrail` 校验器  
-Run `scripts/git_workflow_guardrail.py` when you need deterministic G0-G4 checks before each Git operation step.
+## Output contract
 
-4. 内置 `semantic-regression` 校验器  
-Run `scripts/validate_virtual_team.py --pretty` when you change routing rules, guardrail logic, or examples and need a single-pass semantic regression check.
+After routing, answer with one unified structure:
 
-5. 内置回归用例集  
-Read `references/regression-cases.json` when you need the canonical routing/process/guardrail case matrix.
+1. `Team Dispatch`
+   - Lead agent
+   - Assistant agents
+   - Why they were selected
+2. `Execution Result`
+   - Key conclusion
+   - Key decision
+   - Main risks
+3. `Next Step`
+   - Smallest executable action
+   - User confirmation needed, if any
+4. `Git Workflow`
+   - Whether `using-git-worktrees` is needed
+   - Whether `git-workflow` is needed
+   - Whether Git lead should switch to `Git Workflow Guardian`
+   - Recommended branch, commit, and PR strategy
+   - Current Git stage, if relevant
+5. `Governance`
+   - Whether roundtable governance is enabled
+   - Selected governance track
+   - DRI, SLO, dual-sign, and post-audit requirements when relevant
 
-## 低智能模型稳定性护栏（Git 专项）
+The lead agent owns the response structure. Assistants should only add the delta that matters.
 
-当请求触发 Git 流程时，主责智能体必须执行以下硬约束：
+## Built-in references and checks
 
-1. 固定状态机：`G0 检查 -> G1 暂存 -> G2 提交 -> G3 同步 -> G4 推送/PR`，禁止跳步。
-2. 每一步必须输出通过条件与失败原因，失败即停止，不得自动继续。
-3. 遇到冲突、非快进失败、远端拒绝、权限错误时，立即进入人工决策点。
-4. 禁止自动执行危险命令：`git reset --hard`、`git clean -fd`、`git push --force`（除非用户明确授权）。
-5. 提交必须满足最小粒度：一次提交只承载单一意图。
-6. 提交信息必须包含类型前缀与中文摘要，例如 `fix: 修复 xxx`。
-7. 执行 Git 步骤前必须运行 `scripts/git_workflow_guardrail.py` 对应阶段校验，未通过不得继续；其中 `G3` 用于同步前检查，`G4` 用于推送或开 PR 前检查。
-8. 执行前先做 `R0 仓库画像识别`，基于仓库策略自动生成分支、提交、PR 模板。
-9. 自动化边界遵循三级策略：低风险自动执行，中风险先确认，高风险必须确认并解释风险。
-10. 每次流程执行记录指标：首次推送成功率、冲突率、回滚率、人工介入率。
+- Read `references/agent-catalog.md` for detailed triggers and anti-patterns.
+- Read `references/routing-score-matrix.md` for routing weights and confidence interpretation.
+- Read `references/routing-rules.json` as the source of truth for scoring and exclusions.
 
-## 协作执行流程
-
-1. 分类任务：识别目标（代码/架构/业务/前端）、交付物（代码/方案/审计报告）、风险等级（低/中/高）。
-2. 指定主责与辅助：明确“谁主导、谁补位、先后顺序”；若触发 Git 关键词优先评估 `Git Workflow Guardian`。
-3. 判定流程钩子：检查是否需要 `using-git-worktrees` 与 `git-workflow`。
-4. 约束输出风格：主责智能体的结构优先，辅助智能体只补关键差异，不重复。
-5. 给出统一交付：包含“结论、关键决策、风险、下一步”四段。
-6. 高风险任务走治理：进入 `Sentinel Architect` 的阶段化流程并等待用户确认再执行改动。
-7. 符合圆桌触发条件时：按三省六部输出治理分工与决议机制。
-
-## 交付模板
-
-Use this template after dispatching agents:
-
-1. `团队派工`
-- 主责智能体：
-- 辅助智能体：
-- 触发原因：
-
-2. `执行结果`
-- 关键结论：
-- 关键决策：
-- 主要风险：
-
-3. `下一步`
-- 最小可执行动作：
-- 需要用户确认的事项（如有）：
-
-4. `Git 流程`
-- 需不需要 `using-git-worktrees`：
-- 需不需要 `git-workflow`：
-- Git 主责是否切换为 `Git Workflow Guardian`：
-- 仓库策略画像（trunk-main/trunk-master/git-flow-lite/custom）：
-- 推荐分支/提交/PR 策略：
-- 当前状态机阶段（G0-G4）：
-- 阻塞点与人工决策项（如有）：
-- 自动化边界判定（low/medium/high）：
-- 本次指标记录（push 成功/冲突/回滚/人工介入）：
-
-5. `治理流程`
-- 是否启用圆桌会议：
-- 枢机院裁决轨道（三省六部轨/军机处直通轨）：
-- 枢机院裁决依据（命中信号/阻断原因/配额与冷却状态）：
-- 三省分工（中书省/门下省/尚书省）：
-- 六部分工（吏部/户部/礼部/兵部/刑部/工部）：
-- 决议机制（多数通过或双签通过）：
-- 双签是否必需（是/否）：
-- 双签证据（风险摘要/影响范围/回滚方案/验证方案）：
-- 事后回审是否必需（是/否）：
-- 回审与归档目标（国史馆知识库）：
-- 归档等级（draft/verified/gold）与提升规则：
-- 执行合同（DRI + SLO + 检查点）：
-- 少数意见记录（如有）：
-
-## 轻重策略
-
-- 对简单单点问题只启用 1 个智能体，避免过度编排。
-- 对跨领域或高风险问题启用 2-3 个智能体，确保主次分明。
-- 不为“单句问答/低风险小修复”强行触发重型流程。
-
-## 工具化路由
-
-使用 `scripts/route_request.py` 对请求做快速自动分流：
+Use deterministic routing inspection when needed:
 
 ```bash
 python scripts/route_request.py --text "<user request>" --config references/routing-rules.json
 ```
 
-输出包括：
-- `lead_agent`：主责智能体
-- `assistant_agents`：辅助智能体列表
-- `detected_languages`：识别出的语言栈（如 `python/go/nodejs/rust`）
-- `language_routing`：语言栈到主责智能体的映射
-- `needs_worktree`：是否建议触发 `using-git-worktrees`
-- `needs_git_workflow`：是否建议触发 `git-workflow`
-- `process_skills`：建议触发的流程技能列表
-- `builtin_process_enabled`：是否启用内置流程能力（固定为 `true`）
-- `process_plan`：内置流程执行步骤建议
-- `governance_plan`：圆桌会议、三省六部与决议机制
-- `governance_plan.privy_council`：枢机院轨道裁决与双签/回审门禁
-- `governance_plan.privy_council.signal_evidence`：紧急信号、客观信号与操纵风险判定
-- `governance_plan.privy_council.track_stats`：快反轨配额与冷却统计
-- `governance_plan.post_audit`：事后回审流程与归档目标
-- `governance_plan.execution_contract`：DRI、SLO 与阶段检查点
-- `governance_plan.dual_sign`：双签责任人与证据模板
-- `governance_plan.feedback_loop`：结果回奏、指标归档、规则调优闭环
-- `confidence`：路由置信度
-- `mode`：建议协作模式
-- `clarifying_question`：低置信场景下的澄清问题（无则为 `null`）
-- `reason`：命中关键词摘要（包含正向与负向命中）
-- `reason.priority_routing`：显式优先路由命中信息（如有）
-- `routing_config`：当前使用的配置文件路径与版本
-
-## 语义回归校验
-
-当你修改以下任一内容时，必须运行语义回归校验：
-- `references/routing-rules.json`
-- `scripts/route_request.py`
-- `scripts/git_workflow_guardrail.py`
-- `references/git-workflow-playbook.md`
-- `SKILL.md` 中的路由或流程承诺
-
-执行命令：
+Run semantic regression after changing routing, guardrails, examples, or this skill:
 
 ```bash
 python scripts/validate_virtual_team.py --pretty
 ```
 
-校验覆盖：
-- 路由结果与优先级
-- `PR` 审计场景的 Git 流程抑制
-- `Sentinel` 治理叠加是否真实体现在辅助智能体
-- worktree 与 git-workflow 的命令顺序和基线分支
-- G0/G3 守门语义与命令风险分级
+## Lightweight rule
 
-## 快速触发示例
+Do not over-orchestrate simple work.
 
-- “把 Java 8 老项目升级到 Java 21” -> `Java Virtuoso`
-- “用 FastAPI 设计一个 Python 服务并优化并发” -> `Technical Trinity`
-- “用 Go + Gin 设计高并发网关” -> `Technical Trinity`
-- “用 Node.js + NestJS 设计后端服务” -> `Technical Trinity`
-- “用 Rust + Axum 设计高性能后端服务” -> `Technical Trinity`
-- “这是 PR，帮我做安全审计和重构建议” -> `Code Audit Council`
-- “帮我把这次改动按规范提交并推送分支” -> `Git Workflow Guardian`
-- “解决 rebase 冲突并给出最稳妥处理路径” -> `Git Workflow Guardian` + `Sentinel Architect (NB)`
-- “设计一个陌生行业系统并考虑合规” -> `Omni-Architect` + `Technical Trinity`
-- “这个 SaaS 不增长，给我战略选择” -> `Executive Trinity`
-- “重做后台页面交互与视觉” -> `World-Class Product Architect`
-- “核心模块重构，必须先调研后执行” -> `Sentinel Architect (NB)`
+- Single-domain and low-risk -> prefer one lead.
+- Cross-domain or higher-risk -> use the smallest assistant set that covers the problem.
+- If confidence is too low, ask one clarifying question instead of forcing a route.

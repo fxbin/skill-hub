@@ -30,11 +30,330 @@
       }
     },
     {
+      "name": "checkout_ux_accessibility_audit",
+      "text": "Audit this checkout UX for accessibility and mobile responsiveness.",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "process_skills": [],
+        "priority_agent": null
+      }
+    },
+    {
       "name": "rebase_conflict",
       "text": "解决 rebase 冲突并给出最稳妥处理路径",
       "expect": {
         "lead_agent": "Git Workflow Guardian",
         "assistant_agents_contains": ["Sentinel Architect (NB)"],
+        "needs_git_workflow": true,
+        "priority_agent": "Git Workflow Guardian"
+      }
+    },
+    {
+      "name": "strategy_plus_technical_copilot",
+      "text": "This SaaS is not growing. Set the strategy and also land the technical plan.",
+      "expect": {
+        "lead_agent": "Executive Trinity",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "omni_plus_technical_copilot",
+      "text": "Design a system for an unfamiliar industry, including compliance and technical landing.",
+      "expect": {
+        "lead_agent": "Omni-Architect",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "python_fastapi_design",
+      "text": "Use Python and FastAPI to build a backend service.",
+      "expect": {
+        "lead_agent": "Technical Trinity",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "python_django_review",
+      "text": "Review this Django API for security issues.",
+      "expect": {
+        "lead_agent": "Code Audit Council",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": false,
+        "priority_agent": "Code Audit Council"
+      }
+    },
+    {
+      "name": "python_flask_git_workflow",
+      "text": "Refactor this Flask service and then commit and push the branch.",
+      "expect": {
+        "lead_agent": "Git Workflow Guardian",
+        "assistant_agents": [],
+        "needs_git_workflow": true,
+        "priority_agent": "Git Workflow Guardian"
+      }
+    },
+    {
+      "name": "python_celery_design",
+      "text": "Design a Python service with Celery workers and reliability guardrails.",
+      "expect": {
+        "lead_agent": "Technical Trinity",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "python_pr_audit_review",
+      "text": "This is a PR. Review this Django service for security issues before merge.",
+      "expect": {
+        "lead_agent": "Code Audit Council",
+        "assistant_agents_contains": ["Git Workflow Guardian", "Technical Trinity"],
+        "needs_git_workflow": true,
+        "priority_agent": "Code Audit Council"
+      }
+    },
+    {
+      "name": "python_fastapi_worktree_git",
+      "text": "Use FastAPI for a backend service, then commit, push, and isolate the work in a worktree.",
+      "expect": {
+        "lead_agent": "Git Workflow Guardian",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": true,
+        "priority_agent": "Git Workflow Guardian"
+      }
+    },
+    {
+      "name": "go_gin_design",
+      "text": "Design a Go service with Gin and improve concurrency.",
+      "expect": {
+        "lead_agent": "Technical Trinity",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "go_pr_audit_review",
+      "text": "Review this Go API for security issues before merge.",
+      "expect": {
+        "lead_agent": "Code Audit Council",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": true,
+        "priority_agent": "Code Audit Council"
+      }
+    },
+    {
+      "name": "go_gin_worktree_git",
+      "text": "Use Go with Gin, then commit, push, and isolate the work in a worktree.",
+      "expect": {
+        "lead_agent": "Git Workflow Guardian",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": true,
+        "priority_agent": "Git Workflow Guardian"
+      }
+    },
+    {
+      "name": "node_nest_design",
+      "text": "Design a Node.js service with NestJS.",
+      "expect": {
+        "lead_agent": "Technical Trinity",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "node_pr_audit_review",
+      "text": "Review this NestJS API for security issues before merge.",
+      "expect": {
+        "lead_agent": "Code Audit Council",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": true,
+        "priority_agent": "Code Audit Council"
+      }
+    },
+    {
+      "name": "node_nest_worktree_git",
+      "text": "Use Node.js with NestJS, then commit, push, and isolate the work in a worktree.",
+      "expect": {
+        "lead_agent": "Git Workflow Guardian",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": true,
+        "priority_agent": "Git Workflow Guardian"
+      }
+    },
+    {
+      "name": "frontend_react_redesign",
+      "text": "Redesign this React dashboard UI and improve the interaction flow.",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "frontend_dashboard_responsive",
+      "text": "Redesign this analytics dashboard for mobile responsiveness and better information hierarchy.",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "frontend_next_shadcn_design",
+      "text": "Design a Next.js admin console with shadcn/ui and Tailwind.",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "frontend_motion_design",
+      "text": "Improve the Framer Motion transitions and loading states in this React onboarding flow.",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "frontend_form_ux_accessibility",
+      "text": "Audit this signup form UX for accessibility, validation, and conversion friction.",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "frontend_backend_contract",
+      "text": "Redesign this React admin page and align the frontend flow with the backend API contract.",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "frontend_auth_api_error_states",
+      "text": "Redesign the login flow, align auth UX with the backend API, and handle error states clearly.",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "frontend_chinese_next_tailwind",
+      "text": "用 Next.js 和 Tailwind 重做这个后台页面的交互和视觉层次。",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "frontend_chinese_form_api_feedback",
+      "text": "优化这个表单的错误提示、空状态和接口失败反馈，并和后端 API 契约对齐。",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "git_dashboard_mixed_request",
+      "text": "帮我提个 commit 然后 push，那个 dashboard 也顺手改下。",
+      "expect": {
+        "lead_agent": "Git Workflow Guardian",
+        "assistant_agents_contains": ["World-Class Product Architect"],
+        "needs_git_workflow": true,
+        "priority_agent": "Git Workflow Guardian"
+      }
+    },
+    {
+      "name": "strategy_colloquial_tech_plan",
+      "text": "做个 saas 增长方案，然后把 tech plan 也落一下。",
+      "expect": {
+        "lead_agent": "Executive Trinity",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "review_nest_auth_flow",
+      "text": "review 下这个 nest 接口，顺便看下 auth flow。",
+      "expect": {
+        "lead_agent": "Code Audit Council",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": false,
+        "priority_agent": "Code Audit Council"
+      }
+    },
+    {
+      "name": "review_djagno_form_api_contract",
+      "text": "给这个 djagno 登录表单做个 ux review，并和后端 api 对齐。",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "frontend_tailwind_worktree_git",
+      "text": "Improve the Tailwind admin UI, then commit, push, and isolate the work in a worktree.",
+      "expect": {
+        "lead_agent": "Git Workflow Guardian",
+        "assistant_agents_contains": ["World-Class Product Architect"],
+        "needs_git_workflow": true,
+        "priority_agent": "Git Workflow Guardian"
+      }
+    },
+    {
+      "name": "java_spring_design",
+      "text": "Design a Java Spring Boot service for order processing.",
+      "expect": {
+        "lead_agent": "Java Virtuoso",
+        "assistant_agents": [],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "java_spring_pr_audit_review",
+      "text": "Review this Spring Boot API for security issues before merge.",
+      "expect": {
+        "lead_agent": "Code Audit Council",
+        "assistant_agents_contains": ["Java Virtuoso", "Git Workflow Guardian"],
+        "needs_git_workflow": true,
+        "priority_agent": "Code Audit Council"
+      }
+    },
+    {
+      "name": "java_spring_worktree_git",
+      "text": "Use Java with Spring Boot, then commit, push, and isolate the work in a worktree.",
+      "expect": {
+        "lead_agent": "Git Workflow Guardian",
+        "assistant_agents_contains": ["Java Virtuoso"],
         "needs_git_workflow": true,
         "priority_agent": "Git Workflow Guardian"
       }

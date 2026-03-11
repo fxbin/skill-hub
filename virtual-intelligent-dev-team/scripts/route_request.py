@@ -154,8 +154,38 @@ def is_git_review_context_only(text: str, git_hits: list[str]) -> bool:
     return any(keyword_matches(lowered, keyword.lower()) for keyword in audit_context_keywords)
 
 
+def is_frontend_checkout_context(text: str, git_hits: list[str]) -> bool:
+    if len(git_hits) == 0:
+        return False
+    normalized_hits = {normalize_process_hit(hit) for hit in git_hits}
+    if normalized_hits != {"checkout"}:
+        return False
+
+    lowered = text.lower()
+    frontend_context_keywords = [
+        "ux",
+        "ui",
+        "accessibility",
+        "a11y",
+        "mobile",
+        "responsive",
+        "react",
+        "tailwind",
+        "design",
+        "interaction",
+        "dashboard",
+        "page",
+        "frontend",
+        "front-end",
+    ]
+    return any(keyword_matches(lowered, keyword) for keyword in frontend_context_keywords)
+
+
 def should_suppress_git_workflow(text: str, process_hits: dict[str, list[str]]) -> bool:
-    return is_git_review_context_only(text, process_hits.get("git-workflow", []))
+    git_hits = process_hits.get("git-workflow", [])
+    return is_git_review_context_only(text, git_hits) or is_frontend_checkout_context(
+        text, git_hits
+    )
 
 
 def detect_process_skills(
@@ -377,6 +407,10 @@ def detect_priority_lead(text: str, config: dict[str, object]) -> dict[str, obje
         if len(all_keywords) > 0 and len(all_hits) != len(all_keywords):
             continue
         if len(any_keywords) > 0 and len(any_hits) == 0:
+            continue
+        if agent == "Git Workflow Guardian" and is_frontend_checkout_context(
+            text, any_hits + all_hits
+        ):
             continue
         if len(exclude_hits) > 0:
             continue
@@ -734,6 +768,72 @@ def dedupe_agents(items: list[str]) -> list[str]:
     return result
 
 
+def apply_assistant_routing_rules(
+    text: str,
+    lead_agent: str,
+    assistants: list[str],
+    scores: dict[str, int],
+    config: dict[str, object],
+) -> list[str]:
+    rules = config.get("assistant_routing_rules", [])
+    if not isinstance(rules, list):
+        return assistants
+
+    lowered = text.lower()
+    merged = list(assistants)
+    for rule in rules:
+        if not isinstance(rule, dict):
+            continue
+        if str(rule.get("lead_agent", "")).strip() != lead_agent:
+            continue
+
+        when_any_keywords = rule.get("when_any_keywords", [])
+        add_assistants = rule.get("add_assistants", [])
+        if not isinstance(when_any_keywords, list) or not isinstance(add_assistants, list):
+            continue
+
+        matched = any(
+            isinstance(keyword, str) and keyword_matches(lowered, keyword.lower())
+            for keyword in when_any_keywords
+        )
+        if not matched:
+            continue
+
+        for agent in add_assistants:
+            if not isinstance(agent, str) or agent == lead_agent:
+                continue
+            if scores.get(agent, 0) > 0 or agent == "Technical Trinity":
+                merged.append(agent)
+
+    return dedupe_agents(merged)
+
+
+def apply_language_copilot_rules(
+    lead_agent: str,
+    assistants: list[str],
+    detected_languages: list[str],
+    language_routing: dict[str, str],
+    needs_worktree: bool,
+    needs_git_workflow: bool,
+) -> list[str]:
+    merged = list(assistants)
+
+    language_assistants: list[str] = []
+    for language in detected_languages:
+        candidate = language_routing.get(language)
+        if isinstance(candidate, str) and candidate.strip():
+            language_assistants.append(candidate)
+    language_assistants = dedupe_agents(language_assistants)
+
+    if lead_agent == "Code Audit Council":
+        merged.extend(language_assistants)
+
+    if lead_agent == "Git Workflow Guardian" and needs_worktree and needs_git_workflow:
+        merged.extend(language_assistants)
+
+    return dedupe_agents([agent for agent in merged if agent != lead_agent])
+
+
 def pick_ministry_owner(
     ministry: str,
     lead_agent: str,
@@ -1053,6 +1153,8 @@ def pick_mode(
         return "低置信分流：等待用户补充信息"
     if sentinel_overlay:
         return "模式 D：高风险治理"
+    if assistant_count > 0:
+        return "模式 B：评审-实现 或 模式 C：战略-技术双轨"
     if confidence >= high_confidence:
         return "模式 A：单点执行"
     if confidence >= medium_confidence:
@@ -1129,6 +1231,21 @@ def route_request(text: str, config: dict[str, object], repo_path: Path) -> dict
     assistants = [
         agent for agent in assistants if scores.get(agent, 0) > 0 and agent != lead_agent
     ]
+    assistants = apply_assistant_routing_rules(
+        text=text,
+        lead_agent=lead_agent,
+        assistants=assistants,
+        scores=scores,
+        config=config,
+    )
+    assistants = apply_language_copilot_rules(
+        lead_agent=lead_agent,
+        assistants=assistants,
+        detected_languages=detected_languages,
+        language_routing=language_routing,
+        needs_worktree=needs_worktree,
+        needs_git_workflow=needs_git_workflow,
+    )
     git_reason_hits = reasons.get("Git Workflow Guardian", {}).get("positive", [])
     if (
         lead_agent != "Git Workflow Guardian"

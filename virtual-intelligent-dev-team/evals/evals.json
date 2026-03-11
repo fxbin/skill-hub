@@ -1,0 +1,504 @@
+{
+  "skill_name": "virtual-intelligent-dev-team",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "This is a PR. Please do a security review and give refactor advice.",
+      "expected_output": "Lead should route to Code Audit Council without incorrectly enabling Git workflow.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Code Audit Council",
+        "assistant_agents is empty",
+        "needs_git_workflow is false",
+        "process_skills is empty"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Please review this Java GC issue and give recommendations.",
+      "expected_output": "Lead should route to Code Audit Council with Java Virtuoso as the language copilot.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Code Audit Council",
+        "assistant_agents contains Java Virtuoso",
+        "priority_routing agent is Code Audit Council"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Design a Go plus Gin high-concurrency API gateway.",
+      "expected_output": "Lead should route to Technical Trinity and detect Go context.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Technical Trinity",
+        "detected_languages contains go",
+        "language_routing.go is Technical Trinity",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Redo the admin page interaction and visual design, and improve the React component structure.",
+      "expected_output": "Lead should route to World-Class Product Architect without backend or audit agents taking over.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents is empty",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Help me commit this change set properly and push the branch.",
+      "expected_output": "Lead should route to Git Workflow Guardian and include a git-workflow plan.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Git Workflow Guardian",
+        "needs_git_workflow is true",
+        "process_skills contains git-workflow",
+        "process_plan first commands contain python scripts/git_workflow_guardrail.py --repo . --stage G3 --pretty",
+        "process_plan first commands contain git push -u origin feat/<ticket>-<summary>"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Core module refactor. Research first, then execute.",
+      "expected_output": "Research-first core refactor work should escalate to Sentinel Architect (NB) without forcing extra governance overlays unless stronger risk signals are present.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Sentinel Architect (NB)",
+        "needs_git_workflow is false",
+        "assistant_agents is empty"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "This SaaS is not growing. Set the strategy and also land the technical plan.",
+      "expected_output": "Lead should route to Executive Trinity and attach Technical Trinity for technical landing.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Executive Trinity",
+        "assistant_agents contains Technical Trinity",
+        "mode is not single-agent execution"
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Design a system for an unfamiliar industry, including compliance and technical landing.",
+      "expected_output": "Lead should route to Omni-Architect and attach Technical Trinity for engineering delivery.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Omni-Architect",
+        "assistant_agents contains Technical Trinity",
+        "governance_plan.privy_council.selected_track is regular track"
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "This is a PR. Please do the audit, then after the fixes commit and push properly.",
+      "expected_output": "Mixed audit plus commit/push execution should route to Git Workflow Guardian as the delivery lead once explicit Git actions dominate the request.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Git Workflow Guardian",
+        "assistant_agents is empty",
+        "needs_git_workflow is true"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Help me figure out what to do with this requirement.",
+      "expected_output": "Low-information requests should fall back to clarification instead of forced routing.",
+      "files": [],
+      "expectations": [
+        "confidence is 0.0",
+        "clarifying_question is not null",
+        "reason.unknown_only_fallback is true"
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Use Python and FastAPI to build a backend service.",
+      "expected_output": "Lead should route to Technical Trinity and detect Python without enabling Git workflow.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Technical Trinity",
+        "detected_languages contains python",
+        "language_routing.python is Technical Trinity",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "Review this Django API for security issues.",
+      "expected_output": "Lead should route to Code Audit Council and attach Technical Trinity as the Python implementation copilot.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Code Audit Council",
+        "assistant_agents contains Technical Trinity",
+        "priority_routing agent is Code Audit Council",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "Refactor this Flask service and then commit and push the branch.",
+      "expected_output": "Git execution should route to Git Workflow Guardian and enable git-workflow even when a Python service is mentioned.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Git Workflow Guardian",
+        "detected_languages contains python",
+        "needs_git_workflow is true",
+        "process_skills contains git-workflow"
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "Design a Python service with Celery workers and reliability guardrails.",
+      "expected_output": "Python async service design should stay with Technical Trinity and not trigger Git workflow.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Technical Trinity",
+        "detected_languages contains python",
+        "language_routing.python is Technical Trinity",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "This is a PR. Review this Django service for security issues before merge.",
+      "expected_output": "Mixed PR audit on a Python service should keep Code Audit Council as lead while attaching Git Workflow Guardian and Technical Trinity.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Code Audit Council",
+        "assistant_agents contains Git Workflow Guardian",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is true",
+        "priority_routing agent is Code Audit Council"
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "Use FastAPI for a backend service, then commit, push, and isolate the work in a worktree.",
+      "expected_output": "FastAPI plus Git execution plus isolation should route to Git Workflow Guardian, attach Technical Trinity, and enable both worktree and git-workflow process skills.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Git Workflow Guardian",
+        "assistant_agents contains Technical Trinity",
+        "detected_languages contains python",
+        "needs_worktree is true",
+        "needs_git_workflow is true",
+        "process_skills contains using-git-worktrees",
+        "process_skills contains git-workflow"
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "Design a Go service with Gin and improve concurrency.",
+      "expected_output": "Go service design should route to Technical Trinity and detect Go without enabling Git workflow.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Technical Trinity",
+        "detected_languages contains go",
+        "language_routing.go is Technical Trinity",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 18,
+      "prompt": "Review this Go API for security issues before merge.",
+      "expected_output": "Go audit review should keep Code Audit Council as lead, attach Technical Trinity, and still enable Git workflow for merge-oriented context.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Code Audit Council",
+        "assistant_agents contains Technical Trinity",
+        "detected_languages contains go",
+        "needs_git_workflow is true",
+        "priority_routing agent is Code Audit Council"
+      ]
+    },
+    {
+      "id": 19,
+      "prompt": "Use Go with Gin, then commit, push, and isolate the work in a worktree.",
+      "expected_output": "Go plus Git execution plus worktree isolation should route to Git Workflow Guardian, attach Technical Trinity, and enable both process skills.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Git Workflow Guardian",
+        "assistant_agents contains Technical Trinity",
+        "detected_languages contains go",
+        "needs_worktree is true",
+        "needs_git_workflow is true",
+        "process_skills contains using-git-worktrees",
+        "process_skills contains git-workflow"
+      ]
+    },
+    {
+      "id": 20,
+      "prompt": "Design a Node.js service with NestJS.",
+      "expected_output": "Node.js service design should route to Technical Trinity and detect nodejs without enabling Git workflow.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Technical Trinity",
+        "detected_languages contains nodejs",
+        "language_routing.nodejs is Technical Trinity",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 21,
+      "prompt": "Review this NestJS API for security issues before merge.",
+      "expected_output": "Node.js audit review should keep Code Audit Council as lead and attach Technical Trinity while enabling Git workflow for merge context.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Code Audit Council",
+        "assistant_agents contains Technical Trinity",
+        "detected_languages contains nodejs",
+        "needs_git_workflow is true",
+        "priority_routing agent is Code Audit Council"
+      ]
+    },
+    {
+      "id": 22,
+      "prompt": "Use Node.js with NestJS, then commit, push, and isolate the work in a worktree.",
+      "expected_output": "Node.js plus Git execution plus worktree isolation should route to Git Workflow Guardian, attach Technical Trinity, and enable both process skills.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Git Workflow Guardian",
+        "assistant_agents contains Technical Trinity",
+        "detected_languages contains nodejs",
+        "needs_worktree is true",
+        "needs_git_workflow is true",
+        "process_skills contains using-git-worktrees",
+        "process_skills contains git-workflow"
+      ]
+    },
+    {
+      "id": 23,
+      "prompt": "Design a Java Spring Boot service for order processing.",
+      "expected_output": "Java service design should route to Java Virtuoso without enabling Git workflow.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Java Virtuoso",
+        "assistant_agents is empty",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 24,
+      "prompt": "Review this Spring Boot API for security issues before merge.",
+      "expected_output": "Java audit review should keep Code Audit Council as lead, attach Java Virtuoso and Git Workflow Guardian, and enable Git workflow for merge context.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Code Audit Council",
+        "assistant_agents contains Java Virtuoso",
+        "assistant_agents contains Git Workflow Guardian",
+        "needs_git_workflow is true",
+        "priority_routing agent is Code Audit Council"
+      ]
+    },
+    {
+      "id": 25,
+      "prompt": "Use Java with Spring Boot, then commit, push, and isolate the work in a worktree.",
+      "expected_output": "Java plus Git execution plus worktree isolation should route to Git Workflow Guardian, attach Java Virtuoso, and enable both process skills.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Git Workflow Guardian",
+        "assistant_agents contains Java Virtuoso",
+        "needs_worktree is true",
+        "needs_git_workflow is true",
+        "process_skills contains using-git-worktrees",
+        "process_skills contains git-workflow"
+      ]
+    },
+    {
+      "id": 26,
+      "prompt": "Redesign this React dashboard UI and improve the interaction flow.",
+      "expected_output": "Frontend redesign and interaction work should route to World-Class Product Architect without backend or Git agents taking over.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents is empty",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 27,
+      "prompt": "Audit this checkout UX for accessibility and mobile responsiveness.",
+      "expected_output": "Checkout UX and accessibility review should stay with World-Class Product Architect and must not be misrouted to Git because of the word checkout.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents is empty",
+        "needs_git_workflow is false",
+        "process_skills is empty"
+      ]
+    },
+    {
+      "id": 28,
+      "prompt": "Improve the Tailwind admin UI, then commit, push, and isolate the work in a worktree.",
+      "expected_output": "Frontend UI work plus Git execution and worktree isolation should route to Git Workflow Guardian, attach World-Class Product Architect, and enable both process skills.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Git Workflow Guardian",
+        "assistant_agents contains World-Class Product Architect",
+        "needs_worktree is true",
+        "needs_git_workflow is true",
+        "process_skills contains using-git-worktrees",
+        "process_skills contains git-workflow"
+      ]
+    },
+    {
+      "id": 29,
+      "prompt": "Design a React design system with Tailwind tokens and shared components.",
+      "expected_output": "Design-system work should route to World-Class Product Architect without backend or Git agents taking over.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents is empty",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 30,
+      "prompt": "Improve the motion design for this React landing page with Framer Motion.",
+      "expected_output": "Motion and interaction design should route to World-Class Product Architect.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents is empty",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 31,
+      "prompt": "Redesign this analytics dashboard for mobile responsiveness and better information hierarchy.",
+      "expected_output": "Responsive dashboard redesign should route to World-Class Product Architect instead of falling back to a generic technical lead.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents is empty",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 32,
+      "prompt": "Audit this signup form UX for accessibility, validation, and conversion friction.",
+      "expected_output": "Form UX and accessibility review should route to World-Class Product Architect.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents is empty",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 33,
+      "prompt": "Redesign this React admin page and align the frontend flow with the backend API contract.",
+      "expected_output": "Frontend redesign plus backend contract alignment should keep World-Class Product Architect as lead and attach Technical Trinity as the engineering copilot.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 34,
+      "prompt": "Design a Next.js admin console with shadcn/ui and Tailwind.",
+      "expected_output": "Next.js plus shadcn/ui plus Tailwind design work should route to World-Class Product Architect.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents is empty",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 35,
+      "prompt": "Improve the Framer Motion transitions and loading states in this React onboarding flow.",
+      "expected_output": "Framer Motion interaction work should route to World-Class Product Architect.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents is empty",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 36,
+      "prompt": "Redesign the login flow, align auth UX with the backend API, and handle error states clearly.",
+      "expected_output": "Auth UX plus backend API alignment should keep World-Class Product Architect as lead and attach Technical Trinity.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 37,
+      "prompt": "用 Next.js 和 Tailwind 重做这个后台页面的交互和视觉层次。",
+      "expected_output": "Chinese frontend redesign requests for Next.js and Tailwind should route to World-Class Product Architect.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents is empty",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 38,
+      "prompt": "优化这个表单的错误提示、空状态和接口失败反馈，并和后端 API 契约对齐。",
+      "expected_output": "Chinese frontend error-state plus API-contract requests should keep World-Class Product Architect as lead and attach Technical Trinity.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 39,
+      "prompt": "帮我提个 commit 然后 push，那个 dashboard 也顺手改下。",
+      "expected_output": "Colloquial Git plus dashboard requests should route to Git Workflow Guardian and attach World-Class Product Architect.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Git Workflow Guardian",
+        "assistant_agents contains World-Class Product Architect",
+        "needs_git_workflow is true"
+      ]
+    },
+    {
+      "id": 40,
+      "prompt": "做个 saas 增长方案，然后把 tech plan 也落一下。",
+      "expected_output": "Colloquial strategy plus tech-plan requests should route to Executive Trinity and attach Technical Trinity.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Executive Trinity",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 41,
+      "prompt": "review 下这个 nest 接口，顺便看下 auth flow。",
+      "expected_output": "Mixed Chinese-English audit requests over Nest auth flows should keep Code Audit Council as lead and attach Technical Trinity.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Code Audit Council",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 42,
+      "prompt": "给这个 djagno 登录表单做个 ux review，并和后端 api 对齐。",
+      "expected_output": "Misspelled framework plus frontend/backend mixed review should keep World-Class Product Architect as lead and attach Technical Trinity.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is false"
+      ]
+    }
+  ]
+}

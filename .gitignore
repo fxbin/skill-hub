@@ -1,3 +1,10 @@
 __pycache__/
 *.pyc
 .skill-metrics/
+.vscode/
+*-workspace/
+**/evals/portfolio-report.json
+**/evals/portfolio-report.md
+**/evals/benchmark-report.md
+**/evals/benchmark-results.json
+**/evals/benchmark-results/
