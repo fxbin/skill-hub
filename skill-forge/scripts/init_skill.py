@@ -20,35 +20,35 @@ description: {description}
 
 # {display_name}
 
-一句话概述这个技能解决什么问题。
+A short explanation of what this skill helps the user do.
 
-## 核心目标
+## Core goals
 
-- 明确本技能的核心能力
-- 说明何时触发以及输出边界
+- State the main capability of the skill.
+- Explain when it should trigger and what its output boundaries are.
 
-## 使用场景
+## Usage scenarios
 
-- 场景 1：填写典型请求
-- 场景 2：填写相关文件或上下文
+- Scenario 1: describe a common request.
+- Scenario 2: describe the relevant files, context, or constraints.
 
-## 工作流程
+## Workflow
 
-1. 先确认目标和输入边界。
-2. 再选择资源目录与执行步骤。
-3. 最后给出固定交付格式。
+1. Confirm the goal, inputs, and boundaries.
+2. Load only the resources needed for the task.
+3. Produce a stable output format.
 
-## 交付模板
+## Output template
 
-1. `结论`：一句话结论
-2. `关键决策`：为什么这样做
-3. `风险`：边界条件或限制
-4. `下一步`：建议动作
+1. `Conclusion`: one-sentence outcome
+2. `Key decisions`: why this approach was chosen
+3. `Risks`: limits, assumptions, or edge cases
+4. `Next step`: what to do after this
 """
 
 REFERENCE_TEMPLATE = """# References
 
-将只在特定任务下才需要读取的资料放在这里。
+Place materials here that should only be read for specific tasks.
 """
 
 ASSET_PLACEHOLDER = """Place templates, images, or boilerplate assets here.
@@ -105,8 +105,10 @@ def create_resource_dirs(skill_dir: Path, resource_dirs: list[str], examples: bo
 
 def build_skill_md(skill_name: str, display_name: str) -> str:
     description = (
-        f"{display_name}。用于补充此技能的功能说明、适用场景和触发关键词。"
-        f" 用户会说“{display_name}”、“更新 {display_name}”、“使用 {skill_name}”等。"
+        f"{display_name}. Use this skill when the user wants to create, update, evaluate, "
+        f"or refine {display_name}, define its workflow, add evals, or improve its triggering description. "
+        f"Users may say things like \"create {display_name}\", \"benchmark {display_name}\", "
+        f"\"update {display_name}\", or \"use {skill_name}\"."
     )
     return SKILL_TEMPLATE.format(
         skill_name=skill_name,

@@ -1,323 +1,234 @@
 ---
 name: skill-forge
-description: 创建可复用技能的核心指南。当用户想要创建新技能、更新现有技能、定义技能结构、编写 SKILL.md、设置 frontmatter 或设计技能工作流时使用此技能。
+description: Build, repair, evaluate, and refine reusable skills end to end. Use this skill whenever the user wants to create a new skill, fix or rewrite an existing SKILL.md, generate agents/openai.yaml, add evals, run validation or benchmark loops, or improve a skill's triggering and iteration workflow.
 ---
 
 # Skill Forge
 
-本技能指导你创建有效的可复用技能。
+Use this skill as the unified engineering workflow for reusable skills.
 
-## 何时使用此技能
+## When To Use
 
-在以下情况下使用：
-- 创建新的可复用技能
-- 更新现有技能的 SKILL.md
-- 定义技能结构和 frontmatter 元数据
-- 设计技能工作流和触发规则
-- 将技能接入 AI 助手
+Use `skill-forge` when the user wants to:
 
-## 核心原则
+- create a new skill scaffold
+- repair or rewrite an existing skill
+- normalize `SKILL.md`, frontmatter, `VERSION`, or `agents/openai.yaml`
+- add `evals/evals.json` or a benchmark workflow
+- validate a skill before commit
+- improve a skill through review, regression, and iteration
 
-### 1. 保持专注
+## Positioning
 
-一个技能应该聚焦于单一能力：
-- ✅ 好的示例：`pdf-form-filler`、`git-workflow-helper`、`java-migration-guide`
-- ❌ 过宽示例：`document-processor`、`development-tools`
+`skill-forge` owns the full skill lifecycle:
 
-### 2. 描述要具体
+1. define the skill boundary
+2. scaffold the folder and metadata
+3. write or repair the skill instructions
+4. add eval prompts and validation
+5. run benchmarks and review outcomes
+6. iterate until the skill is stable
 
-description 是技能被触发的关键，必须包含：
-- **做什么**：技能的具体功能
-- **何时使用**：用户在什么场景下会使用这个技能
-- **触发关键词**：中文和英文的常见表达
+Do not treat this as only a scaffold generator. It is the project-local skill engineering entry point.
 
-### 3. 遵循标准结构
+## Workflow
 
-```
-skill-name/
-├── SKILL.md (必需)
-├── VERSION (可选)
-├── references/ (可选)
-│   └── *.md
-├── scripts/ (可选)
-│   └── *.py/*.js/*.sh
-├── assets/ (可选)
-└── agents/ (可选)
-    └── openai.yaml
-```
+### 1. Capture intent and boundary
 
-## 技能创建流程
+Clarify:
 
-### 步骤 1：确定技能范围
+- what the skill should enable
+- when it should trigger
+- what good output looks like
+- whether the work needs scripts, references, assets, evals, or benchmarks
 
-首先明确技能的功能：
+Keep the skill focused. One skill should solve one coherent problem.
 
-1. **提出澄清问题**：
-   - 这个技能提供什么具体能力？
-   - 用户在什么场景下会使用这个技能？
-   - 需要哪些工具或资源？
-   - 是个人使用还是团队共享？
+### 2. Initialize or repair the scaffold
 
-2. **保持聚焦**：一个技能 = 一个核心能力
+Create a new skill:
 
-### 步骤 2：初始化技能脚手架
-
-```bash
+```powershell
 python skill-forge/scripts/init_skill.py skill-name --path .
 ```
 
-需要占位示例文件时：
+Create a new skill with placeholder resources:
 
-```bash
+```powershell
 python skill-forge/scripts/init_skill.py skill-name --path . --with-examples
 ```
 
-该脚本会自动生成：
-- `SKILL.md`
-- `VERSION`
-- `agents/openai.yaml`
-- `references/`、`scripts/`、`assets/`（以及可选示例文件）
+Use repository rules explicitly:
 
-如需按外部仓库规范生成，传入配置文件：
-
-```bash
-python skill-forge/scripts/init_skill.py skill-name --path . \
-  --config skill-forge/references/generic-skill-config.json
+```powershell
+python skill-forge/scripts/init_skill.py skill-name --path . --config skill-forge/references/generic-skill-config.json
 ```
 
-### 步骤 3：编写 SKILL.md frontmatter
+When updating an existing skill, preserve the directory name and frontmatter `name`.
 
-YAML frontmatter 是必需部分：
+### 3. Write or repair `SKILL.md`
+
+The frontmatter must explain both function and trigger context.
+
+Minimum shape:
 
 ```yaml
 ---
 name: skill-name
-description: 技能功能描述 + 使用场景 + 触发关键词
+description: What the skill does, when to use it, and which requests should trigger it.
 ---
 ```
 
-**字段要求**：
-
-| 字段 | 要求 |
-|------|------|
-| `name` | 小写字母、数字、中划线；最大 64 字符；与目录名一致 |
-| `description` | 最大 1024 字符；包含"做什么"+"何时使用"+触发关键词 |
-
-**描述公式**：`[功能] + [使用场景] + [触发关键词]`
-
-✅ **好的示例**：
-```yaml
-description: Java 21 与 Spring Boot 3.2+ 迁移指南。用于 Java 版本升级、依赖兼容性评估、遗留代码现代化改造。用户会说"升级 Java"、"Java 迁移"、"Spring Boot 升级"等。
-```
-
-❌ **不好的示例**：
-```yaml
-description: 帮助 Java 开发
-description: 代码重构工具
-```
-
-### 步骤 4：编写 SKILL.md 正文
-
-使用清晰的 Markdown 结构：
+The body should stay lean and practical. Prefer this structure:
 
 ```markdown
-# 技能名称
+# Skill Name
 
-一句话概述技能功能。
+One-sentence purpose.
 
-## 核心目标
+## When To Use
+- scenario 1
+- scenario 2
 
-- 目标 1
-- 目标 2
+## Workflow
+1. clarify the task
+2. load only relevant resources
+3. produce the expected output
 
-## 使用场景
-
-- 场景 1：具体描述
-- 场景 2：具体描述
-
-## 自动触发规则
-
-描述技能在什么条件下会被激活。
-
-## 交付模板
-
-使用统一的输出格式：
-
-1. `结论`：xxx
-2. `决策`：xxx
-3. `风险`：xxx
-4. `下一步`：xxx
-
-## 快速触发示例
-
-- "触发短语 1" -> 预期行为
-- "触发短语 2" -> 预期行为
+## Output
+- conclusion
+- key decisions
+- risks
+- next step
 ```
 
-### 步骤 5：编写 VERSION 文件（可选）
+Move long references, templates, or deterministic helpers into `references/`, `assets/`, or `scripts/`.
 
-内容为语义化版本号：
-```
-v1.0.0
-```
+### 4. Generate or refresh `agents/openai.yaml`
 
-### 步骤 6：添加支持文件（可选）
-
-- **references/**：参考资料、路由规则、模式库
-- **scripts/**：可执行脚本、路由工具
-- **assets/**：模板文件、配置文件
-- **agents/**：智能体定义配置
-
-### 步骤 7：生成或刷新 `agents/openai.yaml`
-
-```bash
+```powershell
 python skill-forge/scripts/generate_openai_yaml.py ./skill-name
 ```
 
-如需覆盖展示字段：
+Override interface fields when needed:
 
-```bash
-python skill-forge/scripts/generate_openai_yaml.py ./skill-name \
-  --interface display_name="My Skill" \
-  --interface short_description="Help create or update My Skill" \
-  --interface default_prompt="Use $my-skill to ..."
+```powershell
+python skill-forge/scripts/generate_openai_yaml.py ./skill-name ^
+  --interface display_name="My Skill" ^
+  --interface short_description="Create and optimize this skill cleanly." ^
+  --interface default_prompt="Use $my-skill to scaffold, validate, or refine this skill."
 ```
 
-字段定义见 [references/openai_yaml.md](references/openai_yaml.md)。
-配置覆盖见 [references/configuration.md](references/configuration.md)。
+### 5. Add eval prompts
 
-### 步骤 8：快速校验技能
+Every skill that supports objective checking should have `evals/evals.json`.
 
-```bash
+Initialize a starter eval file:
+
+```powershell
+python skill-forge/scripts/init_evals.py ./skill-name
+```
+
+Good eval prompts should be realistic, user-like, and cover:
+
+- primary path
+- edge cases
+- mixed or ambiguous requests
+- obvious regressions the skill must not reintroduce
+
+### 6. Validate the skill
+
+Quick validation:
+
+```powershell
 python skill-forge/scripts/quick_validate.py ./skill-name
+```
+
+Repository validation:
+
+```powershell
 python scripts/validate_skills.py
 ```
 
-先跑单技能快速校验，再跑仓库全量校验。
+### 7. Run benchmark and review
 
-外部仓库建议显式传入配置：
+Use the local benchmark runner to combine validation, eval structure checks, category summaries, and report generation:
 
-```bash
-python skill-forge/scripts/quick_validate.py ./skill-name \
-  --config skill-forge/references/generic-skill-config.json
-
-python scripts/validate_skills.py --repo-root . \
-  --config skill-forge/references/generic-skill-config.json
+```powershell
+python skill-forge/scripts/run_skill_benchmarks.py ./skill-name --pretty ^
+  --output ./skill-name/evals/benchmark-results.json ^
+  --markdown-output ./skill-name/evals/benchmark-report.md
 ```
 
-## Frontmatter 最佳实践
+For iteration-to-iteration comparison:
 
-### 必需字段
-
-```yaml
----
-name: skill-name
-description: 功能描述 + 使用场景 + 触发关键词
----
+```powershell
+python skill-forge/scripts/run_skill_benchmarks.py ./skill-name ^
+  --previous-output ./skill-name-workspace/iteration-2/benchmark-results.json ^
+  --output ./skill-name/evals/benchmark-results.json ^
+  --markdown-output ./skill-name/evals/benchmark-report.md
 ```
 
-### 可选字段
+For repository-wide reporting:
 
-- `metadata`：
-  - `short-description`：简短描述（用于列表展示）
-- `allowed-tools`：限制可用工具
-- `license`：技能许可证标识（可选）
-
-仅在确实需要时添加可选字段，避免 frontmatter 过载。
-
-### `agents/openai.yaml`（推荐）
-
-如果技能需要在 UI 中展示，创建 `agents/openai.yaml`，至少包含：
-
-```yaml
-interface:
-  display_name: "用户可读名称"
-  short_description: "25-64 字符简述"
-  default_prompt: "Use $skill-name to ..."
+```powershell
+python skill-forge/scripts/generate_skill_portfolio_report.py . ^
+  --output ./skill-forge/evals/portfolio-report.json ^
+  --markdown-output ./skill-forge/evals/portfolio-report.md
 ```
 
-约束：
-- `short_description` 建议 25-64 字符
-- `default_prompt` 必须包含 `$skill-name`（例如 `$skill-forge`）
-- 字符串值统一使用引号包裹
+For richer review loops, create a sibling workspace such as:
 
-### 描述优化技巧
-
-- 包含具体的触发短语
-- 提及文件类型或格式
-- 使用"用于"、"当...时"、"用户会说"等句式
-
-## 常见模式
-
-### 模式 1：路由型技能
-
-```yaml
----
-name: java-virtuoso
-description: Java 21、Spring Boot 3.2+、JVM 性能调优专家。用于 Java 开发、框架选型、性能优化、版本升级。用户会说"Java 开发"、"Spring Boot"、"JVM 调优"等。
----
-
-# Java Virtuoso
-
-## 核心目标
-
-- 提供 Java 技术决策
-- 优化代码性能和并发能力
+```text
+my-skill-workspace/
+  iteration-1/
+  iteration-2/
 ```
 
-### 模式 2：流程型技能
+Within each iteration, compare current outputs against a baseline, keep `eval_metadata.json`, and summarize what improved or regressed.
 
-```yaml
----
-name: git-workflow-guardian
-description: Git 工作流守护者。用于分支策略、提交规范、PR 合并、冲突处理。用户会说"提交代码"、"解决冲突"、"创建分支"、"PR 审核"等。
----
+### 8. Iterate with evidence
 
-# Git Workflow Guardian
+When improving a skill:
 
-## 核心目标
+- generalize from user feedback instead of overfitting to one prompt
+- remove prompt weight that does not change outcomes
+- explain why instructions matter instead of writing rigid rules everywhere
+- convert repeated manual work into scripts when it clearly recurs
 
-- 保障 Git 流程规范性
-- 提供冲突处理决策
-```
+## Evaluation Guidance
 
-### 模式 3：多智能体协作技能
+Use both qualitative and quantitative signals.
 
-```yaml
----
-name: virtual-intelligent-dev-team
-description: 智能专家团队路由器。自动调度多个专业智能体，协作完成复杂任务。用于多角色协作、跨领域决策、复杂任务分解。
----
+Quantitative checks:
 
-# Virtual Intelligent Dev Team
+- does the skill validate
+- does it have eval prompts
+- do benchmark runs pass
+- do eval categories cover the skill lifecycle
+- does the benchmark report expose per-eval status
+- do trigger descriptions stay within constraints
 
-## 团队成员
+Qualitative checks:
 
-- xxx
-```
+- is the skill readable
+- does the workflow feel coherent
+- are the outputs stable across similar prompts
+- does the skill avoid bloated or contradictory instructions
 
-## 校验清单
+## Output Contract
 
-创建完技能后，验证以下内容：
+When working on a skill, prefer to return:
 
-- [ ] 目录名与 frontmatter `name` 一致
-- [ ] `VERSION` 文件存在且格式正确（如果需要）
-- [ ] description 包含功能 + 使用场景 + 触发关键词
-- [ ] description 不超过 1024 字符
-- [ ] YAML frontmatter 格式正确
-- [ ] frontmatter 仅使用允许字段（`name`、`description`、`metadata`、`allowed-tools`、`license`）
-- [ ] 如果存在 `agents/openai.yaml`，包含 `display_name`、`short_description`、`default_prompt`
-- [ ] `default_prompt` 包含 `$<skill-name>`
-- [ ] 技能能在相关场景下被正确触发
+1. a short assessment of current issues
+2. the concrete files updated
+3. validation or benchmark results
+4. remaining risks and the next improvement step
 
-## 输出格式
+## Resources
 
-创建技能时，我会：
+Read only what is needed:
 
-1. 询问技能的核心功能和触发场景
-2. 建议技能名称和目录结构
-3. 优先运行 `skill-forge/scripts/init_skill.py` 初始化脚手架
-4. 编写或更新符合规范的 `SKILL.md`
-5. 生成 `agents/openai.yaml` 并补齐支持文件
-6. 运行 `quick_validate.py` 和仓库级校验
-7. 给出使用示例和触发规则
+- [configuration.md](references/configuration.md)
+- [generic-skill-config.json](references/generic-skill-config.json)
+- [openai_yaml.md](references/openai_yaml.md)

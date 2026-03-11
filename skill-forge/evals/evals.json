@@ -1,0 +1,61 @@
+{
+  "skill_name": "skill-forge",
+  "evals": [
+    {
+      "id": 1,
+      "category": "create",
+      "prompt": "Use $skill-forge to create a new skill called api-contract-guardian for reviewing backend API compatibility, generate the standard folder structure, and give me the first draft of SKILL.md.",
+      "expected_output": "Creates a realistic new-skill scaffold plan and a first draft focused on API compatibility review.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "category": "repair",
+      "prompt": "Use $skill-forge to repair an existing skill whose SKILL.md frontmatter is broken, the description is too vague, and agents/openai.yaml is missing required interface fields.",
+      "expected_output": "Repairs malformed skill metadata and restores a valid SKILL.md plus openai.yaml workflow.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "category": "metadata",
+      "prompt": "Use $skill-forge to regenerate agents/openai.yaml for a skill after I renamed the display title and want a cleaner short_description and default_prompt.",
+      "expected_output": "Regenerates openai metadata cleanly and preserves skill-name correctness in default_prompt.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "category": "evals",
+      "prompt": "Use $skill-forge to add evals/evals.json to an existing skill that already works but has no tests. I want realistic prompts that cover the main workflow, a regression path, and one mixed request.",
+      "expected_output": "Adds a realistic eval plan instead of placeholder-only prompts and explains why each case exists.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "category": "benchmark",
+      "prompt": "Use $skill-forge to benchmark a skill before commit. I need a repeatable command, a readable report, and a quick summary of whether the skill is structurally ready.",
+      "expected_output": "Runs or describes a benchmark workflow with validation, eval checks, and a concise readiness summary.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "category": "triggering",
+      "prompt": "Use $skill-forge to improve a skill description that is under-triggering. I need better wording for when the skill should activate, but I do not want the description to become bloated.",
+      "expected_output": "Improves trigger wording while keeping the description lean and practical.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "category": "cleanup",
+      "prompt": "Use $skill-forge to review a skill that has too much content in SKILL.md, duplicated instructions, and logic that should probably move into scripts or references.",
+      "expected_output": "Identifies prompt bloat, proposes structure cleanup, and moves deterministic work toward scripts or references.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "category": "iteration",
+      "prompt": "Use $skill-forge to update a repository skill after several iterations. Compare the current version against the previous one, tell me what improved, and point out what still is not measurable enough.",
+      "expected_output": "Applies an iteration mindset, compares versions, and highlights remaining measurement gaps.",
+      "files": []
+    }
+  ]
+}
