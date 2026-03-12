@@ -357,6 +357,53 @@
         "needs_git_workflow": true,
         "priority_agent": "Git Workflow Guardian"
       }
+    },
+    {
+      "name": "startup_mvp_runbook_shape",
+      "text": "We need a startup MVP with product UX, backend delivery, and launch strategy.",
+      "expect": {
+        "lead_agent": "Executive Trinity",
+        "assistant_agents_contains": ["World-Class Product Architect"],
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "audit_fix_handoff_shape",
+      "text": "This is a PR. Review this Django service for security issues, then tell me the exact fixes and the safest next delivery step.",
+      "expect": {
+        "lead_agent": "Code Audit Council",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "needs_git_workflow": false,
+        "priority_agent": "Code Audit Council"
+      }
+    },
+    {
+      "name": "regulated_domain_runbook_shape",
+      "text": "Design a healthcare workflow system with compliance constraints and technical landing.",
+      "expect": {
+        "lead_agent": "Omni-Architect",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "frontend_backend_runbook_shape",
+      "text": "Redesign the billing settings UX, align it with the backend API contract, and make the states responsive.",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents_contains": ["Technical Trinity"],
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "high_risk_production_change_shape",
+      "text": "This is a production-critical payment migration. Research first, stage it, define rollback, and handle the PR safely.",
+      "expect": {
+        "lead_agent": "Java Virtuoso",
+        "assistant_agents_contains": ["Sentinel Architect (NB)", "Git Workflow Guardian"],
+        "needs_git_workflow": true,
+        "priority_agent": null
+      }
     }
   ],
   "process_plan_cases": [

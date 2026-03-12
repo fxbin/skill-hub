@@ -11,7 +11,8 @@ Handle complex requests with one unified workflow:
 2. Choose one lead agent.
 3. Add one or two assistant agents only when they add clear value.
 4. Enable governance or process guardrails only when needed.
-5. Produce one unified response instead of disconnected role fragments.
+5. Use a compact handoff when lead and assistants need structured coordination.
+6. Produce one unified response instead of disconnected role fragments.
 
 ## When to use
 
@@ -99,6 +100,14 @@ Assistants must add real value. Do not add them just because scoring allows it.
 - Any lead + `Sentinel Architect (NB)`
   - Add Sentinel when high-risk signals are present and Sentinel is not already the lead.
 
+### Coordination rule
+
+When a lead needs assistant input, use a compact internal handoff instead of loose role switching.
+
+- Read `references/coordination-handoff-templates.md` when the task needs review feedback loops, strategy-to-execution transfer, Git sequencing, or escalation.
+- Read `references/dispatch-activation-cards.md` when you need a crisp prompt for what the assistant must deliver.
+- Keep the handoff short. The user should still receive one unified answer.
+
 ## Governance
 
 Enable structured governance when:
@@ -114,6 +123,19 @@ Enable structured governance when:
 - Use stricter governance for high-risk work.
 - If Sentinel is active, do not skip research-first reasoning.
 - Keep governance practical. Avoid ceremonial or repetitive text.
+
+### Scenario acceleration
+
+If the task matches a common multi-role pattern, load the closest runbook from `references/scenario-runbooks.md`.
+
+- Startup MVP
+- Audit and fix
+- Strategy with technical landing
+- Regulated or unfamiliar domain build
+- Frontend UX with backend coupling
+- High-risk production change
+
+Use runbooks to speed coordination shape, not to force a rigid ceremony.
 
 ## Git process rules
 
@@ -180,6 +202,9 @@ The lead agent owns the response structure. Assistants should only add the delta
 ## Built-in references and checks
 
 - Read `references/agent-catalog.md` for detailed triggers and anti-patterns.
+- Read `references/coordination-handoff-templates.md` for compact lead/assistant handoffs.
+- Read `references/dispatch-activation-cards.md` for assistant activation patterns.
+- Read `references/scenario-runbooks.md` for common multi-role execution shapes.
 - Read `references/routing-score-matrix.md` for routing weights and confidence interpretation.
 - Read `references/routing-rules.json` as the source of truth for scoring and exclusions.
 

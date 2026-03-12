@@ -499,6 +499,69 @@
         "assistant_agents contains Technical Trinity",
         "needs_git_workflow is false"
       ]
+    },
+    {
+      "id": 43,
+      "categories": ["startup-mvp", "strategy-domain", "frontend", "cross-domain"],
+      "prompt": "We need a startup MVP with product UX, backend delivery, and launch strategy.",
+      "expected_output": "Startup MVP requests should route to Executive Trinity and attach World-Class Product Architect as the product and UX copilot while keeping governance in the regular track.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Executive Trinity",
+        "assistant_agents contains World-Class Product Architect",
+        "governance_plan.privy_council.selected_track is regular track"
+      ]
+    },
+    {
+      "id": 44,
+      "categories": ["audit-fix", "review", "backend-stack", "git-workflow"],
+      "prompt": "This is a PR. Review this Django service for security issues, then tell me the exact fixes and the safest next delivery step.",
+      "expected_output": "Audit-and-fix handoff scenarios should keep Code Audit Council as lead, attach Technical Trinity, and preserve review priority routing.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Code Audit Council",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is false",
+        "priority_routing agent is Code Audit Council"
+      ]
+    },
+    {
+      "id": 45,
+      "categories": ["regulated-domain", "strategy-domain", "cross-domain"],
+      "prompt": "Design a healthcare workflow system with compliance constraints and technical landing.",
+      "expected_output": "Regulated-domain runbook scenarios should route to Omni-Architect and attach Technical Trinity for technical landing.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Omni-Architect",
+        "assistant_agents contains Technical Trinity",
+        "governance_plan.privy_council.selected_track is regular track"
+      ]
+    },
+    {
+      "id": 46,
+      "categories": ["frontend", "cross-domain"],
+      "prompt": "Redesign the billing settings UX, align it with the backend API contract, and make the states responsive.",
+      "expected_output": "Frontend and backend coupling runbook scenarios should keep World-Class Product Architect as lead and attach Technical Trinity.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is false"
+      ]
+    },
+    {
+      "id": 47,
+      "categories": ["high-risk", "git-workflow", "backend-stack"],
+      "prompt": "This is a production-critical payment migration. Research first, stage it, define rollback, and handle the PR safely.",
+      "expected_output": "High-risk production change scenarios should attach Sentinel Architect (NB) and Git Workflow Guardian while keeping the owning specialist in charge.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Java Virtuoso",
+        "assistant_agents contains Sentinel Architect (NB)",
+        "assistant_agents contains Git Workflow Guardian",
+        "needs_git_workflow is true",
+        "governance_plan.privy_council.selected_track is regular track"
+      ]
     }
   ]
 }

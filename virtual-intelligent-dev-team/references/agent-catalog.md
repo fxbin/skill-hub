@@ -1,88 +1,78 @@
 # Agent Catalog
 
-来源：内置智能体角色清单  
-同步时间：`2026-03-04`
+Source of truth for each team member's scope, trigger patterns, and anti-patterns.
 
-## 目录
+## 1. Java Virtuoso
 
-1. Java Virtuoso
-2. Sentinel Architect (NB)
-3. Technical Trinity
-4. Code Audit Council
-5. Git Workflow Guardian
-6. Omni-Architect
-7. Executive Trinity
-8. World-Class Product Architect
+- Core strengths: Java 21, Spring Boot 3.2+, JVM performance, concurrency strategy, migration from legacy Java APIs.
+- Best triggers: `java`, `spring`, `jvm`, `gc`, `virtual threads`, `java upgrade`, `spring boot`.
+- Typical tasks: backend implementation, performance tuning, Java refactors, Spring architecture, concurrency reviews.
+- Avoid using as lead for: pure business strategy, pure UI design, generic Git-only tasks.
+- Output bias: concrete Java decisions, production-ready implementation guidance, test strategy, migration notes.
 
-## 1) Java Virtuoso
+## 2. Sentinel Architect (NB)
 
-- 核心能力：Java 21、Spring Boot 3.2+、JVM 性能、并发策略、现代 API 替换。
-- 触发信号：`Java`、`Spring`、`JVM`、`GC`、`虚拟线程`、`Java 8 升级`。
-- 典型任务：后端重构、性能排查、并发设计、老 API 现代化替换。
-- 避免场景：纯商业策略、纯视觉设计。
-- 输出重点：现代策略说明、生产级代码、测试建议、必要时 JVM 深挖。
+- Core strengths: high-risk change governance, staged execution, research-first delivery, safety rails for critical work.
+- Best triggers: `high risk`, `critical`, `production-impacting`, `research first`, `migration with rollback`, `sensitive refactor`.
+- Typical tasks: risky refactors, hotfix governance, phased modernization, conflict-heavy coordination.
+- Avoid using as lead for: low-risk one-off fixes or straightforward single-step answers.
+- Output bias: execution mode, risk gates, rollback thinking, decision checkpoints, auditability.
 
-## 2) Sentinel Architect (NB)
+## 3. Technical Trinity
 
-- 核心能力：RIPER-5 状态机流程治理，高风险改造的阶段化执行。
-- 触发信号：`核心模块重构`、`先调研再执行`、`高风险变更`、`需要严格审批`。
-- 典型任务：复杂多步骤改造、关键系统热修复、强流程约束任务。
-- 避免场景：简单低风险改动或单步问答。
-- 输出重点：模式声明、阶段产物、计划合约、执行与审计闭环。
+- Core strengths: general backend engineering, system design, implementation tradeoffs, reliability, DevSecOps-aware delivery.
+- Best triggers: `system design`, `backend`, `api`, `service`, `python`, `go`, `node`, `rust`, `architecture`, `reliability`.
+- Typical tasks: service design, module refactors, platform engineering, implementation planning, technical landing.
+- Avoid using as lead for: pure market strategy or purely visual frontend redesign.
+- Output bias: architecture choices, implementation slices, risk tradeoffs, operational concerns.
 
-## 3) Technical Trinity
+## 4. Code Audit Council
 
-- 核心能力：架构、工程实现、DevSecOps 三方联合决策。
-- 触发信号：`技术选型`、`系统设计`、`可扩展性`、`安全与可靠性`、`代码优化`、`python/go/node.js/rust` 后端开发。
-- 典型任务：中大型系统架构、复杂模块重构、工程规范升级。
-- 避免场景：纯业务战略或纯 UI 视觉任务。
-- 输出重点：架构决策、实现方案、风险与改进建议。
+- Core strengths: review, audit, security assessment, maintainability analysis, refactor prioritization.
+- Best triggers: `review`, `audit`, `security review`, `pr review`, `code review`, `vulnerability`, `refactor assessment`.
+- Typical tasks: bug/risk finding, PR review, hardening advice, quality grading, remediation prioritization.
+- Avoid using as lead for: requests without code context or pure strategy discussions.
+- Output bias: findings first, severity ordering, behavioral regressions, test gaps, concrete remediation advice.
 
-## 4) Code Audit Council
+## 5. Git Workflow Guardian
 
-- 核心能力：多维代码审计（安全、性能、架构、业务、可读性）与重构建议。
-- 触发信号：`代码审查`、`审计`、`PR 前检查`、`安全漏洞`、`屎山重构`。
-- 典型任务：高风险代码评审、合规检查、提交前质量把关。
-- 避免场景：没有代码上下文的抽象商业讨论。
-- 输出重点：质量评分、致命问题、分维度会诊、重构版本。
+- Core strengths: branch policy, staged Git workflow, commit/push/PR safety, merge/rebase handling, worktree usage.
+- Best triggers: `git workflow`, `commit`, `push`, `pull request`, `branch`, `rebase`, `merge`, `worktree`, `release`.
+- Typical tasks: safe Git execution, PR flow design, branch strategy, conflict handling, release hygiene.
+- Avoid using as lead for: pure code review or non-Git business discussions.
+- Output bias: safest next Git step, stage status, guardrails, branch/commit/PR recommendations.
 
-## 5) Git Workflow Guardian
+## 6. Omni-Architect
 
-- 核心能力：Git 工作流治理、状态机门禁、提交质量控制、冲突停止点与人工接管边界。
-- 触发信号：`git workflow`、`分支策略`、`提交规范`、`commit/push/rebase`、`冲突处理`、`发布/发版`。
-- 典型任务：提交与推送改动、处理 rebase/merge 冲突、制定 PR 门禁与分支模型。
-- 避免场景：纯代码审计或纯业务讨论。
-- 输出重点：G0-G4 状态机、风险分级、阻塞点、最小安全操作序列。
+- Core strengths: unfamiliar industries, domain constraints, compliance-heavy systems, cross-industry solutioning.
+- Best triggers: `healthcare`, `fintech`, `government`, `compliance`, `domain constraints`, `industry architecture`, `0-1 blueprint`.
+- Typical tasks: regulated architecture, domain modeling, cross-functional system planning, solution framing for unknown domains.
+- Avoid using as lead for: narrow implementation tickets or isolated UI tasks.
+- Output bias: domain assumptions, constraints, target architecture, compliance boundaries, delivery plan.
 
-## 6) Omni-Architect
+## 7. Executive Trinity
 
-- 核心能力：跨行业场景下的领域约束建模 + 技术落地一体化设计。
-- 触发信号：`陌生行业`、`合规敏感`、`0-1 系统方案`、`复杂系统蓝图`。
-- 典型任务：行业数字化方案、售前架构、跨域复杂系统设计。
-- 避免场景：简单脚本、纯前端视觉任务。
-- 输出重点：领域约束、产品策略、系统架构、核心实现、风险防御。
+- Core strengths: business strategy, growth, pricing, monetization, positioning, operating model decisions.
+- Best triggers: `growth`, `pricing`, `monetization`, `go-to-market`, `competition`, `market strategy`, `saas strategy`.
+- Typical tasks: go/no-go decisions, growth diagnosis, pricing choices, strategic reframing, operating-model tradeoffs.
+- Avoid using as lead for: pure code implementation or low-level technical debugging.
+- Output bias: business decision, rationale, tradeoffs, execution implications, measurable next moves.
 
-## 7) Executive Trinity
+## 8. World-Class Product Architect
 
-- 核心能力：战略判断、运营执行、产品增长的商业闭环。
-- 触发信号：`商业模式`、`增长瓶颈`、`融资`、`竞争策略`、`定价`。
-- 典型任务：Go/No-Go 决策、增长诊断、BP 预演、战略转型。
-- 避免场景：纯代码实现或低层技术问题。
-- 输出重点：战略结论、市场与愿景、执行运营、产品增长、致命风险。
+- Core strengths: UX architecture, frontend interaction design, React implementation direction, design systems, accessibility.
+- Best triggers: `ui`, `ux`, `react`, `next.js`, `dashboard`, `design system`, `tailwind`, `shadcn`, `accessibility`, `motion`.
+- Typical tasks: redesigns, UI audits, responsive flows, form UX, component systems, frontend/backend interaction shaping.
+- Avoid using as lead for: pure backend infrastructure or pure business strategy.
+- Output bias: user flow clarity, frontend implementation direction, interaction details, responsiveness, accessibility.
 
-## 8) World-Class Product Architect
+## Routing Guidance
 
-- 核心能力：产品体验、交互、视觉、React 工程化协同落地。
-- 触发信号：`前端页面`、`UI/UX`、`React`、`Tailwind`、`组件交互`。
-- 典型任务：MVP 页面搭建、界面重构、复杂交互组件、动效优化。
-- 避免场景：纯后端架构或纯商业战略。
-- 输出重点：产品意图、高质量前端代码、交互反馈、可维护组件化。
-
-## 路由优先级建议
-
-1. 审计类请求优先派发 `Code Audit Council`。
-2. 技术实现任务按技术栈优先（Java 场景先看 `Java Virtuoso`）。
-3. 跨行业高复杂任务优先 `Omni-Architect`。
-4. 商业决策优先 `Executive Trinity`。
-5. 前端体验与产品界面优先 `World-Class Product Architect`。
-6. 若任务高风险且需阶段化控制，叠加 `Sentinel Architect (NB)` 进行流程治理。
+1. Reviews and audits should prefer `Code Audit Council`, unless the request is clearly UI/UX review.
+2. Git flow and commit/push/PR execution should prefer `Git Workflow Guardian`.
+3. Java and Spring requests should prefer `Java Virtuoso`.
+4. UI/UX and frontend-heavy work should prefer `World-Class Product Architect`.
+5. Strategy and market decisions should prefer `Executive Trinity`.
+6. Regulated or unfamiliar industry architecture should prefer `Omni-Architect`.
+7. General implementation and backend design should prefer `Technical Trinity`.
+8. Add or elevate `Sentinel Architect (NB)` for high-risk or research-first work.

@@ -157,7 +157,9 @@ def parse_expectation(expectation: str, result: dict[str, object]) -> tuple[bool
         if expected == "0.0":
             return float(value) == 0.0, f"{field.strip()}={value!r}"
         if expected == "regular track":
-            return str(value) in {"regular track", "三省六部轨", "涓夌渷鍏儴杞?"}, f"{field.strip()}={value!r}"
+            return str(value) in {"regular track", "三省六部轨"}, f"{field.strip()}={value!r}"
+        if expected == "fast track":
+            return str(value) in {"fast track", "军机处直通轨"}, f"{field.strip()}={value!r}"
         return str(value) == expected, f"{field.strip()}={value!r}"
 
     return False, "unsupported expectation"
@@ -186,7 +188,11 @@ def evaluate_evals(config: dict[str, object]) -> dict[str, object]:
             ok, detail = parse_expectation(str(raw), result)
             if not ok:
                 failures.append(f"{raw} [{detail}]")
-        tags = classify_prompt(prompt)
+        raw_categories = item.get("categories")
+        if isinstance(raw_categories, list) and all(isinstance(category, str) for category in raw_categories):
+            tags = [str(category) for category in raw_categories]
+        else:
+            tags = classify_prompt(prompt)
         passed = len(failures) == 0
         for tag in tags:
             category_totals[tag] += 1
