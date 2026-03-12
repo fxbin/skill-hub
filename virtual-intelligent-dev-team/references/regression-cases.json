@@ -511,6 +511,30 @@
         "needs_git_workflow": true,
         "priority_agent": null
       }
+    },
+    {
+      "name": "repeated_failure_root_cause_debugging",
+      "text": "We already tried two fixes. It still fails in production. Stop guessing, inspect the logs, find the root cause, and only then propose the next step.",
+      "expect": {
+        "lead_agent": "Sentinel Architect (NB)",
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "mcp_registration_root_cause_debugging",
+      "text": "This MCP server registration still fails after multiple attempts. Read the logs, inspect the config, identify the root cause, and stage the safest fix.",
+      "expect": {
+        "lead_agent": "Sentinel Architect (NB)",
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
+        "needs_git_workflow": false,
+        "priority_agent": null
+      }
     }
   ],
   "process_plan_cases": [

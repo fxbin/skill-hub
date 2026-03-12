@@ -87,7 +87,24 @@ Use these runbooks when the user request implies a recurring multi-role pattern.
   3. Define rollback and stop conditions.
   4. Keep coordination tight; do not add assistants without a clear job.
 - Success markers:
-  - staged plan
-  - rollback thinking
-  - explicit stop conditions
-  - post-change verification
+- staged plan
+- rollback thinking
+- explicit stop conditions
+- post-change verification
+
+## 7. Repeated Failure and Root-Cause Debugging
+
+- Lead: `Sentinel Architect (NB)`
+- Common assistants: `Technical Trinity`, `Code Audit Council`
+- Use when: the user says previous fixes failed, the issue still reproduces, or asks for logs, root cause, or non-speculative debugging.
+- Flow:
+  1. Freeze guesswork and summarize what has already been tried.
+  2. Identify the missing evidence: logs, config, runtime state, repro steps, or recent diffs.
+  3. Form the smallest root-cause hypotheses that can be tested.
+  4. Validate before proposing a patch.
+  5. If a fix is required, define the safest next change and rollback path.
+- Success markers:
+  - evidence-first debugging
+  - root cause separated from symptom
+  - no speculative patching
+  - minimal validating next step

@@ -105,3 +105,29 @@ Use only when risk, ambiguity, or disagreement is high enough to justify stronge
 - Recommended governance mode:
   - [Roundtable / Sentinel-led staged execution]
 ```
+
+## 6. Root-Cause Escalation Handoff
+
+Use when `Sentinel Architect (NB)` takes over after repeated failed attempts or when the user explicitly asks for root-cause analysis.
+
+```markdown
+## Root-Cause Handoff
+- Lead: Sentinel Architect (NB)
+- Assistant: [Technical Trinity / Code Audit Council / other]
+- Symptom:
+  - [Observed failure]
+- Attempts already made:
+  - [Attempt 1]
+  - [Attempt 2]
+- Evidence available:
+  - [Logs / config / repro / recent diff]
+- Evidence missing:
+  - [What must be inspected next]
+- Root-cause hypotheses:
+  - [Hypothesis A]
+  - [Hypothesis B]
+- Smallest validating step:
+  - [Exact next action]
+- Guardrail:
+  - Do not propose a production fix before validation unless the user asks for containment only.
+```

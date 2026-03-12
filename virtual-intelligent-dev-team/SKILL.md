@@ -134,8 +134,19 @@ If the task matches a common multi-role pattern, load the closest runbook from `
 - Regulated or unfamiliar domain build
 - Frontend UX with backend coupling
 - High-risk production change
+- Repeated-failure or root-cause debugging
 
 Use runbooks to speed coordination shape, not to force a rigid ceremony.
+
+### Root-cause discipline
+
+When the user signals repeated failed attempts, unresolved production behavior, or explicitly asks for root-cause analysis:
+
+- Read `references/root-cause-escalation-playbook.md`.
+- Do not propose another blind patch first.
+- Require evidence such as logs, config, repro state, or recent changes.
+- Prefer `Sentinel Architect (NB)` as lead when "still fails", "already tried", "inspect logs", or "find the root cause" is central.
+- Attach `Technical Trinity` only when implementation or runtime analysis is needed after the evidence loop is clear.
 
 ## Git process rules
 
@@ -205,6 +216,7 @@ The lead agent owns the response structure. Assistants should only add the delta
 - Read `references/coordination-handoff-templates.md` for compact lead/assistant handoffs.
 - Read `references/dispatch-activation-cards.md` for assistant activation patterns.
 - Read `references/scenario-runbooks.md` for common multi-role execution shapes.
+- Read `references/root-cause-escalation-playbook.md` for repeated-failure and root-cause debugging.
 - Read `references/routing-score-matrix.md` for routing weights and confidence interpretation.
 - Read `references/routing-rules.json` as the source of truth for scoring and exclusions.
 

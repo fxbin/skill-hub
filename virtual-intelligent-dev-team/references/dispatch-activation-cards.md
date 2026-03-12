@@ -64,6 +64,8 @@ Use these cards to keep multi-agent activation crisp. They are internal prompts 
   - staged checkpoints
   - rollback strategy
   - stop conditions
+  - evidence needed before another fix attempt
+  - root-cause hypothesis and smallest validating step
 
 ## Java Virtuoso
 

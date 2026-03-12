@@ -657,6 +657,38 @@
         "assistant_agents contains Git Workflow Guardian",
         "needs_git_workflow is true"
       ]
+    },
+    {
+      "categories": [
+        "root-cause",
+        "debugging",
+        "high-risk"
+      ],
+      "prompt": "We already tried two fixes. It still fails in production. Stop guessing, inspect the logs, find the root cause, and only then propose the next step.",
+      "expected_output": "Repeated failed attempts plus explicit root-cause language should escalate to Sentinel Architect (NB), with Technical Trinity attached for runtime or implementation analysis.",
+      "expectations": [
+        "lead_agent is Sentinel Architect (NB)",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is false"
+      ],
+      "id": 52,
+      "files": []
+    },
+    {
+      "categories": [
+        "root-cause",
+        "debugging",
+        "config-runtime"
+      ],
+      "prompt": "This MCP server registration still fails after multiple attempts. Read the logs, inspect the config, identify the root cause, and stage the safest fix.",
+      "expected_output": "MCP or config-runtime root-cause requests should escalate to Sentinel Architect (NB) and attach Technical Trinity for system-level diagnosis.",
+      "expectations": [
+        "lead_agent is Sentinel Architect (NB)",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is false"
+      ],
+      "id": 53,
+      "files": []
     }
   ]
 }

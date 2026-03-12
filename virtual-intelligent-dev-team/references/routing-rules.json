@@ -240,6 +240,27 @@
       "add_assistants": [
         "Git Workflow Guardian"
       ]
+    },
+    {
+      "lead_agent": "Sentinel Architect (NB)",
+      "when_any_keywords": [
+        "root cause",
+        "inspect the logs",
+        "read the logs",
+        "service",
+        "backend",
+        "api",
+        "config",
+        "mcp",
+        "server",
+        "incident",
+        "??",
+        "??",
+        "??"
+      ],
+      "add_assistants": [
+        "Technical Trinity"
+      ]
     }
   ],
   "priority_routing_rules": [
@@ -529,6 +550,86 @@
         {
           "keyword": "零容错",
           "score": 5
+        },
+        {
+          "keyword": "root cause",
+          "score": 6
+        },
+        {
+          "keyword": "find the root cause",
+          "score": 6
+        },
+        {
+          "keyword": "still fails",
+          "score": 6
+        },
+        {
+          "keyword": "multiple attempts",
+          "score": 5
+        },
+        {
+          "keyword": "after multiple attempts",
+          "score": 5
+        },
+        {
+          "keyword": "already tried",
+          "score": 5
+        },
+        {
+          "keyword": "tried two fixes",
+          "score": 6
+        },
+        {
+          "keyword": "stop guessing",
+          "score": 6
+        },
+        {
+          "keyword": "inspect the logs",
+          "score": 6
+        },
+        {
+          "keyword": "read the logs",
+          "score": 6
+        },
+        {
+          "keyword": "production incident",
+          "score": 6
+        },
+        {
+          "keyword": "systematically debug",
+          "score": 5
+        },
+        {
+          "keyword": "stuck debugging",
+          "score": 5
+        },
+        {
+          "keyword": "??",
+          "score": 6
+        },
+        {
+          "keyword": "????",
+          "score": 6
+        },
+        {
+          "keyword": "????",
+          "score": 5
+        },
+        {
+          "keyword": "??",
+          "score": 6
+        },
+        {
+          "keyword": "????",
+          "score": 6
+        },
+        {
+          "keyword": "????",
+          "score": 5
+        },
+        {
+          "keyword": "????",
+          "score": 6
         }
       ],
       "negative": []
