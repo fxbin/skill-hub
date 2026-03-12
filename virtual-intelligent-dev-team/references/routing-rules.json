@@ -254,9 +254,9 @@
         "mcp",
         "server",
         "incident",
-        "??",
-        "??",
-        "??"
+        "故障",
+        "根因",
+        "日志"
       ],
       "add_assistants": [
         "Technical Trinity"
@@ -604,31 +604,31 @@
           "score": 5
         },
         {
-          "keyword": "??",
+          "keyword": "根因",
           "score": 6
         },
         {
-          "keyword": "????",
+          "keyword": "日志排查",
           "score": 6
         },
         {
-          "keyword": "????",
+          "keyword": "查看日志",
           "score": 5
         },
         {
-          "keyword": "??",
+          "keyword": "别猜",
           "score": 6
         },
         {
-          "keyword": "????",
+          "keyword": "重复失败",
           "score": 6
         },
         {
-          "keyword": "????",
+          "keyword": "多次尝试",
           "score": 5
         },
         {
-          "keyword": "????",
+          "keyword": "仍然失败",
           "score": 6
         }
       ],

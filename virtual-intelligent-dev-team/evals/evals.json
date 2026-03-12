@@ -582,7 +582,8 @@
         "assistant_agents contains Sentinel Architect (NB)",
         "assistant_agents contains Git Workflow Guardian",
         "needs_git_workflow is true",
-        "governance_plan.privy_council.selected_track is regular track"
+        "governance_plan.privy_council.selected_track is regular track",
+        "governance_plan.execution_contract.dri_required is true"
       ]
     },
     {
@@ -669,7 +670,9 @@
       "expectations": [
         "lead_agent is Sentinel Architect (NB)",
         "assistant_agents contains Technical Trinity",
-        "needs_git_workflow is false"
+        "needs_git_workflow is false",
+        "governance_plan.dual_sign.required is true",
+        "governance_plan.execution_contract.dri_agent is Sentinel Architect (NB)"
       ],
       "id": 52,
       "files": []
@@ -685,7 +688,9 @@
       "expectations": [
         "lead_agent is Sentinel Architect (NB)",
         "assistant_agents contains Technical Trinity",
-        "needs_git_workflow is false"
+        "needs_git_workflow is false",
+        "governance_plan.dual_sign.required is true",
+        "governance_plan.execution_contract.dri_agent is Sentinel Architect (NB)"
       ],
       "id": 53,
       "files": []

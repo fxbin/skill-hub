@@ -261,6 +261,7 @@ def render_markdown(result: dict[str, object]) -> str:
     tests = result["test_run"]
     validator = result["validator_run"]
     evals = result["eval_run"]
+    diff = result.get("diff")
 
     lines.append("# Benchmark Report")
     lines.append("")
@@ -274,6 +275,31 @@ def render_markdown(result: dict[str, object]) -> str:
     lines.append("")
     for item in evals["category_breakdown"]:
         lines.append(f"- `{item['category']}`: `{item['passed']}/{item['total']}`")
+    if isinstance(diff, dict):
+        lines.append("")
+        lines.append("## Diff Vs Previous")
+        lines.append("")
+        previous = diff.get("previous_summary", {})
+        if isinstance(previous, dict):
+            lines.append(
+                f"- Previous evals: `{previous.get('evals_passed', 0)}/{previous.get('evals_total', 0)}`"
+            )
+            lines.append(
+                f"- Current evals: `{evals['passed']}/{evals['total']}`"
+            )
+        new_failures = diff.get("new_failures", [])
+        resolved_failures = diff.get("resolved_failures", [])
+        category_changes = diff.get("category_changes", [])
+        lines.append(f"- New failures: `{len(new_failures)}`")
+        lines.append(f"- Resolved failures: `{len(resolved_failures)}`")
+        if category_changes:
+            lines.append("")
+            lines.append("### Category Changes")
+            lines.append("")
+            for item in category_changes:
+                lines.append(
+                    f"- `{item['category']}`: `{item['previous_passed']}/{item['previous_total']}` -> `{item['current_passed']}/{item['current_total']}`"
+                )
     lines.append("")
     lines.append("## Lead Distribution")
     lines.append("")
@@ -302,12 +328,100 @@ def render_markdown(result: dict[str, object]) -> str:
                 lines.append(f"  - {failure}")
     else:
         lines.append("- None")
+    if isinstance(diff, dict):
+        new_failures = diff.get("new_failures", [])
+        resolved_failures = diff.get("resolved_failures", [])
+        lines.append("")
+        lines.append("## Failure Delta")
+        lines.append("")
+        if new_failures:
+            lines.append("### New Failures")
+            lines.append("")
+            for item in new_failures:
+                lines.append(f"- `#{item['id']}` {item['prompt']}")
+        else:
+            lines.append("- New failures: None")
+        lines.append("")
+        if resolved_failures:
+            lines.append("### Resolved Failures")
+            lines.append("")
+            for item in resolved_failures:
+                lines.append(f"- `#{item['id']}` {item['prompt']}")
+        else:
+            lines.append("- Resolved failures: None")
     return "\n".join(lines) + "\n"
+
+
+def load_previous_result(path: Path) -> dict[str, object] | None:
+    if not path.exists():
+        return None
+    data = load_json(path)
+    if "eval_run" not in data or "summary" not in data:
+        return None
+    return data
+
+
+def build_diff(current: dict[str, object], previous: dict[str, object]) -> dict[str, object]:
+    current_cases = {
+        str(case.get("id")): case for case in current["eval_run"]["cases"] if isinstance(case, dict)
+    }
+    previous_cases = {
+        str(case.get("id")): case for case in previous["eval_run"]["cases"] if isinstance(case, dict)
+    }
+    new_failures: list[dict[str, object]] = []
+    resolved_failures: list[dict[str, object]] = []
+    for case_id, case in current_cases.items():
+        prev = previous_cases.get(case_id)
+        if prev is None:
+            continue
+        if bool(prev.get("passed")) and not bool(case.get("passed")):
+            new_failures.append({"id": case.get("id"), "prompt": case.get("prompt")})
+        if not bool(prev.get("passed")) and bool(case.get("passed")):
+            resolved_failures.append({"id": case.get("id"), "prompt": case.get("prompt")})
+
+    prev_categories = {
+        item["category"]: item
+        for item in previous["eval_run"].get("category_breakdown", [])
+        if isinstance(item, dict) and "category" in item
+    }
+    curr_categories = {
+        item["category"]: item
+        for item in current["eval_run"].get("category_breakdown", [])
+        if isinstance(item, dict) and "category" in item
+    }
+    all_categories = sorted(set(prev_categories) | set(curr_categories))
+    category_changes: list[dict[str, object]] = []
+    for category in all_categories:
+        prev = prev_categories.get(category, {"passed": 0, "total": 0})
+        curr = curr_categories.get(category, {"passed": 0, "total": 0})
+        if prev.get("passed") != curr.get("passed") or prev.get("total") != curr.get("total"):
+            category_changes.append(
+                {
+                    "category": category,
+                    "previous_passed": prev.get("passed", 0),
+                    "previous_total": prev.get("total", 0),
+                    "current_passed": curr.get("passed", 0),
+                    "current_total": curr.get("total", 0),
+                }
+            )
+
+    prev_summary = previous.get("summary", {})
+    return {
+        "previous_summary": {
+            "evals_passed": previous["eval_run"].get("passed", 0),
+            "evals_total": previous["eval_run"].get("total", 0),
+            "overall_passed": prev_summary.get("overall_passed"),
+        },
+        "new_failures": new_failures,
+        "resolved_failures": resolved_failures,
+        "category_changes": category_changes,
+    }
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run benchmark suite for virtual-intelligent-dev-team")
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR), help="Directory for benchmark artifacts")
+    parser.add_argument("--previous-output", help="Previous benchmark JSON report for diff comparison")
     parser.add_argument("--pretty", action="store_true", help="Pretty-print JSON summary to stdout")
     return parser.parse_args()
 
@@ -329,6 +443,10 @@ def main() -> None:
         "eval_run": eval_run,
     }
     result["summary"] = build_summary(test_run, validator_run, eval_run)
+    if args.previous_output:
+        previous = load_previous_result(Path(args.previous_output).resolve())
+        if previous is not None:
+            result["diff"] = build_diff(result, previous)
 
     json_path = output_dir / "benchmark-results.json"
     md_path = output_dir / "benchmark-report.md"
@@ -346,6 +464,9 @@ def main() -> None:
         "tests_passed": test_run["passed"],
         "validator_passed": validator_run["passed"],
     }
+    if "diff" in result:
+        stdout_payload["new_failures"] = len(result["diff"].get("new_failures", []))
+        stdout_payload["resolved_failures"] = len(result["diff"].get("resolved_failures", []))
     if args.pretty:
         print(json.dumps(stdout_payload, ensure_ascii=False, indent=2))
     else:
