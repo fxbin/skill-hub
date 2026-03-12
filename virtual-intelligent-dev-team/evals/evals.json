@@ -335,11 +335,11 @@
     {
       "id": 28,
       "prompt": "Improve the Tailwind admin UI, then commit, push, and isolate the work in a worktree.",
-      "expected_output": "Frontend UI work plus Git execution and worktree isolation should route to Git Workflow Guardian, attach World-Class Product Architect, and enable both process skills.",
+      "expected_output": "Frontend UI work plus Git execution and worktree isolation should keep World-Class Product Architect as lead, attach Git Workflow Guardian, and enable both process skills.",
       "files": [],
       "expectations": [
-        "lead_agent is Git Workflow Guardian",
-        "assistant_agents contains World-Class Product Architect",
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents contains Git Workflow Guardian",
         "needs_worktree is true",
         "needs_git_workflow is true",
         "process_skills contains using-git-worktrees",
@@ -459,12 +459,13 @@
     {
       "id": 39,
       "prompt": "帮我提个 commit 然后 push，那个 dashboard 也顺手改下。",
-      "expected_output": "Colloquial Git plus dashboard requests should route to Git Workflow Guardian and attach World-Class Product Architect.",
+      "expected_output": "Colloquial Git plus dashboard requests should keep World-Class Product Architect as lead and attach Git Workflow Guardian as the delivery copilot.",
       "files": [],
       "expectations": [
-        "lead_agent is Git Workflow Guardian",
-        "assistant_agents contains World-Class Product Architect",
-        "needs_git_workflow is true"
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents contains Git Workflow Guardian",
+        "needs_git_workflow is true",
+        "priority_routing agent is None"
       ]
     },
     {
@@ -502,7 +503,12 @@
     },
     {
       "id": 43,
-      "categories": ["startup-mvp", "strategy-domain", "frontend", "cross-domain"],
+      "categories": [
+        "startup-mvp",
+        "strategy-domain",
+        "frontend",
+        "cross-domain"
+      ],
       "prompt": "We need a startup MVP with product UX, backend delivery, and launch strategy.",
       "expected_output": "Startup MVP requests should route to Executive Trinity and attach World-Class Product Architect as the product and UX copilot while keeping governance in the regular track.",
       "files": [],
@@ -514,7 +520,12 @@
     },
     {
       "id": 44,
-      "categories": ["audit-fix", "review", "backend-stack", "git-workflow"],
+      "categories": [
+        "audit-fix",
+        "review",
+        "backend-stack",
+        "git-workflow"
+      ],
       "prompt": "This is a PR. Review this Django service for security issues, then tell me the exact fixes and the safest next delivery step.",
       "expected_output": "Audit-and-fix handoff scenarios should keep Code Audit Council as lead, attach Technical Trinity, and preserve review priority routing.",
       "files": [],
@@ -527,7 +538,11 @@
     },
     {
       "id": 45,
-      "categories": ["regulated-domain", "strategy-domain", "cross-domain"],
+      "categories": [
+        "regulated-domain",
+        "strategy-domain",
+        "cross-domain"
+      ],
       "prompt": "Design a healthcare workflow system with compliance constraints and technical landing.",
       "expected_output": "Regulated-domain runbook scenarios should route to Omni-Architect and attach Technical Trinity for technical landing.",
       "files": [],
@@ -539,7 +554,10 @@
     },
     {
       "id": 46,
-      "categories": ["frontend", "cross-domain"],
+      "categories": [
+        "frontend",
+        "cross-domain"
+      ],
       "prompt": "Redesign the billing settings UX, align it with the backend API contract, and make the states responsive.",
       "expected_output": "Frontend and backend coupling runbook scenarios should keep World-Class Product Architect as lead and attach Technical Trinity.",
       "files": [],
@@ -551,7 +569,11 @@
     },
     {
       "id": 47,
-      "categories": ["high-risk", "git-workflow", "backend-stack"],
+      "categories": [
+        "high-risk",
+        "git-workflow",
+        "backend-stack"
+      ],
       "prompt": "This is a production-critical payment migration. Research first, stage it, define rollback, and handle the PR safely.",
       "expected_output": "High-risk production change scenarios should attach Sentinel Architect (NB) and Git Workflow Guardian while keeping the owning specialist in charge.",
       "files": [],
@@ -561,6 +583,79 @@
         "assistant_agents contains Git Workflow Guardian",
         "needs_git_workflow is true",
         "governance_plan.privy_council.selected_track is regular track"
+      ]
+    },
+    {
+      "id": 48,
+      "categories": [
+        "review",
+        "git-workflow",
+        "backend-stack",
+        "boundary-conflict"
+      ],
+      "prompt": "Review this Spring Boot PR, then commit and push the fixes.",
+      "expected_output": "When review, git delivery, and Java stack signals conflict, review should remain lead while Git and implementation specialists attach as assistants.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Code Audit Council",
+        "assistant_agents contains Git Workflow Guardian",
+        "assistant_agents contains Java Virtuoso",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is true",
+        "priority_routing agent is Code Audit Council"
+      ]
+    },
+    {
+      "id": 49,
+      "categories": [
+        "frontend",
+        "cross-domain",
+        "git-workflow",
+        "boundary-conflict"
+      ],
+      "prompt": "Redesign the dashboard UX, align it with the backend API, then commit and push.",
+      "expected_output": "When frontend/backend coupling and explicit git delivery conflict, World-Class Product Architect should remain lead while Technical Trinity and Git Workflow Guardian attach as assistants.",
+      "files": [],
+      "expectations": [
+        "lead_agent is World-Class Product Architect",
+        "assistant_agents contains Technical Trinity",
+        "assistant_agents contains Git Workflow Guardian",
+        "needs_git_workflow is true",
+        "priority_routing agent is None"
+      ]
+    },
+    {
+      "id": 50,
+      "categories": [
+        "strategy-domain",
+        "cross-domain",
+        "git-workflow",
+        "boundary-conflict"
+      ],
+      "prompt": "Set the pricing strategy, then define the implementation plan and rollout PR flow.",
+      "expected_output": "When strategy, implementation, and rollout PR flow conflict, Executive Trinity should remain lead while Git Workflow Guardian and Technical Trinity attach.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Executive Trinity",
+        "assistant_agents contains Git Workflow Guardian",
+        "assistant_agents contains Technical Trinity",
+        "needs_git_workflow is true"
+      ]
+    },
+    {
+      "id": 51,
+      "categories": [
+        "regulated-domain",
+        "git-workflow",
+        "boundary-conflict"
+      ],
+      "prompt": "Design a healthcare backend, then open the PR and define rollback.",
+      "expected_output": "When regulated-domain architecture and explicit PR or rollback flow conflict, Omni-Architect should remain lead and Git Workflow Guardian should attach as the workflow copilot.",
+      "files": [],
+      "expectations": [
+        "lead_agent is Omni-Architect",
+        "assistant_agents contains Git Workflow Guardian",
+        "needs_git_workflow is true"
       ]
     }
   ]

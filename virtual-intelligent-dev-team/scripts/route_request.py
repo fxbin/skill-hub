@@ -1129,6 +1129,30 @@ def pick_process_lead_agent(process_skills: list[str], config: dict[str, object]
     return str(config.get("default_process_lead_agent", "Technical Trinity"))
 
 
+def rebalance_git_lead_for_semantic_owner(
+    lead_agent: str,
+    priority_route: dict[str, object] | None,
+    scores: dict[str, int],
+    needs_git_workflow: bool,
+) -> str:
+    if lead_agent != "Git Workflow Guardian" or not needs_git_workflow:
+        return lead_agent
+    if priority_route is not None:
+        return lead_agent
+
+    semantic_owners = [
+        "Code Audit Council",
+        "World-Class Product Architect",
+        "Omni-Architect",
+        "Executive Trinity",
+    ]
+    git_score = scores.get("Git Workflow Guardian", 0)
+    for agent in semantic_owners:
+        if scores.get(agent, 0) >= max(5, git_score // 2):
+            return agent
+    return lead_agent
+
+
 def pick_mode(
     confidence: float,
     sentinel_overlay: bool,
@@ -1195,6 +1219,13 @@ def route_request(text: str, config: dict[str, object], repo_path: Path) -> dict
         if priority_agent != "":
             lead_agent = priority_agent
             lead_score = scores.get(lead_agent, 0)
+    lead_agent = rebalance_git_lead_for_semantic_owner(
+        lead_agent=lead_agent,
+        priority_route=priority_route,
+        scores=scores,
+        needs_git_workflow=needs_git_workflow,
+    )
+    lead_score = scores.get(lead_agent, 0)
 
     process_only = lead_score == 0 and len(process_skills) > 0
     language_only = lead_score == 0 and len(process_skills) == 0 and len(detected_languages) > 0

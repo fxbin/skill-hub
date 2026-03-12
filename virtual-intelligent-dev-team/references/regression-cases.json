@@ -5,7 +5,9 @@
       "text": "请 review 这个 Java GC 问题并给出建议",
       "expect": {
         "lead_agent": "Code Audit Council",
-        "assistant_agents_contains": ["Java Virtuoso"],
+        "assistant_agents_contains": [
+          "Java Virtuoso"
+        ],
         "needs_git_workflow": false,
         "priority_agent": "Code Audit Council"
       }
@@ -45,7 +47,9 @@
       "text": "解决 rebase 冲突并给出最稳妥处理路径",
       "expect": {
         "lead_agent": "Git Workflow Guardian",
-        "assistant_agents_contains": ["Sentinel Architect (NB)"],
+        "assistant_agents_contains": [
+          "Sentinel Architect (NB)"
+        ],
         "needs_git_workflow": true,
         "priority_agent": "Git Workflow Guardian"
       }
@@ -55,7 +59,9 @@
       "text": "This SaaS is not growing. Set the strategy and also land the technical plan.",
       "expect": {
         "lead_agent": "Executive Trinity",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "priority_agent": null
       }
     },
@@ -64,7 +70,9 @@
       "text": "Design a system for an unfamiliar industry, including compliance and technical landing.",
       "expect": {
         "lead_agent": "Omni-Architect",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "priority_agent": null
       }
     },
@@ -83,7 +91,9 @@
       "text": "Review this Django API for security issues.",
       "expect": {
         "lead_agent": "Code Audit Council",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": false,
         "priority_agent": "Code Audit Council"
       }
@@ -113,7 +123,10 @@
       "text": "This is a PR. Review this Django service for security issues before merge.",
       "expect": {
         "lead_agent": "Code Audit Council",
-        "assistant_agents_contains": ["Git Workflow Guardian", "Technical Trinity"],
+        "assistant_agents_contains": [
+          "Git Workflow Guardian",
+          "Technical Trinity"
+        ],
         "needs_git_workflow": true,
         "priority_agent": "Code Audit Council"
       }
@@ -123,7 +136,9 @@
       "text": "Use FastAPI for a backend service, then commit, push, and isolate the work in a worktree.",
       "expect": {
         "lead_agent": "Git Workflow Guardian",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": true,
         "priority_agent": "Git Workflow Guardian"
       }
@@ -143,7 +158,9 @@
       "text": "Review this Go API for security issues before merge.",
       "expect": {
         "lead_agent": "Code Audit Council",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": true,
         "priority_agent": "Code Audit Council"
       }
@@ -153,7 +170,9 @@
       "text": "Use Go with Gin, then commit, push, and isolate the work in a worktree.",
       "expect": {
         "lead_agent": "Git Workflow Guardian",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": true,
         "priority_agent": "Git Workflow Guardian"
       }
@@ -173,7 +192,9 @@
       "text": "Review this NestJS API for security issues before merge.",
       "expect": {
         "lead_agent": "Code Audit Council",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": true,
         "priority_agent": "Code Audit Council"
       }
@@ -183,7 +204,9 @@
       "text": "Use Node.js with NestJS, then commit, push, and isolate the work in a worktree.",
       "expect": {
         "lead_agent": "Git Workflow Guardian",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": true,
         "priority_agent": "Git Workflow Guardian"
       }
@@ -243,7 +266,9 @@
       "text": "Redesign this React admin page and align the frontend flow with the backend API contract.",
       "expect": {
         "lead_agent": "World-Class Product Architect",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": false,
         "priority_agent": null
       }
@@ -253,7 +278,9 @@
       "text": "Redesign the login flow, align auth UX with the backend API, and handle error states clearly.",
       "expect": {
         "lead_agent": "World-Class Product Architect",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": false,
         "priority_agent": null
       }
@@ -273,7 +300,9 @@
       "text": "优化这个表单的错误提示、空状态和接口失败反馈，并和后端 API 契约对齐。",
       "expect": {
         "lead_agent": "World-Class Product Architect",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": false,
         "priority_agent": null
       }
@@ -282,10 +311,12 @@
       "name": "git_dashboard_mixed_request",
       "text": "帮我提个 commit 然后 push，那个 dashboard 也顺手改下。",
       "expect": {
-        "lead_agent": "Git Workflow Guardian",
-        "assistant_agents_contains": ["World-Class Product Architect"],
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents_contains": [
+          "Git Workflow Guardian"
+        ],
         "needs_git_workflow": true,
-        "priority_agent": "Git Workflow Guardian"
+        "priority_agent": null
       }
     },
     {
@@ -293,7 +324,9 @@
       "text": "做个 saas 增长方案，然后把 tech plan 也落一下。",
       "expect": {
         "lead_agent": "Executive Trinity",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": false,
         "priority_agent": null
       }
@@ -303,7 +336,9 @@
       "text": "review 下这个 nest 接口，顺便看下 auth flow。",
       "expect": {
         "lead_agent": "Code Audit Council",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": false,
         "priority_agent": "Code Audit Council"
       }
@@ -313,7 +348,9 @@
       "text": "给这个 djagno 登录表单做个 ux review，并和后端 api 对齐。",
       "expect": {
         "lead_agent": "World-Class Product Architect",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": false,
         "priority_agent": null
       }
@@ -322,10 +359,12 @@
       "name": "frontend_tailwind_worktree_git",
       "text": "Improve the Tailwind admin UI, then commit, push, and isolate the work in a worktree.",
       "expect": {
-        "lead_agent": "Git Workflow Guardian",
-        "assistant_agents_contains": ["World-Class Product Architect"],
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents_contains": [
+          "Git Workflow Guardian"
+        ],
         "needs_git_workflow": true,
-        "priority_agent": "Git Workflow Guardian"
+        "priority_agent": null
       }
     },
     {
@@ -343,7 +382,10 @@
       "text": "Review this Spring Boot API for security issues before merge.",
       "expect": {
         "lead_agent": "Code Audit Council",
-        "assistant_agents_contains": ["Java Virtuoso", "Git Workflow Guardian"],
+        "assistant_agents_contains": [
+          "Java Virtuoso",
+          "Git Workflow Guardian"
+        ],
         "needs_git_workflow": true,
         "priority_agent": "Code Audit Council"
       }
@@ -353,7 +395,9 @@
       "text": "Use Java with Spring Boot, then commit, push, and isolate the work in a worktree.",
       "expect": {
         "lead_agent": "Git Workflow Guardian",
-        "assistant_agents_contains": ["Java Virtuoso"],
+        "assistant_agents_contains": [
+          "Java Virtuoso"
+        ],
         "needs_git_workflow": true,
         "priority_agent": "Git Workflow Guardian"
       }
@@ -363,7 +407,9 @@
       "text": "We need a startup MVP with product UX, backend delivery, and launch strategy.",
       "expect": {
         "lead_agent": "Executive Trinity",
-        "assistant_agents_contains": ["World-Class Product Architect"],
+        "assistant_agents_contains": [
+          "World-Class Product Architect"
+        ],
         "priority_agent": null
       }
     },
@@ -372,7 +418,9 @@
       "text": "This is a PR. Review this Django service for security issues, then tell me the exact fixes and the safest next delivery step.",
       "expect": {
         "lead_agent": "Code Audit Council",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "needs_git_workflow": false,
         "priority_agent": "Code Audit Council"
       }
@@ -382,7 +430,9 @@
       "text": "Design a healthcare workflow system with compliance constraints and technical landing.",
       "expect": {
         "lead_agent": "Omni-Architect",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "priority_agent": null
       }
     },
@@ -391,7 +441,9 @@
       "text": "Redesign the billing settings UX, align it with the backend API contract, and make the states responsive.",
       "expect": {
         "lead_agent": "World-Class Product Architect",
-        "assistant_agents_contains": ["Technical Trinity"],
+        "assistant_agents_contains": [
+          "Technical Trinity"
+        ],
         "priority_agent": null
       }
     },
@@ -400,7 +452,62 @@
       "text": "This is a production-critical payment migration. Research first, stage it, define rollback, and handle the PR safely.",
       "expect": {
         "lead_agent": "Java Virtuoso",
-        "assistant_agents_contains": ["Sentinel Architect (NB)", "Git Workflow Guardian"],
+        "assistant_agents_contains": [
+          "Sentinel Architect (NB)",
+          "Git Workflow Guardian"
+        ],
+        "needs_git_workflow": true,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "review_git_language_conflict_shape",
+      "text": "Review this Spring Boot PR, then commit and push the fixes.",
+      "expect": {
+        "lead_agent": "Code Audit Council",
+        "assistant_agents_contains": [
+          "Git Workflow Guardian",
+          "Java Virtuoso",
+          "Technical Trinity"
+        ],
+        "needs_git_workflow": true,
+        "priority_agent": "Code Audit Council"
+      }
+    },
+    {
+      "name": "frontend_backend_git_conflict_shape",
+      "text": "Redesign the dashboard UX, align it with the backend API, then commit and push.",
+      "expect": {
+        "lead_agent": "World-Class Product Architect",
+        "assistant_agents_contains": [
+          "Technical Trinity",
+          "Git Workflow Guardian"
+        ],
+        "needs_git_workflow": true,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "strategy_implementation_git_conflict_shape",
+      "text": "Set the pricing strategy, then define the implementation plan and rollout PR flow.",
+      "expect": {
+        "lead_agent": "Executive Trinity",
+        "assistant_agents_contains": [
+          "Git Workflow Guardian",
+          "Technical Trinity"
+        ],
+        "needs_git_workflow": true,
+        "priority_agent": null
+      }
+    },
+    {
+      "name": "regulated_domain_git_conflict_shape",
+      "text": "Design a healthcare backend, then open the PR and define rollback.",
+      "expect": {
+        "lead_agent": "Omni-Architect",
+        "assistant_agents_contains": [
+          "Git Workflow Guardian"
+        ],
         "needs_git_workflow": true,
         "priority_agent": null
       }
@@ -447,7 +554,11 @@
     {
       "name": "command_policy",
       "type": "command_policy",
-      "commands": ["git status", "git push", "git push --force"],
+      "commands": [
+        "git status",
+        "git push",
+        "git push --force"
+      ],
       "expect": {
         "max_risk": "high",
         "decisions": {

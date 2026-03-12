@@ -1,14 +1,16 @@
 import importlib.util
+from contextlib import contextmanager
 import json
 import subprocess
 import sys
-import tempfile
 import unittest
 from pathlib import Path
+from uuid import uuid4
 
 
 SKILL_DIR = Path(__file__).resolve().parents[1]
 REPO_ROOT = SKILL_DIR.parent
+TMP_ROOT = REPO_ROOT / ".tmp-validation"
 ROUTE_SCRIPT = SKILL_DIR / "scripts" / "route_request.py"
 GUARDRAIL_SCRIPT = SKILL_DIR / "scripts" / "git_workflow_guardrail.py"
 VALIDATOR_SCRIPT = SKILL_DIR / "scripts" / "validate_virtual_team.py"
@@ -49,6 +51,14 @@ def git(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
 def configure_repo(repo: Path) -> None:
     git("config", "user.name", "Codex Test", cwd=repo)
     git("config", "user.email", "codex@example.com", cwd=repo)
+
+
+@contextmanager
+def make_tempdir():
+    TMP_ROOT.mkdir(parents=True, exist_ok=True)
+    path = TMP_ROOT / f"tmp-{uuid4().hex}"
+    path.mkdir(parents=True, exist_ok=False)
+    yield str(path)
 
 
 class RoutingTests(unittest.TestCase):
@@ -405,15 +415,15 @@ class RoutingTests(unittest.TestCase):
         self.assertIn("Technical Trinity", result["assistant_agents"])
         self.assertFalse(result["needs_git_workflow"])
 
-    def test_git_dashboard_mixed_request_adds_product_architect(self) -> None:
+    def test_git_dashboard_mixed_request_keeps_product_lead_with_git_assistant(self) -> None:
         result = route_request.route_request(
             "帮我提个 commit 然后 push，那个 dashboard 也顺手改下。",
             load_config(),
             repo_path=REPO_ROOT,
         )
 
-        self.assertEqual("Git Workflow Guardian", result["lead_agent"])
-        self.assertIn("World-Class Product Architect", result["assistant_agents"])
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertIn("Git Workflow Guardian", result["assistant_agents"])
         self.assertTrue(result["needs_git_workflow"])
 
     def test_strategy_colloquial_tech_plan_adds_technical_trinity(self) -> None:
@@ -449,15 +459,15 @@ class RoutingTests(unittest.TestCase):
         self.assertIn("Technical Trinity", result["assistant_agents"])
         self.assertFalse(result["needs_git_workflow"])
 
-    def test_frontend_tailwind_git_worktree_routes_to_git_guardian_with_product_assistant(self) -> None:
+    def test_frontend_tailwind_git_worktree_routes_to_product_lead_with_git_assistant(self) -> None:
         result = route_request.route_request(
             "Improve the Tailwind admin UI, then commit, push, and isolate the work in a worktree.",
             load_config(),
             repo_path=REPO_ROOT,
         )
 
-        self.assertEqual("Git Workflow Guardian", result["lead_agent"])
-        self.assertIn("World-Class Product Architect", result["assistant_agents"])
+        self.assertEqual("World-Class Product Architect", result["lead_agent"])
+        self.assertIn("Git Workflow Guardian", result["assistant_agents"])
         self.assertTrue(result["needs_worktree"])
         self.assertTrue(result["needs_git_workflow"])
         self.assertIn("using-git-worktrees", result["process_skills"])
@@ -507,7 +517,7 @@ class RoutingTests(unittest.TestCase):
 
 class GuardrailTests(unittest.TestCase):
     def test_g0_blocks_preexisting_staged_changes(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
+        with make_tempdir() as tmp:
             repo = Path(tmp)
             git("init", cwd=repo)
             configure_repo(repo)
@@ -521,32 +531,27 @@ class GuardrailTests(unittest.TestCase):
                 guardrail.validate_stage(repo=repo, stage="G0", commit_message=None, max_staged_files=20)
 
     def test_g3_reports_when_branch_is_behind(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            remote = root / "remote.git"
-            local_a = root / "local-a"
-            local_b = root / "local-b"
+        with make_tempdir() as tmp:
+            repo = Path(tmp)
+            git("init", cwd=repo)
+            configure_repo(repo)
+            git("checkout", "-b", "main", cwd=repo)
+            (repo / "demo.txt").write_text("v1\n", encoding="utf-8")
+            git("add", "demo.txt", cwd=repo)
+            git("commit", "-m", "feat: add demo file", cwd=repo)
+            base_sha = git("rev-parse", "HEAD", cwd=repo).stdout.strip()
 
-            git("init", "--bare", str(remote), cwd=root)
-            git("clone", str(remote), str(local_a), cwd=root)
-            configure_repo(local_a)
-            git("checkout", "-b", "main", cwd=local_a)
-            (local_a / "demo.txt").write_text("v1\n", encoding="utf-8")
-            git("add", "demo.txt", cwd=local_a)
-            git("commit", "-m", "feat: add demo file", cwd=local_a)
-            git("push", "-u", "origin", "main", cwd=local_a)
+            git("branch", "upstream-main", cwd=repo)
+            git("checkout", "upstream-main", cwd=repo)
+            (repo / "demo.txt").write_text("v1\nv2\n", encoding="utf-8")
+            git("add", "demo.txt", cwd=repo)
+            git("commit", "-m", "fix: update demo file", cwd=repo)
 
-            git("clone", str(remote), str(local_b), cwd=root)
-            configure_repo(local_b)
-            git("checkout", "main", cwd=local_b)
-            (local_b / "demo.txt").write_text("v1\nv2\n", encoding="utf-8")
-            git("add", "demo.txt", cwd=local_b)
-            git("commit", "-m", "fix: update demo file", cwd=local_b)
-            git("push", "origin", "main", cwd=local_b)
-
-            git("fetch", "origin", cwd=local_a)
+            git("checkout", "main", cwd=repo)
+            git("reset", "--hard", base_sha, cwd=repo)
+            git("branch", "--set-upstream-to=upstream-main", "main", cwd=repo)
             result = guardrail.validate_stage(
-                repo=local_a,
+                repo=repo,
                 stage="G3",
                 commit_message=None,
                 max_staged_files=20,

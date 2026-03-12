@@ -4,15 +4,17 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager
 import importlib.util
 import json
 import subprocess
-import tempfile
 from pathlib import Path
+from uuid import uuid4
 
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = SKILL_DIR.parent
+TMP_ROOT = REPO_ROOT / ".tmp-validation"
 CONFIG_PATH = SKILL_DIR / "references" / "routing-rules.json"
 CASES_PATH = SKILL_DIR / "references" / "regression-cases.json"
 ROUTE_SCRIPT = SKILL_DIR / "scripts" / "route_request.py"
@@ -53,7 +55,7 @@ def load_config() -> dict[str, object]:
 
 
 def run_git(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
+    proc = subprocess.run(
         ["git", *args],
         cwd=str(cwd),
         check=True,
@@ -61,11 +63,20 @@ def run_git(*args: str, cwd: Path) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         encoding="utf-8",
     )
+    return (proc.stdout or "").strip()
 
 
 def configure_repo(repo: Path) -> None:
     run_git("config", "user.name", "Codex Validator", cwd=repo)
     run_git("config", "user.email", "codex-validator@example.com", cwd=repo)
+
+
+@contextmanager
+def make_tempdir():
+    TMP_ROOT.mkdir(parents=True, exist_ok=True)
+    path = TMP_ROOT / f"tmp-{uuid4().hex}"
+    path.mkdir(parents=True, exist_ok=False)
+    yield str(path)
 
 
 def check(condition: bool, message: str) -> None:
@@ -131,7 +142,7 @@ def validate_process_plan_cases(cases: list[dict[str, object]]) -> list[dict[str
 
 
 def scenario_g0_staged_should_fail() -> None:
-    with tempfile.TemporaryDirectory() as tmp:
+    with make_tempdir() as tmp:
         repo = Path(tmp)
         run_git("init", cwd=repo)
         configure_repo(repo)
@@ -150,31 +161,27 @@ def scenario_g0_staged_should_fail() -> None:
 
 
 def scenario_g3_behind_should_report_sync() -> None:
-    with tempfile.TemporaryDirectory() as tmp:
-        root = Path(tmp)
-        remote = root / "remote.git"
-        local_a = root / "local-a"
-        local_b = root / "local-b"
+    with make_tempdir() as tmp:
+        repo = Path(tmp)
+        run_git("init", cwd=repo)
+        configure_repo(repo)
+        run_git("checkout", "-b", "main", cwd=repo)
+        (repo / "demo.txt").write_text("v1\n", encoding="utf-8")
+        run_git("add", "demo.txt", cwd=repo)
+        run_git("commit", "-m", "feat: add demo file", cwd=repo)
+        base_sha = run_git("rev-parse", "HEAD", cwd=repo)
 
-        run_git("init", "--bare", str(remote), cwd=root)
-        run_git("clone", str(remote), str(local_a), cwd=root)
-        configure_repo(local_a)
-        run_git("checkout", "-b", "main", cwd=local_a)
-        (local_a / "demo.txt").write_text("v1\n", encoding="utf-8")
-        run_git("add", "demo.txt", cwd=local_a)
-        run_git("commit", "-m", "feat: add demo file", cwd=local_a)
-        run_git("push", "-u", "origin", "main", cwd=local_a)
-        run_git("symbolic-ref", "HEAD", "refs/heads/main", cwd=remote)
+        run_git("branch", "upstream-main", cwd=repo)
+        run_git("checkout", "upstream-main", cwd=repo)
+        (repo / "demo.txt").write_text("v1\nv2\n", encoding="utf-8")
+        run_git("add", "demo.txt", cwd=repo)
+        run_git("commit", "-m", "fix: update demo file", cwd=repo)
 
-        run_git("clone", str(remote), str(local_b), cwd=root)
-        configure_repo(local_b)
-        (local_b / "demo.txt").write_text("v1\nv2\n", encoding="utf-8")
-        run_git("add", "demo.txt", cwd=local_b)
-        run_git("commit", "-m", "fix: update demo file", cwd=local_b)
-        run_git("push", "origin", "main", cwd=local_b)
+        run_git("checkout", "main", cwd=repo)
+        run_git("reset", "--hard", base_sha, cwd=repo)
+        run_git("branch", "--set-upstream-to=upstream-main", "main", cwd=repo)
 
-        run_git("fetch", "origin", cwd=local_a)
-        result = guardrail.validate_stage(repo=local_a, stage="G3", commit_message=None, max_staged_files=20)
+        result = guardrail.validate_stage(repo=repo, stage="G3", commit_message=None, max_staged_files=20)
         details = result.get("details", {})
         check(result.get("passed") is True, "g3 behind case: expected pass")
         check(int(details.get("behind", 0)) == 1, "g3 behind case: expected behind=1")
