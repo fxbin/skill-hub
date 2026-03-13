@@ -8,3 +8,4 @@ __pycache__/
 **/evals/benchmark-report.md
 **/evals/benchmark-results.json
 **/evals/benchmark-results/
+.tmp-*
