@@ -39,7 +39,7 @@
     {
       "id": "virtual-intelligent-dev-team",
       "display_name": "Virtual Intelligent Dev Team",
-      "version": "v4.0",
+      "version": "v4.1.0",
       "path": "virtual-intelligent-dev-team",
       "positioning": "personal-skill",
       "default_prompt": "Use $virtual-intelligent-dev-team to auto-route this request, enforce deterministic git guardrails, and coordinate specialized agents across engineering, architecture, security, workflow, strategy, and frontend UX.",
