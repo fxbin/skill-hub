@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wechat Content Forge"
+  short_description: "Plan, style-check, draft, and revise Wechat articles"
+  default_prompt: "Use $wechat-content-forge to plan topics, confirm style, draft, revise, and review a Wechat public-account article."
