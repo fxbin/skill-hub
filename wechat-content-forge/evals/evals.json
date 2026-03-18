@@ -6,56 +6,122 @@
       "category": "topic-planning",
       "prompt": "Use $wechat-content-forge to turn this vague idea into a公众号选题：我想写一篇关于在 AI 时代重新开始写日记的文章，基于我的个人风格，不要直接出终稿，先给我选题陈述、目标读者、主结论和标题方向。",
       "expected_output": "Starts from topic clarification rather than full drafting, and produces topic statement, reader target, core conclusion, and title directions.",
-      "files": []
+      "files": [
+        "references/topic-router.md",
+        "references/workflow-playbook.md"
+      ]
     },
     {
       "id": 2,
       "category": "style-confirmation",
       "prompt": "Use $wechat-content-forge to do 文风确认 before writing. The topic is 为什么记录仍然重要. Route it to the right母题, pick the most relevant built-in corpus anchors, and tell me what must be preserved, what must be avoided, and how this piece should end.",
       "expected_output": "Identifies the right topic cluster, uses built-in corpus anchors, and outputs a concrete style confirmation block before drafting.",
-      "files": []
+      "files": [
+        "references/topic-router.md",
+        "references/style-baseline.md",
+        "references/life-notes-style-system.md"
+      ]
     },
     {
       "id": 3,
       "category": "growth-drafting",
       "prompt": "Use $wechat-content-forge to draft a公众号 article on 努力不是为了赢过别人，而是为了让自己有更多选择. Keep my personal tone, use the growth theme anchors, and give me a readable outline plus a first draft.",
       "expected_output": "Routes to the growth theme, keeps a restrained personal tone, and returns both outline and first draft instead of generic motivational prose.",
-      "files": []
+      "files": [
+        "references/topic-router.md",
+        "references/pass-criteria.md"
+      ]
     },
     {
       "id": 4,
-      "category": "ai-tool-article",
-      "prompt": "Use $wechat-content-forge to write a工具向公众号稿，主题是：如何把零散网页资料整理成适合喂 AI 的 Markdown。不要写成标准工具号，要保留个人动机、个人判断和明确交付。",
-      "expected_output": "Produces a tool article with clear reader value while preserving personal motive and judgment instead of collapsing into a generic tutorial tone.",
-      "files": []
+      "category": "ai-tool-research",
+      "prompt": "Use $wechat-content-forge to handle a time-sensitive AI tool article. The topic is: 最近有哪些靠谱的方法可以把零散网页资料整理成适合喂 AI 的 Markdown。先不要直接写终稿，先走 research loop，列出已确认事实、待确认事项、可写入正文的判断，再给我一个是否值得继续写的结论。",
+      "expected_output": "Enters the research loop before drafting, separates confirmed facts from pending checks, avoids overclaiming, and gives a clear go or no-go decision for continuing.",
+      "files": [
+        "references/research-playbook.md",
+        "references/topic-router.md"
+      ]
     },
     {
       "id": 5,
-      "category": "rewrite-existing-draft",
-      "prompt": "Use $wechat-content-forge to revise my draft. It currently reads like AI: the structure is okay, but the voice is too smooth, too complete, and lacks my停顿感与真实感. Keep the argument, fix the tone, and tell me what changed.",
-      "expected_output": "Performs a tone-focused rewrite, preserves the core argument, reduces AI smoothness, and explains the main revision moves.",
-      "files": []
+      "category": "ai-tool-article",
+      "prompt": "Use $wechat-content-forge to write a工具向公众号稿，主题是：如何把零散网页资料整理成适合喂 AI 的 Markdown。不要写成标准工具号，要保留个人动机、个人判断和明确交付。",
+      "expected_output": "Produces a tool article with clear reader value while preserving personal motive and judgment instead of collapsing into a generic tutorial tone.",
+      "files": [
+        "references/topic-router.md",
+        "references/pass-criteria.md",
+        "references/research-playbook.md"
+      ]
     },
     {
       "id": 6,
-      "category": "pass-review",
-      "prompt": "Use $wechat-content-forge to review a finished公众号 draft. I need you to separate two judgments: 像不像我 and 能不能发. Then review it against the built-in pass criteria and tell me the strongest point, the fatal weakness, and which step it should return to next.",
-      "expected_output": "Applies separate style-vs-publishability judgments and uses the pass criteria to produce a concrete review with a clear next-step fallback.",
-      "files": []
+      "category": "rewrite-existing-draft",
+      "prompt": "Use $wechat-content-forge to revise my draft. It currently reads like AI: the structure is okay, but the voice is too smooth, too complete, and lacks my停顿感与真实感. Keep the argument, fix the tone, and tell me what changed.",
+      "expected_output": "Performs a tone-focused rewrite, preserves the core argument, reduces AI smoothness, and explains the main revision moves.",
+      "files": [
+        "references/style-baseline.md",
+        "references/pass-criteria.md"
+      ]
     },
     {
       "id": 7,
-      "category": "fallback-no-corpus",
-      "prompt": "Use $wechat-content-forge for a case where I only give you one sentence: 我想写一篇关于普通生活也值得认真过的公众号. Assume I did not point to any extra samples. Do not stall. Use the built-in corpus, tell me which anchors you picked, and move forward with the minimum viable workflow.",
-      "expected_output": "Falls back to built-in corpus anchors without blocking, explains chosen anchors, and continues with a minimum viable workflow.",
-      "files": []
+      "category": "pass-review",
+      "prompt": "Use $wechat-content-forge to review a finished公众号 draft. I need you to separate two judgments: 像不像我 and 能不能发. Then review it against the built-in pass criteria and tell me the strongest point, the fatal weakness, and which step it should return to next.",
+      "expected_output": "Applies separate style-vs-publishability judgments and uses the pass criteria to produce a concrete review with a clear next-step fallback.",
+      "files": [
+        "references/pass-criteria.md",
+        "references/publish-gate.md"
+      ]
     },
     {
       "id": 8,
+      "category": "publish-gate",
+      "prompt": "Use $wechat-content-forge to run the final 发布门禁 on a draft that feels almost ready. I want PASS / WARN / FAIL for 像不像我, 能不能发, and 发了值不值. If one item fails, tell me exactly which stage the draft should go back to.",
+      "expected_output": "Runs the stricter publish gate with three separate verdicts, names the fatal issue, and maps any failure to a specific rollback stage.",
+      "files": [
+        "references/publish-gate.md",
+        "references/pass-criteria.md"
+      ]
+    },
+    {
+      "id": 9,
+      "category": "fallback-no-corpus",
+      "prompt": "Use $wechat-content-forge for a case where I only give you one sentence: 我想写一篇关于普通生活也值得认真过的公众号. Assume I did not point to any extra samples. Do not stall. Use the built-in corpus, tell me which anchors you picked, and move forward with the minimum viable workflow.",
+      "expected_output": "Falls back to built-in corpus anchors without blocking, explains chosen anchors, and continues with a minimum viable workflow.",
+      "files": [
+        "references/corpus-index.md",
+        "references/topic-router.md"
+      ]
+    },
+    {
+      "id": 10,
       "category": "topic-routing-regression",
       "prompt": "Use $wechat-content-forge to handle two very different requests and show that you route them differently: 1) 为什么我想重新开始写日记 2) 如何用 AI 工具搭建自己的小工作流. I care about whether the voice, structure, and anchor selection change with the topic.",
       "expected_output": "Demonstrates topic-aware routing by changing corpus anchor selection, structure, and tone between a reflective diary piece and an AI workflow piece.",
-      "files": []
+      "files": [
+        "references/topic-router.md",
+        "references/research-playbook.md"
+      ]
+    },
+    {
+      "id": 11,
+      "category": "operations-planning",
+      "prompt": "Use $wechat-content-forge to plan the next month of my公众号, not just one article. Build 4 content pillars from my existing mother-themes, suggest a 2-week publishing rhythm, and tell me which topic should be written first and why.",
+      "expected_output": "Switches into the operations branch, proposes content pillars and a publishing rhythm, and still keeps the plan grounded in the user's personal mother-themes rather than generic growth tactics.",
+      "files": [
+        "references/operations-playbook.md",
+        "references/topic-router.md"
+      ]
+    },
+    {
+      "id": 12,
+      "category": "series-sequencing",
+      "prompt": "Use $wechat-content-forge to treat this as a series-design task: I already wrote one article about重新开始写日记, and now I want the next two pieces to continue the thread without repeating myself. Tell me what the next article should carry forward, what should be held back, and how the three pieces differ in reader takeaway.",
+      "expected_output": "Designs a series-aware follow-up plan, distinguishes article roles, and explains how each piece carries a different payoff instead of repeating the same theme.",
+      "files": [
+        "references/operations-playbook.md",
+        "references/workflow-playbook.md"
+      ]
     }
   ]
 }

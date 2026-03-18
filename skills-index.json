@@ -1,7 +1,7 @@
 {
   "repository": "skill-hub",
   "owner": "fxbin",
-  "updated_at": "2026-03-11",
+  "updated_at": "2026-03-18",
   "skills": [
     {
       "id": "skill-forge",
@@ -17,6 +17,24 @@
         "benchmark",
         "portfolio",
         "scaffolding"
+      ]
+    },
+    {
+      "id": "wechat-content-forge",
+      "display_name": "Wechat Content Forge",
+      "version": "v1.2.0",
+      "path": "wechat-content-forge",
+      "positioning": "personal-skill",
+      "default_prompt": "Use $wechat-content-forge to route this Wechat article by mother-theme, lock voice from the built-in corpus, handle research when the topic is time-sensitive, and separate '像不像我' from '能不能发' before finalizing.",
+      "tags": [
+        "writing",
+        "wechat",
+        "public-account",
+        "style",
+        "editing",
+        "publish-gate",
+        "research",
+        "operations"
       ]
     },
     {
