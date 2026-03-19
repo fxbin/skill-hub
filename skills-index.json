@@ -22,10 +22,10 @@
     {
       "id": "wechat-content-forge",
       "display_name": "Wechat Content Forge",
-      "version": "v1.2.0",
+      "version": "v1.3.0",
       "path": "wechat-content-forge",
       "positioning": "personal-skill",
-      "default_prompt": "Use $wechat-content-forge to route this Wechat article by mother-theme, lock voice from the built-in corpus, handle research when the topic is time-sensitive, and separate '像不像我' from '能不能发' before finalizing.",
+      "default_prompt": "Use $wechat-content-forge to route this Wechat article by mother-theme, produce a research brief when facts are unstable, lock voice from the built-in corpus, score the draft through the publish gate, and sequence follow-up topics when this belongs to a series.",
       "tags": [
         "writing",
         "wechat",
@@ -34,7 +34,8 @@
         "editing",
         "publish-gate",
         "research",
-        "operations"
+        "operations",
+        "series"
       ]
     },
     {

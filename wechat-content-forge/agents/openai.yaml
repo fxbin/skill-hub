@@ -1,4 +1,4 @@
 interface:
   display_name: "Wechat Content Forge"
-  short_description: "Route, style-lock, draft, and publish-gate Wechat articles"
-  default_prompt: "Use $wechat-content-forge to route this Wechat article by mother-theme, lock voice from the built-in corpus, handle research when the topic is time-sensitive, and separate '像不像我' from '能不能发' before finalizing."
+  short_description: "Plan, research, score, and sequence Wechat article output"
+  default_prompt: "Use $wechat-content-forge to route this Wechat article by mother-theme, produce a research brief when facts are unstable, lock voice from the built-in corpus, score the draft through the publish gate, and sequence follow-up topics when this belongs to a series."
