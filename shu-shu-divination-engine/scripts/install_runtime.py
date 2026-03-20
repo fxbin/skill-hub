@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import importlib
 import subprocess
 import sys
 from pathlib import Path
@@ -19,6 +20,27 @@ def run(command: list[str]) -> None:
         raise SystemExit(completed.returncode)
 
 
+def verify_imports() -> None:
+    checks = {
+        "cn2an": "cn2an",
+        "ephem": "ephem",
+        "kinliuren": "kinliuren",
+        "kinqimen": "kinqimen",
+        "numpy": "numpy",
+        "proces": "proces",
+        "sxtwl": "sxtwl",
+    }
+    missing: list[str] = []
+    for package, module_name in checks.items():
+        try:
+            importlib.import_module(module_name)
+        except ModuleNotFoundError:
+            missing.append(package)
+    if missing:
+        names = ", ".join(missing)
+        raise SystemExit(f"runtime dependencies installed incompletely, missing imports: {names}")
+
+
 def main() -> int:
     if not REQUIREMENTS_FILE.exists():
         raise SystemExit(f"missing requirements file: {REQUIREMENTS_FILE}")
@@ -26,6 +48,7 @@ def main() -> int:
     run([sys.executable, "-m", "ensurepip", "--upgrade"])
     run([sys.executable, "-m", "pip", "install", "-r", str(REQUIREMENTS_FILE)])
     run([sys.executable, "-m", "pip", "install", "--no-deps", "kinqimen==0.0.6.6"])
+    verify_imports()
     print("runtime dependencies installed")
     return 0
 

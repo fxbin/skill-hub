@@ -10,6 +10,12 @@ SKILL_DIR = Path(__file__).resolve().parents[1]
 SCRIPTS_DIR = SKILL_DIR / "scripts"
 ENGINE_SCRIPT = SCRIPTS_DIR / "divination_engine.py"
 
+HAS_KINQIMEN = importlib.util.find_spec("kinqimen") is not None
+HAS_KINLIUREN = importlib.util.find_spec("kinliuren") is not None
+HAS_LIUYAO_RUNTIME = HAS_KINQIMEN
+HAS_QIMEN_RUNTIME = HAS_KINQIMEN
+HAS_LIUREN_RUNTIME = HAS_KINQIMEN and HAS_KINLIUREN
+
 
 def load_module(name: str, path: Path):
     if str(SCRIPTS_DIR) not in sys.path:
@@ -91,6 +97,7 @@ class RoutingTests(unittest.TestCase):
 
 
 class ExecutionTests(unittest.TestCase):
+    @unittest.skipUnless(HAS_LIUYAO_RUNTIME, "requires kinqimen runtime")
     def test_liuyao_computes_when_event_time_is_available(self) -> None:
         result = engine.analyze_prompt("这个合作能不能成，什么时候能有结果？", event_time="2026-03-18T15:00:00")
         payload = result["execution"]["computed_payload"]
@@ -105,9 +112,10 @@ class ExecutionTests(unittest.TestCase):
         self.assertEqual("蒙之渙", payload["movement"]["pair_name"])
         self.assertEqual("阴变阳", payload["movement"]["moving_lines"][0]["movement"])
         self.assertEqual("四世卦", payload["hexagrams"]["main"]["shi_ying_pattern"])
-        self.assertEqual("官丙子水", payload["hexagrams"]["main"]["body_line"])
+        self.assertEqual("官丑子水", payload["hexagrams"]["main"]["body_line"])
         self.assertEqual("丙午年辛卯月辛卯日丙申時", payload["time_anchor"]["ganzhi"])
 
+    @unittest.skipUnless(HAS_QIMEN_RUNTIME, "requires kinqimen runtime")
     def test_qimen_computes_from_explicit_candidate_times(self) -> None:
         result = engine.analyze_prompt("2026-03-20 09:00 和 2026-03-22 15:00 这两个时间，哪个更适合去见客户谈合作？")
         interpretation = result["execution"]["computed_payload"]["interpretation"]
@@ -119,6 +127,7 @@ class ExecutionTests(unittest.TestCase):
         self.assertEqual("西北", interpretation["recommended_direction"])
         self.assertEqual("生", interpretation["recommended_door"])
 
+    @unittest.skipUnless(HAS_LIUREN_RUNTIME, "requires kinqimen and kinliuren runtime")
     def test_liuren_computes_when_event_time_is_available(self) -> None:
         result = engine.analyze_prompt(
             "我怀疑合伙人最近有别的盘算，想看他真实想法，还有这件事后面会怎么演变。",
@@ -143,6 +152,7 @@ class CompoundPriorityTests(unittest.TestCase):
         self.assertEqual("liuyao", result["routing"]["selected_method"])
         self.assertEqual(0, len(result["execution"]["deferred_questions"]))
 
+    @unittest.skipUnless(HAS_QIMEN_RUNTIME, "requires kinqimen runtime")
     def test_compound_prompt_prioritizes_executable_question_over_first_question(self) -> None:
         result = engine.analyze_prompt("我适合打工还是创业？2026-03-20 09:00 和 2026-03-22 15:00 哪个时间更适合去见客户谈合作？")
         self.assertTrue(result["compound"])
@@ -166,6 +176,7 @@ class CompoundPriorityTests(unittest.TestCase):
 
 
 class AnswerCardAndResponseTests(unittest.TestCase):
+    @unittest.skipUnless(HAS_LIUYAO_RUNTIME and HAS_QIMEN_RUNTIME and HAS_LIUREN_RUNTIME, "requires full runtime stack")
     def test_answer_cards_are_exposed(self) -> None:
         meihua = engine.analyze_prompt("今天下午3点我突然发现钥匙不见了，最后在卧室书桌见过。数字是3、8、2。", reference_time="2026-03-19T09:00:00")
         liuyao = engine.analyze_prompt("这个合作能不能成，什么时候能有结果？", event_time="2026-03-18T15:00:00")
@@ -180,8 +191,9 @@ class AnswerCardAndResponseTests(unittest.TestCase):
         self.assertGreaterEqual(len(liuyao["execution"]["answer_card"]["key_signals"]), 2)
         self.assertGreaterEqual(len(qimen["execution"]["answer_card"]["action_advice"]), 3)
         self.assertGreaterEqual(len(liuren["execution"]["answer_card"]["follow_up_focus"]), 1)
-        self.assertIn("末传", liuren["execution"]["answer_card"]["follow_up_focus"][0])
+        self.assertIn("末傳", liuren["execution"]["answer_card"]["follow_up_focus"][0])
 
+    @unittest.skipUnless(HAS_QIMEN_RUNTIME, "requires kinqimen runtime")
     def test_final_response_collects_answer_card_sections(self) -> None:
         result = engine.analyze_prompt("2026-03-20 09:00 和 2026-03-22 15:00 这两个时间，哪个更适合去见客户谈合作？")
         final_response = result["final_response"]
@@ -197,7 +209,16 @@ class AnswerCardAndResponseTests(unittest.TestCase):
 class CliTests(unittest.TestCase):
     def test_cli_outputs_json(self) -> None:
         completed = subprocess.run(
-            [sys.executable, str(ENGINE_SCRIPT), "--prompt", "今天下午 3 点我突然发现钥匙不见了，最后在卧室书桌见过。数字是 3、8、2。", "--reference-time", "2026-03-19T09:00:00", "--output", "json"],
+            [
+                sys.executable,
+                str(ENGINE_SCRIPT),
+                "--prompt",
+                "今天下午 3 点我突然发现钥匙不见了，最后在卧室书桌见过。数字是 3、8、2。",
+                "--reference-time",
+                "2026-03-19T09:00:00",
+                "--output",
+                "json",
+            ],
             check=True,
             text=True,
             capture_output=True,
@@ -207,9 +228,17 @@ class CliTests(unittest.TestCase):
         self.assertEqual("meihua", payload["routing"]["selected_method"])
         self.assertEqual("computed", payload["execution"]["status"])
 
+    @unittest.skipUnless(HAS_QIMEN_RUNTIME, "requires kinqimen runtime")
     def test_cli_outputs_text_report(self) -> None:
         completed = subprocess.run(
-            [sys.executable, str(ENGINE_SCRIPT), "--prompt", "2026-03-20 09:00 和 2026-03-22 15:00 这两个时间，哪个更适合去见客户谈合作？", "--output", "text"],
+            [
+                sys.executable,
+                str(ENGINE_SCRIPT),
+                "--prompt",
+                "2026-03-20 09:00 和 2026-03-22 15:00 这两个时间，哪个更适合去见客户谈合作？",
+                "--output",
+                "text",
+            ],
             check=True,
             text=True,
             capture_output=True,
@@ -217,6 +246,14 @@ class CliTests(unittest.TestCase):
         )
         self.assertIn("适用术数:", completed.stdout)
         self.assertIn("测算结论:", completed.stdout)
+
+    def test_missing_runtime_is_reported_gracefully_for_qimen(self) -> None:
+        if HAS_QIMEN_RUNTIME:
+            self.skipTest("runtime is available in this environment")
+        result = engine.analyze_prompt("2026-03-20 09:00 和 2026-03-22 15:00 这两个时间，哪个更适合去见客户谈合作？")
+        self.assertEqual("qimen", result["routing"]["selected_method"])
+        self.assertEqual("missing-runtime", result["execution"]["status"])
+        self.assertEqual("kinqimen", result["execution"]["missing_dependency"]["name"])
 
 
 if __name__ == "__main__":

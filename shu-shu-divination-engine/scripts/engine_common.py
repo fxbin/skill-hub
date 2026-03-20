@@ -12,6 +12,8 @@ from pathlib import Path
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+KINQIMEN_INSTALL_HINT = "请先在虚拟环境中运行 `python scripts/install_runtime.py` 安装 kinqimen 运行依赖。"
+KINLIUREN_INSTALL_HINT = "请先在虚拟环境中运行 `python scripts/install_runtime.py` 安装 kinliuren 与 kinqimen 运行依赖。"
 
 PALACE_DIRECTIONS = {
     "乾": "西北",
@@ -50,10 +52,24 @@ RELATIVE_DEFAULT_MERIDIEM = {
     "明早": "早上",
 }
 
+
+class RuntimeDependencyError(RuntimeError):
+    """Raised when a deterministic adapter is missing a required runtime dependency."""
+
+    def __init__(self, dependency: str, install_hint: str, detail: str | None = None) -> None:
+        message = detail or f"missing runtime dependency: {dependency}"
+        super().__init__(message)
+        self.dependency = dependency
+        self.install_hint = install_hint
+        self.detail = detail or ""
+
 def _alias_kinqimen_config() -> None:
     if "config" in sys.modules:
         return
-    spec = importlib.util.find_spec("kinqimen.config")
+    try:
+        spec = importlib.util.find_spec("kinqimen.config")
+    except ModuleNotFoundError:
+        return
     if spec is None:
         return
     module = importlib.import_module("kinqimen.config")
@@ -65,6 +81,38 @@ def ensure_runtime_paths() -> None:
     # kinqimen upstream uses bare `import config`; map it explicitly to the
     # installed package submodule so we do not need ad-hoc sys.path hacks.
     _alias_kinqimen_config()
+
+
+def _load_module(module_name: str, *, dependency: str, install_hint: str):
+    try:
+        return importlib.import_module(module_name)
+    except ModuleNotFoundError as exc:
+        if exc.name not in {module_name, dependency, "config"} and not str(exc.name).startswith(f"{dependency}."):
+            raise
+        raise RuntimeDependencyError(
+            dependency,
+            install_hint,
+            f"缺少运行依赖 {dependency}，当前无法加载 {module_name}。",
+        ) from exc
+
+
+def load_kinqimen_config():
+    """Load kinqimen config lazily so the whole engine does not fail at import time."""
+    ensure_runtime_paths()
+    return _load_module("kinqimen.config", dependency="kinqimen", install_hint=KINQIMEN_INSTALL_HINT)
+
+
+def load_qimen_class():
+    """Load the kinqimen Qimen class lazily."""
+    ensure_runtime_paths()
+    module = _load_module("kinqimen.kinqimen", dependency="kinqimen", install_hint=KINQIMEN_INSTALL_HINT)
+    return module.Qimen
+
+
+def load_liuren_class():
+    """Load the kinliuren Liuren class lazily."""
+    module = _load_module("kinliuren.kinliuren", dependency="kinliuren", install_hint=KINLIUREN_INSTALL_HINT)
+    return module.Liuren
 
 
 def apply_meridiem(hour: int, meridiem: str | None) -> int:

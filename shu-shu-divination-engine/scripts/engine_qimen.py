@@ -5,12 +5,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from engine_common import PALACE_DIRECTIONS, ensure_runtime_paths, split_iso_datetime
-
-
-ensure_runtime_paths()
-
-from kinqimen.kinqimen import Qimen  # type: ignore  # noqa: E402
+from engine_common import PALACE_DIRECTIONS, load_qimen_class, split_iso_datetime
 
 
 DOOR_WEIGHTS = {"開": 4, "生": 4, "休": 3, "景": 1, "杜": 0, "驚": -2, "死": -3, "傷": -4}
@@ -55,6 +50,7 @@ def rank_palaces(pan: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def evaluate_time_candidate(event_time: str) -> dict[str, Any]:
+    Qimen = load_qimen_class()
     year, month, day, hour, minute = split_iso_datetime(event_time)
     pan = Qimen(year, month, day, hour, minute).pan(1)
     ranked = rank_palaces(pan)

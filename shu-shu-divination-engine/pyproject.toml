@@ -3,6 +3,14 @@ name = "shu-shu-divination-engine"
 version = "0.1.0"
 description = "Deterministic routing and execution engine for Chinese divination workflows."
 requires-python = ">=3.12,<3.13"
+dependencies = [
+  "cn2an==0.5.23",
+  "ephem==4.2.1",
+  "kinliuren==0.1.2.9",
+  "numpy==2.4.3",
+  "proces==0.1.7",
+  "sxtwl==2.0.6",
+]
 
 [tool.uv]
 package = false

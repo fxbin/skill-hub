@@ -17,6 +17,7 @@ if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
 from engine_common import (  # noqa: E402
+    RuntimeDependencyError,
     extract_explicit_datetimes,
     normalize_candidate_times,
     normalize_datetime_text,
@@ -758,44 +759,55 @@ def analyze_prompt(
         result["execution"]["next_step"] = "如果你愿意继续，我就按这个术数进入起测。"
         return finalize_result(result)
 
-    if selected_method == "meihua":
-        chosen_numbers, basis = choose_numbers(merged_inputs["numbers"], merged_inputs["event_time"])
-        if not chosen_numbers or basis is None:
-            result["execution"]["status"] = "needs_input"
-            result["execution"]["summary"] = "梅花易数还不能直接起测。"
-            result["execution"]["next_step"] = missing[0]
+    try:
+        if selected_method == "meihua":
+            chosen_numbers, basis = choose_numbers(merged_inputs["numbers"], merged_inputs["event_time"])
+            if not chosen_numbers or basis is None:
+                result["execution"]["status"] = "needs_input"
+                result["execution"]["summary"] = "梅花易数还不能直接起测。"
+                result["execution"]["next_step"] = missing[0]
+                return finalize_result(result)
+            execution = build_meihua_reading(primary_item["question"], chosen_numbers, basis, merged_inputs["event_time"])
+        elif selected_method == "liuyao":
+            if missing:
+                result["execution"]["status"] = "needs_input"
+                result["execution"]["summary"] = "六爻还不能直接起卦。"
+                result["execution"]["next_step"] = missing[0]
+                return finalize_result(result)
+            execution = compute_liuyao(merged_inputs["event_time"], primary_item["question"])
+            execution["answer_card"] = execution["computed_payload"]["answer_card"]
+            execution["computed_payload"]["interpretation"]["core"] = execution["computed_payload"]["interpretation"]["structured"]
+        elif selected_method == "qimen":
+            if missing:
+                result["execution"]["status"] = "needs_input"
+                result["execution"]["summary"] = "奇门还不能直接起盘。"
+                result["execution"]["next_step"] = missing[0]
+                return finalize_result(result)
+            qimen_times = merged_inputs["candidate_times"] or ([merged_inputs["event_time"]] if merged_inputs["event_time"] else [])
+            execution = compute_qimen(qimen_times, primary_item["question"])
+            execution["answer_card"] = execution["computed_payload"]["answer_card"]
+        elif selected_method == "liuren":
+            if missing:
+                result["execution"]["status"] = "needs_input"
+                result["execution"]["summary"] = "大六壬还不能直接起课。"
+                result["execution"]["next_step"] = missing[0]
+                return finalize_result(result)
+            execution = compute_liuren(merged_inputs["event_time"], primary_item["question"])
+            execution["answer_card"] = execution["computed_payload"]["answer_card"]
+        else:
+            result["execution"]["status"] = "adjacent-rewrite"
+            result["execution"]["summary"] = "这题暂时没有落到四术数可执行入口。"
+            result["execution"]["next_step"] = "先把问题收缩成一个短期、单一、可验证的预测问题。"
             return finalize_result(result)
-        execution = build_meihua_reading(primary_item["question"], chosen_numbers, basis, merged_inputs["event_time"])
-    elif selected_method == "liuyao":
-        if missing:
-            result["execution"]["status"] = "needs_input"
-            result["execution"]["summary"] = "六爻还不能直接起卦。"
-            result["execution"]["next_step"] = missing[0]
-            return finalize_result(result)
-        execution = compute_liuyao(merged_inputs["event_time"], primary_item["question"])
-        execution["answer_card"] = execution["computed_payload"]["answer_card"]
-        execution["computed_payload"]["interpretation"]["core"] = execution["computed_payload"]["interpretation"]["structured"]
-    elif selected_method == "qimen":
-        if missing:
-            result["execution"]["status"] = "needs_input"
-            result["execution"]["summary"] = "奇门还不能直接起盘。"
-            result["execution"]["next_step"] = missing[0]
-            return finalize_result(result)
-        qimen_times = merged_inputs["candidate_times"] or ([merged_inputs["event_time"]] if merged_inputs["event_time"] else [])
-        execution = compute_qimen(qimen_times, primary_item["question"])
-        execution["answer_card"] = execution["computed_payload"]["answer_card"]
-    elif selected_method == "liuren":
-        if missing:
-            result["execution"]["status"] = "needs_input"
-            result["execution"]["summary"] = "大六壬还不能直接起课。"
-            result["execution"]["next_step"] = missing[0]
-            return finalize_result(result)
-        execution = compute_liuren(merged_inputs["event_time"], primary_item["question"])
-        execution["answer_card"] = execution["computed_payload"]["answer_card"]
-    else:
-        result["execution"]["status"] = "adjacent-rewrite"
-        result["execution"]["summary"] = "这题暂时没有落到四术数可执行入口。"
-        result["execution"]["next_step"] = "先把问题收缩成一个短期、单一、可验证的预测问题。"
+    except RuntimeDependencyError as exc:
+        result["execution"]["status"] = "missing-runtime"
+        result["execution"]["summary"] = f"当前环境缺少 {exc.dependency} 运行依赖，暂时不能继续起测。"
+        result["execution"]["next_step"] = exc.install_hint
+        result["execution"]["missing_dependency"] = {
+            "name": exc.dependency,
+            "detail": exc.detail,
+            "install_hint": exc.install_hint,
+        }
         return finalize_result(result)
 
     result["execution"].update(execution)

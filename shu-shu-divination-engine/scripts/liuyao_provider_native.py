@@ -9,12 +9,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from engine_common import ensure_runtime_paths, split_iso_datetime
-
-
-ensure_runtime_paths()
-
-from kinqimen import config  # type: ignore  # noqa: E402
+from engine_common import load_kinqimen_config, split_iso_datetime
 
 
 TRIGRAM_LINE_CODES = {
@@ -101,6 +96,7 @@ def _find_six_mons(day_ganzhi: str) -> list[str]:
 
 
 def _compute_native_core(event_time: str) -> dict[str, Any]:
+    config = load_kinqimen_config()
     year, month, day, hour, minute = split_iso_datetime(event_time)
     ganzhi = config.gangzhi(year, month, day, hour, minute)
     lunar = config.lunar_date_d(year, month, day)

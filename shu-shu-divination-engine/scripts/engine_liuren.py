@@ -5,13 +5,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from engine_common import ensure_runtime_paths, split_iso_datetime
-
-
-ensure_runtime_paths()
-
-from kinliuren.kinliuren import Liuren  # type: ignore  # noqa: E402
-from kinqimen import config  # type: ignore  # noqa: E402
+from engine_common import load_kinqimen_config, load_liuren_class, split_iso_datetime
 
 
 MONTH_NAMES = {
@@ -101,6 +95,8 @@ def build_answer_card(normalized_question: str, interpretation: dict[str, Any]) 
 
 def compute_liuren(event_time: str, normalized_question: str) -> dict[str, Any]:
     """Compute a Da Liu Ren reading for hidden motives and unfolding dynamics."""
+    config = load_kinqimen_config()
+    Liuren = load_liuren_class()
     year, month, day, hour, minute = split_iso_datetime(event_time)
     jieqi = config.jq(year, month, day, hour, minute)
     lunar = config.lunar_date_d(year, month, day)
