@@ -7,6 +7,7 @@
 | id | 名称 | 版本 | 路径 | 说明 |
 | --- | --- | --- | --- | --- |
 | `skill-forge` | Skill Forge | `v5.1.0` | `skill-forge/` | 仓库内统一的 skill 工程平台，覆盖脚手架、修复、eval、benchmark、portfolio 报告与迭代优化。 |
+| `shu-shu-divination-engine` | Shu Shu Divination Engine | `v1.1.0` | `shu-shu-divination-engine/` | 在梅花易数、六爻、奇门遁甲、大六壬之间完成分流、起测、结构化测算与预测性追问，并提供本地引擎与评测链。 |
 | `wechat-content-forge` | Wechat Content Forge | `v1.3.0` | `wechat-content-forge/` | 基于个人语料完成公众号选题、研究简报、文风确认、初稿、发布评分卡与系列化运营规划。 |
 | `webnovel-style-forge` | Webnovel Style Forge | `v2.0.0` | `webnovel-style-forge/` | 提炼网文文风、降低 AI 味、构建可复用风格提示词，并通过对照与迭代持续打磨。 |
 | `virtual-intelligent-dev-team` | Virtual Intelligent Dev Team | `v4.1.0` | `virtual-intelligent-dev-team/` | 自动路由到合适专家智能体并组织协作交付，覆盖开发、架构、安全、Git 流程、业务策略和前端 UX。 |
@@ -16,6 +17,7 @@
 ```text
 skill-hub/
 ├── skill-forge/
+├── shu-shu-divination-engine/
 ├── wechat-content-forge/
 ├── webnovel-style-forge/
 ├── virtual-intelligent-dev-team/

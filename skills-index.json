@@ -1,7 +1,7 @@
 {
   "repository": "skill-hub",
   "owner": "fxbin",
-  "updated_at": "2026-03-18",
+  "updated_at": "2026-03-20",
   "skills": [
     {
       "id": "skill-forge",
@@ -17,6 +17,26 @@
         "benchmark",
         "portfolio",
         "scaffolding"
+      ]
+    },
+    {
+      "id": "shu-shu-divination-engine",
+      "display_name": "Shu Shu Divination Engine",
+      "version": "v1.1.0",
+      "path": "shu-shu-divination-engine",
+      "positioning": "personal-skill",
+      "default_prompt": "Use $shu-shu-divination-engine to choose among 梅花易数、六爻、奇门遁甲、大六壬, collect the minimum起测信息, and continue into formal起测、structured测算, and next-step predictive follow-up instead of stopping at method recommendation.",
+      "tags": [
+        "divination",
+        "shu-shu",
+        "routing",
+        "execution",
+        "prediction",
+        "meihua",
+        "liuyao",
+        "qimen",
+        "liuren",
+        "eval"
       ]
     },
     {
