@@ -1,0 +1,4 @@
+interface:
+  display_name: "Shu Shu Divination Engine"
+  short_description: "Route, execute, and continue Chinese divination workflows."
+  default_prompt: "Use $shu-shu-divination-engine to choose among 梅花易数、六爻、奇门遁甲、大六壬, collect the minimum起测信息, and continue into formal起测、structured测算, and next-step predictive follow-up instead of stopping at method recommendation."

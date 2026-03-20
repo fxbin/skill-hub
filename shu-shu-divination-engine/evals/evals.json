@@ -1,0 +1,234 @@
+{
+  "skill_name": "shu-shu-divination-engine",
+  "evals": [
+    {
+      "id": 1,
+      "name": "失物短期判断进入梅花",
+      "category": "engine-routing",
+      "prompt": "我钥匙今天早上突然找不到了，最后一次确认是在卧室书桌。数字是 3、8、2。",
+      "expected_output": "应路由到梅花易数，并直接进入短期寻物测算。",
+      "files": [],
+      "inputs": {
+        "reference_time": "2026-03-19T09:00:00"
+      },
+      "assertions": [
+        {
+          "type": "equals",
+          "path": "routing.selected_method",
+          "value": "meihua"
+        },
+        {
+          "type": "equals",
+          "path": "execution.status",
+          "value": "computed"
+        },
+        {
+          "type": "equals",
+          "path": "execution.basis",
+          "value": "numbers"
+        },
+        {
+          "type": "gte",
+          "path": "compound_analysis.supporting_fragments.__len__",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "六爻单题成败应期",
+      "category": "engine-routing",
+      "prompt": "这个合作能不能成，什么时候能有结果？",
+      "expected_output": "应路由到六爻，并在给定起测时间后完成起卦与结构化输出。",
+      "files": [],
+      "inputs": {
+        "event_time": "2026-03-18T15:00:00"
+      },
+      "assertions": [
+        {
+          "type": "equals",
+          "path": "routing.selected_method",
+          "value": "liuyao"
+        },
+        {
+          "type": "equals",
+          "path": "execution.status",
+          "value": "computed"
+        },
+        {
+          "type": "equals",
+          "path": "execution.computed_payload.hexagrams.main.name",
+          "value": "蒙"
+        },
+        {
+          "type": "equals",
+          "path": "execution.computed_payload.movement.focus_line",
+          "value": "六五"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "奇门候选时间比较",
+      "category": "engine-routing",
+      "prompt": "2026-03-20 09:00 和 2026-03-22 15:00 这两个时间，哪个更适合去见客户谈合作？",
+      "expected_output": "应路由到奇门遁甲，并比较两个候选时间给出推荐时点和方向。",
+      "files": [],
+      "assertions": [
+        {
+          "type": "equals",
+          "path": "routing.selected_method",
+          "value": "qimen"
+        },
+        {
+          "type": "equals",
+          "path": "execution.status",
+          "value": "computed"
+        },
+        {
+          "type": "equals",
+          "path": "execution.computed_payload.interpretation.recommended_direction",
+          "value": "西北"
+        },
+        {
+          "type": "equals",
+          "path": "execution.computed_payload.interpretation.recommended_door",
+          "value": "生"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "大六壬查看暗线动机",
+      "category": "engine-routing",
+      "prompt": "我怀疑合伙人最近有别的盘算，想看他真实想法，还有这件事后面会怎么演变。",
+      "expected_output": "应路由到大六壬，并输出暗线与演变的结构化判断。",
+      "files": [],
+      "inputs": {
+        "event_time": "2026-03-18T15:00:00"
+      },
+      "assertions": [
+        {
+          "type": "equals",
+          "path": "routing.selected_method",
+          "value": "liuren"
+        },
+        {
+          "type": "equals",
+          "path": "execution.status",
+          "value": "computed"
+        },
+        {
+          "type": "equals",
+          "path": "execution.computed_payload.pattern.0",
+          "value": "賊尅"
+        },
+        {
+          "type": "contains",
+          "path": "execution.answer_card.follow_up_focus.0",
+          "value": "末传"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "八字命盘问题分流到相邻体系",
+      "category": "adjacent-routing",
+      "prompt": "请你分析这个八字命盘，推演从 2026 年开始的大运流年走势，重点看事业、婚姻、健康。再告诉我 2026 年适不适合把写作当主业。",
+      "expected_output": "应明确指出这更像八字命盘问题，而不是直接硬套四术数。",
+      "files": [],
+      "assertions": [
+        {
+          "type": "equals",
+          "path": "execution.status",
+          "value": "adjacent-rewrite"
+        },
+        {
+          "type": "equals",
+          "path": "routing.adjacent_system",
+          "value": "bazi"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "复合问题优先选择可执行主问题",
+      "category": "compound-routing",
+      "prompt": "我适合打工还是创业？什么时候能走财运？2026年把写作当主业行不行？",
+      "expected_output": "应先拆分，不机械取第一句，并选出最适合进入执行链的主问题。",
+      "files": [],
+      "assertions": [
+        {
+          "type": "equals",
+          "path": "compound",
+          "value": true
+        },
+        {
+          "type": "equals",
+          "path": "compound_analysis.primary_index",
+          "value": 2
+        },
+        {
+          "type": "equals",
+          "path": "compound_analysis.primary_question",
+          "value": "2026年把写作当主业行不行"
+        },
+        {
+          "type": "equals",
+          "path": "routing.selected_method",
+          "value": "liuyao"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "只要方法推荐时停止在分流层",
+      "category": "interaction-control",
+      "prompt": "先别算，只告诉我下周见客户哪天更顺，这类问题更适合六爻还是奇门？",
+      "expected_output": "应尊重用户只要方法推荐的意图，不强行展开完整测算。",
+      "files": [],
+      "assertions": [
+        {
+          "type": "equals",
+          "path": "method_only_request",
+          "value": true
+        },
+        {
+          "type": "equals",
+          "path": "execution.status",
+          "value": "method-only"
+        },
+        {
+          "type": "equals",
+          "path": "routing.selected_method",
+          "value": "qimen"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "信息不足时进入补锚点状态",
+      "category": "input-gap",
+      "prompt": "我钥匙找不到了，我现在只想到两个数字 3 和 8，帮我看看今天还能不能找到。",
+      "expected_output": "应分流到梅花，但不能硬算，应明确提示还缺第 3 个数字或起测时间。",
+      "files": [],
+      "assertions": [
+        {
+          "type": "equals",
+          "path": "routing.selected_method",
+          "value": "meihua"
+        },
+        {
+          "type": "equals",
+          "path": "execution.status",
+          "value": "needs_input"
+        },
+        {
+          "type": "contains",
+          "path": "execution.missing_inputs.0",
+          "value": "3 个随机数字"
+        }
+      ]
+    }
+  ]
+}

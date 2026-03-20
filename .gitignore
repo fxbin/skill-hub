@@ -1,11 +1,30 @@
 __pycache__/
 *.pyc
+.venv/
+# 运行时临时虚拟环境，不应提交
+**/.tmp-native-runtime-venv/
 .skill-metrics/
 .vscode/
 *-workspace/
+**/uv-sync.log
+**/uv.lock
+# 评测生成物：报告 / 结果 / 状态 / 中间批次
+**/evals/engine-eval-results.json
+**/evals/engine-eval-report.md
+**/evals/engine-eval-status.md
+**/evals/conversation-eval-results.json
+**/evals/conversation-eval-report.md
+**/evals/conversation-eval-status.md
 **/evals/portfolio-report.json
 **/evals/portfolio-report.md
 **/evals/benchmark-report.md
 **/evals/benchmark-results.json
 **/evals/benchmark-results/
+**/evals/trigger-eval-report.md
+**/evals/trigger-eval-status.md
+**/evals/trigger-eval-results.json
+**/evals/trigger-batches/
+**/evals/trigger-matrix/
+**/evals/trigger-matrix-report.md
+**/evals/trigger-matrix-results.json
 .tmp-*

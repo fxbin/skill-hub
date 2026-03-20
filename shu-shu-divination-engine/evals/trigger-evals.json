@@ -1,0 +1,82 @@
+[
+  {
+    "query": "我和前任断联三个月了，最近她突然点赞我朋友圈。我想知道还有没有复合机会，大概什么时候会有明确结果。",
+    "should_trigger": true
+  },
+  {
+    "query": "这个合作我不只想知道能不能签，我更想知道卡点在哪，什么时候容易推进下来。",
+    "should_trigger": true
+  },
+  {
+    "query": "下周去上海见客户，我有周二上午和周四下午两个时间，你帮我看哪次去谈更顺。",
+    "should_trigger": true
+  },
+  {
+    "query": "我怀疑合伙人最近有别的盘算，想看他真实想法，还有这件事后面会怎么演变。",
+    "should_trigger": true
+  },
+  {
+    "query": "我今天出门前突然有点不安，下午这趟行程适不适合去，帮我选个合适的术数先问我关键点。",
+    "should_trigger": true
+  },
+  {
+    "query": "我不懂玄学，你别急着算，先告诉我这种问题该用梅花、六爻、奇门还是大六壬。",
+    "should_trigger": true
+  },
+  {
+    "query": "我有一大段背景，里面混了工作、感情和搬家三件事，你先帮我拆开，再判断各自适合怎么问。",
+    "should_trigger": true
+  },
+  {
+    "query": "请帮我把这个很泛的人生问题改成能预测的问题，我现在最想看的是 2026 年把写作当主业行不行。",
+    "should_trigger": true
+  },
+  {
+    "query": "我钥匙今早在家里找不到了，我只想快速判断今天还能不能找到，大概还在不在家里。",
+    "should_trigger": true
+  },
+  {
+    "query": "我想问的是对方到底怎么想，不只是结果，你先判断最适合用哪门术数。",
+    "should_trigger": true
+  },
+  {
+    "query": "大师，我的八字是身强还是身弱，喜神和忌神分别是什么？",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我看一下我的太阳、月亮和上升星座分别是什么，哪个影响最大。",
+    "should_trigger": false
+  },
+  {
+    "query": "我家床头朝哪个方向最好，明年哪个方位不能动土？",
+    "should_trigger": false
+  },
+  {
+    "query": "今年要不要补财库，还阴债到底有没有用？",
+    "should_trigger": false
+  },
+  {
+    "query": "我最近总失眠焦虑，想知道是不是抑郁症，应该吃什么药。",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我算一下我大概能活到多少岁，哪几年有血光之灾。",
+    "should_trigger": false
+  },
+  {
+    "query": "我想用塔罗看看这个月爱情运势，你直接抽牌吧。",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我设计一个客厅收纳方案，最好顺便看起来温馨一点。",
+    "should_trigger": false
+  },
+  {
+    "query": "我想知道家里鱼缸摆哪里最旺财，户型缺角要怎么化解。",
+    "should_trigger": false
+  },
+  {
+    "query": "请给我解释一下十神里的食神和伤官有什么区别。",
+    "should_trigger": false
+  }
+]

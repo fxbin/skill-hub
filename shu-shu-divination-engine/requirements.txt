@@ -1,0 +1,9 @@
+# 运行时公共依赖。
+# `kinqimen` 需单独以 --no-deps 安装，因为其上游元数据把 ephem 锁死在 4.1.3，
+# 但当前 Python 3.12 环境实际需要 ephem 4.2.1 才能正常安装运行。
+cn2an==0.5.23
+ephem==4.2.1
+kinliuren==0.1.2.9
+numpy==2.4.3
+proces==0.1.7
+sxtwl==2.0.6

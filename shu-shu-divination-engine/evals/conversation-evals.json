@@ -1,0 +1,160 @@
+{
+  "skill_name": "shu-shu-divination-engine",
+  "evals": [
+    {
+      "id": 1,
+      "name": "梅花缺锚点后补数字完成起测",
+      "turns": [
+        {
+          "prompt": "我钥匙找不到了，我现在只想到两个数字 3 和 8，帮我看看今天还能不能找到。",
+          "assertions": [
+            {
+              "type": "equals",
+              "path": "routing.selected_method",
+              "value": "meihua"
+            },
+            {
+              "type": "equals",
+              "path": "execution.status",
+              "value": "needs_input"
+            }
+          ]
+        },
+        {
+          "inputs": {
+            "numbers": [3, 8, 2]
+          },
+          "assertions": [
+            {
+              "type": "equals",
+              "path": "routing.selected_method",
+              "value": "meihua"
+            },
+            {
+              "type": "equals",
+              "path": "execution.status",
+              "value": "computed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "六爻缺时间后补起测时间完成起卦",
+      "turns": [
+        {
+          "prompt": "这个合作能不能成，什么时候能有结果？",
+          "assertions": [
+            {
+              "type": "equals",
+              "path": "routing.selected_method",
+              "value": "liuyao"
+            },
+            {
+              "type": "equals",
+              "path": "execution.status",
+              "value": "needs_input"
+            }
+          ]
+        },
+        {
+          "inputs": {
+            "event_time": "2026-03-18T15:00:00"
+          },
+          "assertions": [
+            {
+              "type": "equals",
+              "path": "execution.status",
+              "value": "computed"
+            },
+            {
+              "type": "equals",
+              "path": "execution.computed_payload.hexagrams.main.name",
+              "value": "蒙"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "奇门先路由后补候选时间完成比较",
+      "turns": [
+        {
+          "prompt": "下周去上海见客户，我有周二上午和周四下午两个时间，你帮我看哪次去谈更顺。",
+          "assertions": [
+            {
+              "type": "equals",
+              "path": "routing.selected_method",
+              "value": "qimen"
+            },
+            {
+              "type": "equals",
+              "path": "execution.status",
+              "value": "needs_input"
+            }
+          ]
+        },
+        {
+          "inputs": {
+            "candidate_times": [
+              "2026-03-20T09:00:00",
+              "2026-03-22T15:00:00"
+            ]
+          },
+          "assertions": [
+            {
+              "type": "equals",
+              "path": "execution.status",
+              "value": "computed"
+            },
+            {
+              "type": "equals",
+              "path": "execution.computed_payload.interpretation.recommended_direction",
+              "value": "西北"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "大六壬先识别暗线问题后补时间完成起课",
+      "turns": [
+        {
+          "prompt": "我怀疑合伙人最近有别的盘算，想看他真实想法，还有这件事后面会怎么演变。",
+          "assertions": [
+            {
+              "type": "equals",
+              "path": "routing.selected_method",
+              "value": "liuren"
+            },
+            {
+              "type": "equals",
+              "path": "execution.status",
+              "value": "needs_input"
+            }
+          ]
+        },
+        {
+          "inputs": {
+            "event_time": "2026-03-18T15:00:00"
+          },
+          "assertions": [
+            {
+              "type": "equals",
+              "path": "execution.status",
+              "value": "computed"
+            },
+            {
+              "type": "equals",
+              "path": "execution.computed_payload.pattern.0",
+              "value": "賊尅"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
